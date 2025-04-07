@@ -12,3 +12,15 @@ git config --list 				# 확인
 # github에 upload 할 폴더 지정
 # upload용 최상위 폴더에 README.md 파일 생성
 # md파일에는 마크업랭귀지 작성가능 (# 하나가 제일 큰글씨, ##이많아질수록 작은글씨)
+# .gitignore 파일 안에 디렉토리 적을 필요없이 폴더명/ 만 적어줄것 (디렉토리x, C:\ai_x\할필요없음/.gitignore)
+
+##
+	cmd cd "경로"
+	경로에서 git init #업로드 폴더에 .git생성
+	git add . #.으로 적을 경우 전부다 올림
+	git commit -m "first commit" (히스토리 버전 이름)
+	git branch -M main (branch 생성 - branch 생성을 하지 않을 경우 master로)
+	git remote add origin https://github.com/id # k-j-hyun
+	git remote -v (확인 - 선택)
+	git push -u origin main (branch에 올리기 branch를 생성하지 않았다면 master)
+##

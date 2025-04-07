@@ -40,4 +40,10 @@ git config --list 				# 확인
 			add . commit -m "같은버전" push origin main
 			##
 
+# 집에와서 clone https://github.com/k-j-hyun/ai_x.git 하기
+# git pull origin main 까지 완료
+# git-scm 설치후 lrl.kr/eiHQS 에서 nvidia exe 설치후 3번 덮어씌우고 아나콘다 설치하기
+# 25.04.07. 집에와서 NVIDIA CUDA 설치중 오류 발생 사진찍어 강사님께 질문하기!
+# Anaconda3 설치후 anaconda prompt 관리자 권한 실행 후 -  pip install tensorflow==2.10 명령어 입력시 오류 발생 사진찍어 강사님께 질문하기!
+git add note -> git commit -m "last" -> git push origin main 입력하기
 

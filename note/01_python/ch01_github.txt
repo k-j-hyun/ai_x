@@ -20,7 +20,9 @@ git config --list 				# 확인
 	git add . #.으로 적을 경우 전부다 올림
 	git commit -m "first commit" (히스토리 버전 이름)
 	git branch -M main (branch 생성 - branch 생성을 하지 않을 경우 master로)
-	git remote add origin https://github.com/id # k-j-hyun
+	git remote add origin https://github.com/id.git/ # k-j-hyun/ai_x/.git/
 	git remote -v (확인 - 선택)
 	git push -u origin main (branch에 올리기 branch를 생성하지 않았다면 master)
 ##
+
+test2

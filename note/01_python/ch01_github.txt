@@ -24,5 +24,9 @@ git config --list 				# 확인
 	git remote -v (확인 - 선택)
 	git push -u origin main (branch에 올리기 branch를 생성하지 않았다면 master)
 ##
+	##추가 수정 github 동기화 or 버전만들기
+	git add .
+	git commit -m "second" #second가 버전이름(second, third ... )
+	git push -u origin main
+	##
 
-test2

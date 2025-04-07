@@ -1,0 +1,14 @@
+github-scm
+
+git-scm.com/downloads
+	# pypi.org : 무료 라이브러리 도움말 사이트
+	# tiobe.com/tiobe-index : 언어 순위
+
+*git bash
+git config --global user.name "id" 		# nickname
+git config --global user.email "email" 		# a@a.a
+git config --list 				# 확인
+
+# github에 upload 할 폴더 지정
+# upload용 최상위 폴더에 README.md 파일 생성
+# md파일에는 마크업랭귀지 작성가능 (# 하나가 제일 큰글씨, ##이많아질수록 작은글씨)

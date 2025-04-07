@@ -37,5 +37,7 @@ git config --list 				# 확인
 			git add .
 			git commit -m "last"
 			git push origin main
+			add . commit -m "같은버전" push origin main
 			##
+
 

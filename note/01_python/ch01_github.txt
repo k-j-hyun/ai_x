@@ -29,4 +29,13 @@ git config --list 				# 확인
 	git commit -m "second" #second가 버전이름(second, third ... )
 	git push -u origin main
 	##
+		##협업 or 다른pc와 동기화하기
+		git clone 주소 폴더이름 (https://github.com/k-j-hyun/ai_x.git)
+		git pull origin main (git 저장소와 내 pc간 동기화)
+		##
+			##수정후
+			git add .
+			git commit -m "last"
+			git push origin main
+			##
 

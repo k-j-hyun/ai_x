@@ -6,3 +6,9 @@
 		3.zip file 압축풀기
 		4.Anaconda3 setup##
 
+	##anaconda3 uninstall ->
+	user - 내pc - anaconda폴더 삭제까지 한 후에 재설치 할것##
+
+#Anaconda
+Add Anaconda3 to my PATH environment variable 체크 하고 설치할것
+(Django, plask 작업시 문제 생길 수 있음)

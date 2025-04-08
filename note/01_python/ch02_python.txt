@@ -12,3 +12,7 @@
 #Anaconda
 Add Anaconda3 to my PATH environment variable 체크 하고 설치할것
 (Django, plask 작업시 문제 생길 수 있음)
+-Navigator : 아나콘다의 환경과 프로젝트 및 설치 구성요소들을 관리할 수 있는 윈도우 애플리케이션
+-Prompt : 아나콘다 명령을 직접 실행시킬 수 있는 명령행 프롬프트
+-Jupyter Notebook : 주피터 노트북 실행
+-Spyder : 파이썬 애플리케이션을 개발하기 위한 통하개발 환경(IDE)

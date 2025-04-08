@@ -1,0 +1,8 @@
+# 250408
+
+	##GPU를 사용하는 anaconda 설치 방법
+		1.NVIDIA framework SDK uninstall
+		2.CUDA setup
+		3.zip file 압축풀기
+		4.Anaconda3 setup##
+

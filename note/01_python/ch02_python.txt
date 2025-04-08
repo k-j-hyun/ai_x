@@ -26,7 +26,9 @@ Add Anaconda3 to my PATH environment variable 체크 하고 설치할것
 	Jupyter Prompt 관리자권한으로 실행 후 
 	conda install -c conda-forge jupyter_nbextensions_configurator
 
-	pip install jupyter_nbextensions_configurator jupyter_contrib_nbextensions jupyter contrib nbextension install --user
+	pip install jupyter_nbextensions_configurator jupyter_contrib_nbextensions 
+	
+	jupyter contrib nbextension install --user
 	
 	jupyter nbextensions_configurator enable --user
 
@@ -36,5 +38,23 @@ Add Anaconda3 to my PATH environment variable 체크 하고 설치할것
 
 	반드시 순서대로 입력##
 
+#Jupyter Notebook 실행하기
+localhost:8888/tree#nbextensions_configurator
+-> disable 체크해제 -> Table of Contents (2) 체크 -> 하단 파라미터 첫줄 automatically 체크해제
 
-prompt
+##
+from IPython.display import display, HTML
+display(HTML("""
+<style>
+div.container{width:86% !important;}
+div.cell.code_cell.rendered{width:100%;}
+div.CodeMirror {font family:Consolas ; font-size:12pt;}
+div.output {font-size:12pt; font-weight:bold;}
+div.input {font-family:Consolas; font-size:12pt;}
+div.prompt {min-width:70px;}
+div#toc-wrapper{padding top:120px;}
+div.text_cell_render ul li {font-size:12pt;padding:5px;}
+table.dataframe{font-size:12px;}
+</style>
+"""))
+##

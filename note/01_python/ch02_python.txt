@@ -58,3 +58,49 @@ table.dataframe{font-size:12px;}
 </style>
 """))
 ##
+
+	#주피터노트북 단축키
+	esc + a , b -> line 생성
+	esc + dd -> line 삭제
+	esc + m -> 마크다운으로 바뀜
+	dd : 삭제
+	a : 윗셀 추가
+	b : 아랫셀 추가
+	m : 마크다운셀(문서셀)로 변경
+	y : 코드셀로 변경
+	o : 실행결과 접기/펴기(토글기능)
+	! : cmd
+	% : 리눅스cmd
+	#
+
+
+*변수
+	#def'''안에 설명 있음'''
+	def add(x, y=0):
+    	'''
+    	매개변수 2개를 받아 두자리 숫자로 만들어요
+    	x = 10의 자리수가 됨
+    	y = 1의 자리수가 됨
+    	사용법 : add(2, 3) => 23
+    	'''
+    	return x*10 + y
+	add(x, y)
+	#
+
+		## 매개변수 add에 변수를 정의함
+		a = add
+		a(2, 3)
+		##
+
+			###타입정의
+			area = "파이썬"
+			print('area의 주소 :', id(area)) #id(area) : area변수의 주소값
+			print('area의 타입 :', type(area))
+			###
+
+				####넘피함수(소수점자리까지 기억되어있음)
+				import numpy as np
+				area = np.pi * r * r
+				print('area = ', area)
+				####
+

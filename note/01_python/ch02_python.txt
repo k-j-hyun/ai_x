@@ -104,3 +104,30 @@ table.dataframe{font-size:12px;}
 				print('area = ', area)
 				####
 
+#다중변수할당
+a = 10
+b = 20
+
+a, b = 10, 20
+print(a, b)
+
+# 다중 변수 할당시 순차적 할당이 아니고, 일괄 동시 할당
+a, b = b, a+b
+print(a, b)
+#
+
+	##화면입출력(i/o)
+	first = int(input('첫번째 수는? '))
+	second = int(input('두번째 수는? '))
+	sum = first + second
+	print('합', sum)
+	##
+
+#3절. 기본 자료형
+자료형에 따라 값의 크기와 저장방식이 달라짐
+숫자 : int, float, complex
+문자 : str
+논리 : bool(True/False)
+
+#3.2 문자형
+쌍따옴표("-")나 홑따옴표('-')이용

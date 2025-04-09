@@ -12,3 +12,17 @@
 	파일명	file_path = r'경로명과파일이름"
 	파일용도	file_stream = open(file_path, 'w'=출력 'r=read)
 	파일저장	file_stream.close() 
+
+*문자열 슬라이싱
+문자변수[from:stop] : from부터 stop앞까지 추출
+문자변수[from:stop:step] : from부터 stop앞까지 step씩 전진하면서 추출
+	step 생략시 1
+	from 생략시 처음부터 [:3:1]
+	stop 생략시 끝까지 [3::1]
+# 첫 문자 ~ 6번째 인덱스까지 추출
+	print(str_[0:7])
+# 5번째 인덱스부터 끝까지 추출
+	print(str_[5:])
+# str_을 꺼꾸로 출력
+	print(str_[::-1])
+	print(str_[-1::-1])

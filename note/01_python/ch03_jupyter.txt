@@ -1,0 +1,14 @@
+*git 설정 확인 및 변경
+	제어판 -> 자격증명관리자 -> windows 자격증명관리 -> 일반자격증명
+	위 경로에 있는 git 정보 확인 후 본인 계정 아닐시 제거 후 git 재설정하기
+
+*import re
+	변수 = re.findall(정규표현식이들어있는변수, 정보가 들어있는 data)
+	re.search(정규표현식이들어있는변수, 정보가 들어있는 data)
+	re.sub(정규표현식이들어있는변수, '', 정보가 들어있는 data)
+	->^를 사용해서 제외하거나, 추가 규칙 설정 \역슬래시가 있는 정보 앞에는 무조건 r적을것
+
+*파일생성
+	파일명	file_path = r'경로명과파일이름"
+	파일용도	file_stream = open(file_path, 'w'=출력 'r=read)
+	파일저장	file_stream.close() 

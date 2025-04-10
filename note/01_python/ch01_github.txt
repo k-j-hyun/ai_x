@@ -47,4 +47,6 @@ git config --list 				# 확인
 # Anaconda3 설치후 anaconda prompt 관리자 권한 실행 후 -  pip install tensorflow==2.10 아나콘다 삭제, nvidia 설치후 재설치하기
 git add note -> git commit -m "last" -> git push origin main 입력하기
 
-# 250408
+# 250410
+.gitignore 파일을 이그노어할 폴더안에 생성하고
+내용에 폴더명/ 을 적으면 깃허브에 풀,푸쉬 되지 않음

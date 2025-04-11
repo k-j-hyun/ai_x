@@ -1,0 +1,26 @@
+1.csv파일 형식 -> 엑셀로도 열수 있음
+-예제
+지역,최고온도,최저온도,강수확률,년도,월,일
+서울,18,10,40,2025,04,01
+경기,18,11,20,25,04,01
+날짜를 사용하려면 split()과 join()을 사용해야함
+
+2.사용하는 라이브러리 주소 찾기(import)
+import datetime
+datetime.__file__
+C:\Users\Admin\anaconda3\Lib
+
+3.필요한 기능만 가져오는 방법(모듈)
+from datetime import datetime, date, time
+
+#파이썬은 모듈지향형, c,java는 객체지향형 언어#
+
+4.한국어 날짜시간 설정방법
+import locale
+locale.setlocale(locale.LC_TIME, 'ko_KR')
+
+#d-day계산하는 방법
+변수.days
+변수 = 뒤에 시점 - 앞에 시점
+= d-day 계산
+#

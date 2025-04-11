@@ -1,0 +1,52 @@
+✅ 5. 가게 리뷰 크롤링 (네이버 기준 예시)
+python
+복사
+편집
+# crawler.py
+
+import requests
+from bs4 import BeautifulSoup
+
+def crawl_naver_reviews(store_name):
+    query = store_name + " 리뷰"
+    url = f"https://search.naver.com/search.naver?query={query}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    res = requests.get(url, headers=headers)
+
+    if res.status_code != 200:
+        return ["리뷰를 가져오지 못했어요 😢"]
+
+    soup = BeautifulSoup(res.text, "html.parser")
+    
+    # 검색결과에서 리뷰로 보이는 부분 긁어오기 (간단 예시)
+    reviews = []
+    for tag in soup.find_all("span"):
+        txt = tag.get_text()
+        if "맛있" in txt or "별점" in txt or "추천" in txt:
+            reviews.append(txt)
+        if len(reviews) >= 3:
+            break
+
+    if not reviews:
+        return ["리뷰가 없어요 😅"]
+    return reviews
+⚠️ 네이버는 HTML 구조가 자주 바뀌기 때문에 정확한 클래스명을 확인하고 크롤링해야 해. selenium으로 동적 페이지 대응도 가능해.
+
+🧪 사용 예시
+python
+복사
+편집
+from recommender import recommend_restaurants
+from crawler import crawl_naver_reviews
+
+# 사용자가 입력한 예시
+keyword = "도시락"
+price_range = "medium"
+
+results = recommend_restaurants(keyword, price_range)
+
+for res in results:
+    print(f"🍽️ {res['name']} ({res['price']}원) - 메뉴: {res['menu']}")
+    reviews = crawl_naver_reviews(res["name"])
+    for review in reviews:
+        print(f"📝 {review}")

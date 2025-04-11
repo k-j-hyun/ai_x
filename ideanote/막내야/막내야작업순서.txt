@@ -1,0 +1,97 @@
+✅ 주요 기능 요약 및 구현 아이디어
+🖥️ 1. PC/웹 기반 실시간 추천 추적 (Live 추천)
+개념:
+사무실 모니터 앞에서 **카메라로 직원(혹은 부장님)**을 인식
+
+해당 인물의 대화나 입력 텍스트 기반으로 맛집 추천
+
+구현:
+OpenCV + YOLOv8 + MoveNet → 인물 인식/추적
+
+대화 내용 또는 입력 텍스트 → 자연어 처리(NLP)
+
+Django 웹 서버에 실시간 연동
+
+Live 추천은 텍스트 or 카메라 이미지 기반으로
+
+🗣️ 2. "부장님 어제 뭐 드셨어요?" 라이브러리
+아이디어:
+부장님(혹은 관리자)이 이전에 입력했던 음식 기록을 저장
+
+또는 AI 챗봇처럼 대화 가능한 인터페이스
+
+구현 방식:
+간단한 DB (SQLite or PostgreSQL) → 날짜별 음식 기록 저장
+
+Django 템플릿에 대화창 UI
+
+이전 기록 기반 추천 시스템 (비슷한 거 다시 안 뜨게)
+
+💬 3. 직원 간 소통 공간 / 텍스트 전달
+아이디어:
+사내 익명 메시지보드 or 의견 입력 폼
+
+혹은 “오늘 뭐 먹을까요?” 투표 기능
+
+구현:
+Django 모델에 익명 글 저장
+
+WebSocket or AJAX 활용해서 실시간으로 보여주기
+
+"최근 올라온 글" 기준 추천 필터링도 가능
+
+🍜 4. 맛집 추천 시스템
+조건:
+최근 수집된 정보 제외
+
+가격대별로 분류 (ex: 5천~1만 원 / 1만 원 이상 등)
+
+가능한 경우 크롤링해서 리뷰 표시
+
+구현 방식:
+python
+복사
+편집
+def recommend_restaurants(keyword, price_range, exclude_recent=True):
+    # 1. 로컬 DB에 저장된 식당 데이터 활용 (Naver, Kakao 기준)
+    # 2. keyword 기반 검색
+    # 3. 가격대 필터링
+    # 4. 최근 추천한 가게는 제외
+    return result_list
+🔍 5. 크롤링으로 가게 리뷰 가져오기
+구현 방법:
+requests + BeautifulSoup 이용
+
+네이버 플레이스, 카카오맵, 식신 등 활용
+
+예시:
+
+python
+복사
+편집
+def crawl_naver_reviews(store_name):
+    url = f"https://search.naver.com/search.naver?query={store_name}+리뷰"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    res = requests.get(url, headers=headers)
+    soup = BeautifulSoup(res.text, "html.parser")
+    # 리뷰 텍스트 파싱
+    return review_list
+🧩 구조 예시
+camera_handler.py: 실시간 추적 (YOLO + MoveNet)
+
+recommendation.py: 키워드 기반 맛집 추천
+
+chat_memory.py: 관리자 음식 기록 저장
+
+views.py: Django 컨트롤러
+
+templates/: 대화창 + 추천 UI
+
+🔧 다음 단계 제안
+Live 카메라 추적 → YOLO로 얼굴 or 몸 인식 먼저 구성
+
+추천 시스템 백엔드 → keyword+가격대+리뷰 기준 추천
+
+웹 UI → Django로 입력/추천 인터페이스 만들기
+
+필요하면 크롤러까지 확장

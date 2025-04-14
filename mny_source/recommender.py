@@ -35,3 +35,13 @@ def recommend_restaurants(keyword, price_range, exclude_recent=True):
     recent_recommendations.extend([r["name"] for r in result])
 
     return result
+
+# test
+if __name__ == "__main__":
+    keyword = "도시락"
+    price_range = "medium"
+
+    results = recommend_restaurants(keyword, price_range)
+
+    for r in results:
+        print(f"🍱 {r['name']} - 메뉴: {r['menu']}, 가격: {r['price']}원")

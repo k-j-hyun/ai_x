@@ -26,3 +26,12 @@ def crawl_naver_reviews(store_name):
     if not reviews:
         return ["리뷰가 없어요 😅"]
     return reviews
+
+#test
+if __name__ == "__main__":
+    store = "한솥도시락"
+    reviews = crawl_naver_reviews(store)
+
+    print(f"📝 {store} 리뷰")
+    for idx, review in enumerate(reviews, start=1):
+        print(f"{idx}. {review}")

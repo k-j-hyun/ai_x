@@ -1,0 +1,35 @@
+1. 람다 함수 (Lambda Functions)
+람다 함수는 한 줄로 간단하게 정의된 함수입니다.
+
+예: lambda x: x + 1
+
+map(), filter(), sorted() 등과 함께 사용하여 유용하게 활용할 수 있습니다.
+
+2. 람다와 map(), filter()
+map()은 리스트나 다른 반복 가능한 객체의 각 요소에 람다 함수를 적용합니다.
+
+예: map(lambda x: x**2, [1, 2, 3])
+
+filter()는 리스트의 요소들 중 조건에 맞는 값만을 반환합니다.
+
+예: filter(lambda x: x > 10, [5, 15, 8])
+
+3. 딕셔너리와 리스트 다루기
+딕셔너리에서 특정 값을 기준으로 정렬할 때는 key=lambda x: x["key"]를 사용합니다.
+
+예: sorted(students, key=lambda x: x["점수"], reverse=True)
+
+4. map()과 람다를 이용한 변환
+주어진 리스트에서 문자열을 숫자로 변환하거나, 문자열 내 문자를 교체하는 등의 작업을 할 수 있습니다.
+
+예: map(lambda x: int(x.replace(',', '')), prices)
+
+5. 리스트 컴프리헨션 (List Comprehension)
+리스트 컴프리헨션을 사용하여 간결하게 데이터를 처리할 수 있습니다.
+
+예: [func(l) for l in L]
+
+6. 딕셔너리 변경하기
+딕셔너리의 데이터를 다른 형태로 변환할 때 람다 함수를 유용하게 사용할 수 있습니다.
+
+예: {k: v for d in list for k, v in d.items()}

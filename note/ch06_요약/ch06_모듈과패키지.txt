@@ -1,0 +1,40 @@
+1절. 패키지 및 모듈 사용하기
+import A : A모듈을 load
+import A : A패키지밑의 __init__모듈을 load(거의안씀)
+from A import B : A패키지 안의 B모듈 load
+from A import B : A모듈 안의 B함수 load
+from A.B import C : A패키지밑의 B모듈안의 C함수 load
+
+import A as L : A모듈을 L이름으로 load
+import A as L : A패키지를 L이름으로 __init__모듈을 load(거의안씀)
+from A import B as L : A패키지 안의 B모듈을 L별칭으로 load
+from A import B as L : A모듈 안의 B함수를 L이름으로 load
+from A.B import C as L : A패키지밑의 B모듈안의 C함수를 L이름으로 load
+
+
+2절. 패키지 설치 및 삭제
+pip install 패키지명==버전 / conda install 패키지명
+pip show 패키지명 / conda list 패키지명
+pip uninstall 패키지명 / conda remove 패키지명
+python -m pip install --upgrade pip (pip 최신버전으로 upgrade)
+
+* 패키지 아래 __init__.py에 패키지 설정 내용이 추가 *
+
+6장. 모듈과 패키지
+
+모듈 : 함수, 변수, 클래스 등을 담고 있는 파이썬 코드 파일 (*.py파일)
+패키지는 : 모듈들이 포함된 폴더
+
+# 1절. 파이썬 모듈 사용
+anaconda는 1500개 이상의 패키지 install(정확한 갯수는 버전에 따라 상이)
+miniconda : python.org 버전보다 조금 많이 install(최소한의 것만)
+python.org : 파이썬 인터프리터와 함께 파이썬 표준 모듈 200여개 install(re, datetime.. )
+
+
+# 4절. 패키지 설치 및 삭제
+
+* 아나콘다 프롬프트에서 실행
+- 패키지 설치 : pip install 패키지명==버전 (pypi.org) / conda install 패키지명==버전
+                pip install 패키지파일명(*.whl 출처 : pypi.org)
+- 패키지 확인 : pip show 패키지명                     / conda list 패키지명
+- 패키지 삭제 : pip uninstall 패키지명                / conda remove 패키지명

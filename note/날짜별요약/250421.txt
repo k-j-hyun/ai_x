@@ -1,0 +1,36 @@
+한글완성형 : euc-kr
+확장된 한글완성형 : cp949
+*한글 조합형 : utf-8
+
+## 요약
+- 클래스 요약
+**객체를 이용하면 객체에 정보를 저장하고, 그 정보를 이용해서 어떤 기능을 수행할 수 있다**
+**객체 = 데이터(변수:객체마다 고유의 값) + 기능(메소드, 함수)**
+
+**그 객체를 만들기 위한 틀 => 클래스**
+```
+    class 클래스명:
+        '독스트링'
+        클래스변수명 = 값
+        def __init__(self, [객체멤버를 초기화할 변수 = 값,...]):
+            self.인스턴스(일반)변수 = 값
+            객체를 생성할 때 객체 멤버변수의 초기화
+        def method(self):
+            인스턴스 메소드(일반함수)의 매개변수는 self를 반드시 포함
+        @classmethod
+        def classmethod(cls):
+            코드
+        @staticmethod
+        def staticmethod():
+            코드
+    객체변수 = 클래스명()
+    객체변수.method()
+    클래스명.classmethod()
+    클래스명.staticmethod()
+            
+```
+
+super().__init__(name, gender)
+self.major = major
+
+super().__str__() + '이고, 전공은 {}'.format(self.major)

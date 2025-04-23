@@ -33,3 +33,51 @@ pickle.load(f) : data, pkl에 담긴 정보 불러오기
 # 3절. CSV형식 파일 읽기/쓰기
 - CSV파일 -> 리스트데이터로 읽기/쓰기
 - CSV파일 -> 딕셔너리데이터로 읽기/쓰기
+
+# 5절. hdf5(h5)파일 쓰기/읽기
+- h5py 사용
+## 5.1 hdf5파일 쓰기
+- 딕셔너리 리스트를 hdf5파일에 쓰기
+- 데이터프레임을 hdf5파일에 쓰기
+	import seaborn as sns
+	iris_df = sns.load_dataset('iris')
+	display(iris_df[::50])
+   sns.load_dataset() : 정말 많이 쓰는 것
+
+*데이터 저장하는법
+iris_df.to_hdf("data/ch09_iris.hdf5", key='iris')
+iris_dic = iris_df.to_dict()
+*딕셔너리 저장하는법
+import h5py
+with h5py.File('data/ch09_iris_dic.hdf5', 'w') as f:
+    for group, value in iris_dic.items():
+        grp = f.create_group(group)
+        for key, data in value.items():
+            grp.create_dataset(str(key), data=data)
+*딕셔너리hdf5 읽는법
+import h5py
+load_iris_dic = {}
+with h5py.File('data/ch09_iris_dic.hdf5', 'r') as f:
+    for group, value in f.items():
+        temp = {}
+        for key, data in value.items():
+            temp[int(key)] = data[()]
+        load_iris_dic[group] = temp
+load_iris_dic.keys()
+*데이터 읽는법
+import pandas as pd
+load_iris_df = pd.read_hdf('data/ch09_iris.hdf5', key='iris')
+load_iris_df[::50]
+*자료비교
+all(iris_df == load_iris_df) # 두 데이터프레임 변수의 모든 행과 열의 값이 같은지 여부
+*딕셔너리로 변환된 hdf5 읽기
+iris_dic.keys()
+for group, value in iris_dic.items():
+    print('그룹명 :', group)
+    print(value)
+
+# 6절. 연습문제 : 고객관리 프로그램
+- 프로그램 시작시 'data/ch09/customer.txt'(고객 데이터 백업용)"의 내용을 load(객체list) 
+                파일이 없을 경우 빈 파일 생성
+- "data/ch09_customers.txt(고객 데이터 백업용)"의 내용 
+    홍길동, 010-9999-9999, a@a.com, 30, 3, 까칠해

@@ -1,0 +1,66 @@
+# 5절. hdf5(h5)파일 쓰기/읽기
+- h5py 사용
+## 5.1 hdf5파일 쓰기
+- 딕셔너리 리스트를 hdf5파일에 쓰기
+- 데이터프레임을 hdf5파일에 쓰기
+	# seaborn : 시각화 패키지. 학습을 위한 데이터셋 다수 
+	import seaborn as sns
+	iris_df = sns.load_dataset('iris')
+	display(iris_df[::50])
+*데이터 저장하는법
+iris_df.to_hdf("data/ch09_iris.hdf5", key='iris')
+*딕셔너리 저장하는법
+import h5py
+with h5py.File('data/ch09_iris_dic.hdf5', 'w') as f:
+    for group, value in iris_dic.items():
+        grp = f.create_group(group)
+        for key, data in value.items():
+            grp.create_dataset(str(key), data=data)
+*딕셔너리hdf5 읽는법
+import h5py
+load_iris_dic = {}
+with h5py.File('data/ch09_iris_dic.hdf5', 'r') as f:
+    for group, value in f.items():
+        temp = {}
+        for key, data in value.items():
+            temp[int(key)] = data[()]
+        load_iris_dic[group] = temp
+load_iris_dic.keys()
+*데이터 읽는법
+import pandas as pd
+load_iris_df = pd.read_hdf('data/ch09_iris.hdf5', key='iris')
+load_iris_df[::50]
+*자료비교
+all(iris_df == load_iris_df) # 두 데이터프레임 변수의 모든 행과 열의 값이 같은지 여부
+*딕셔너리로 변환된 hdf5 읽기
+iris_dic.keys()
+for group, value in iris_dic.items():
+    print('그룹명 :', group)
+    print(value)
+
+##9장 연습문제
+1. 전체 구성 흐름
+고객 관리 프로그램은 다음과 같은 흐름으로 구성:
+
+고객 클래스 정의 (Customer)
+고객 1명의 정보를 객체로 표현
+고객 목록 파일에서 불러오기 (load_customers)
+프로그램 시작할 때 기존 데이터를 파일에서 불러옴
+
+기능 함수 정의
+fn1_insert_customer_info: 고객 정보 입력
+fn2_print_customers: 전체 고객 출력
+fn3_delete_customer: 고객 삭제
+fn4_search_customer: 고객 이름으로 검색
+fn5_save_customer_csv: csv 파일로 내보내기
+fn9_save_customer_txt: 프로그램 종료 시 txt로 저장
+
+메인 함수 (main)
+사용자 선택에 따라 위 기능들을 실행
+
+# 6절. 연습문제 : 고객관리 프로그램
+- 프로그램 시작시 'data/ch09/customer.txt'(고객 데이터 백업용)"의 내용을 load(객체list) 
+                파일이 없을 경우 빈 파일 생성
+- "data/ch09_customers.txt(고객 데이터 백업용)"의 내용 
+    홍길동, 010-9999-9999, a@a.com, 30, 3, 까칠해 홍길동, 010-9999-9999, a@a.com, 30, 3, 까칠해
+

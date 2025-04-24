@@ -40,7 +40,7 @@ Add Anaconda3 to my PATH environment variable 체크 하고 설치할것
 
 #Jupyter Notebook 실행하기
 localhost:8888/tree#nbextensions_configurator
--> disable 체크해제 -> Table of Contents (2) 체크 -> 하단 파라미터 첫줄 automatically 체크해제
+-> disable 체크해제 -> Table of Contents (2) 체크 -> 하단 파라미터(Parameters) 첫줄 automatically 체크해제
 
 ##
 from IPython.display import display, HTML

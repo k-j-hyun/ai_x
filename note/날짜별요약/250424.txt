@@ -1,4 +1,7 @@
-#클래스 커스토머
+#ch10_N차원배열다루기
+요약텍스트 확인할것
+
+#입출력 프로그래밍 연습예제 완성
 class Customer:
     '고객데이터와 as_dic(), to_list_style(txt백업시), __str__()'
     def __init__(self, name, phone, email, age, grade, etc):

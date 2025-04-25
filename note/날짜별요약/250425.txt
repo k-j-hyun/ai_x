@@ -1,0 +1,96 @@
+#Numpy 패키지 함수와 속성
+
+  ##2.5 배열의 차원 변경하기
+    - 2차원 reshape(면수, 행수, 열수) 1차원 (행수, 열수) : -1이 올 수도 있음
+    - resize(면수, 행수, 열수) : -1 불가
+    - T : 전치행렬로 변환
+    - transpose() : 전치행렬로 변환
+    ※ 실행결과가 출력되면 배열이 수정되지 않고, 실행 결과가 없으면 배열 수정됨
+
+  ##2.6 배열 인쇄
+    배열 출력 옵션 변경(최대값)
+    - #np.set_printoptions(threshold=10000)
+    - #np.set_printoptions(threshold=sys.maxsize)
+    - np.set_printoptions(threshold=np.inf) # 무한대는 np.inf (infinity)
+
+    요소별 곱, 행렬 곱 ( @, dot)
+    - print('요소별 곱 a*b=', a*b, sep='\n')
+    - print('행렬 곱 a@b=', a@b, sep='\n')
+    - print('행렬 곱 a.dot(b)=', a.dot(b), sep='\n')
+
+    단위행렬 np.eye
+    - n행 n열의 단위행렬 : np.eye(n) : A@단위행렬 = A 반드시 정방행렬이어야함
+	np.eye(3)
+
+    배열 요소별 집계
+    - sum, min, max, mean(평균), var(분산), std(표준편차), argmax(최대값의 인덱스)
+    - print('전체합 :', np.sum(a), a.sum())
+    - print('전체최소 :', np.min(a), a.min())
+    - print('전체최대 :', np.max(a), a.max())
+    - print('전체평균 :', np.mean(a), a.mean())
+    - print('전체분산 :', np.var(a), a.var())
+    - print('전체표준편차 :', np.std(a), a.std())
+    - print('a의 행별 최대값 위치 :', a.argmax(axis=1), np.argmax(a, axis=1))
+
+    3차원 배열의 축별 집계
+    - b = np.arange(24).reshape(2, 3, 4) # 2면 3행 4열
+    - # axis=0 : 1축과 2축은 고정하고, 0축(0면, 1면)들의 합 0 + 12, 1 + 13, 2 + 14, 3+ 15
+    - b.sum(axis=0), np.sum(b, axis=0)
+    - # axis=1 : 0축과 2축은 고정하고, 1축(0행,1행,2행)들의 합
+    - b.sum(axis=1), np.sum(b, axis=1)
+
+  ##2.8 그외 요소별 계산하는 범용함수들
+    - 메모리나 시간을 효율적으로 사용할 수 있음
+    - np.add(A, B, C); C = np.add(A, B); C = A+B : 세개의 식 모두 같음
+    - np.subtract(A, B, C); C=np.subtract(A, B); C=A-B
+    - np.multiply(A, B, C); C=np.multiply(A, B); C=A*B
+    - np.sqrt(배열); 요소별 제곱근 cf. math.sqrt(스칼라값)
+
+    ##2.9 브로드 캐스팅
+    - 서로 다른 크기의 배열 간 연산을 수행할 수 있도록 해주는 강력한 기능
+    - a[:, np.newaxis] == np.ix_(a, b)
+    - # a와 b의 모든 쌍의 조합에 대해 계산하고 싶을 때
+    - a = np.array([2, 3, 4, 5])
+    - b = np.array([10, 20, 30, 40])
+    -a + b[:, np.newaxis]
+
+#3절. 배열 합치기/분리하기
+    - 슬라이싱
+    - 두 배열을 합치는 함수
+    - r_, c_
+    - 두 배열을 분리하는 함수
+
+  ##3.1 인덱싱과 슬라이싱
+    - 인덱싱에는 없는 인덱스 사용시 에러
+    - 슬라이싱에는 없는 인덱스 사용시 끝까지
+    - 음수 인덱스는 끝에서부터
+
+  ##3.2 두 배열을 합치는 함수
+    - vstack( (a, b) ) 튜플이 들어감 : 아래로 추가하는 방식
+    - hstack( (a, b) ) 튜플이 들어감 : 옆으로 추가하는 방식
+    - dstack( (a, b) ) 튜플이 들어감 : 마지막 축(열)을 쌓아 합침(차원증가) -> a=ㅡ, b=ㅡ => ll 이렇게 합쳐줌
+
+  ###stack
+    - column_stack(tup) : 열단위로 합침
+    - row_stack(tup) : 행단위로 합침 == vstack(tup)
+    - stack(tup, axis=) : axis 속성에 따라 배열 합침. axis 음수차원 가능 == dstack(tup)
+
+  ##3.3 r_, c_
+    - np.r_[a, b, c] 행합치기
+
+  ## 3.4 배열 분리하는 함수
+    - **vsplit(array, 정수나 벡터) : 첫번째 축을 따라 분할**
+    - **hsplit(array, 정수나 벡터) : 두번째 축을 따라 분할**
+    - **dsplit(array, 정수나 벡터) : depth를 따라 split 나눔(3차원 이상에서만 동작)**
+        - 정수 n : n개 분리
+        - [n] : n번째 index를 기점으로 분리
+        - [m, n] : m번째, n번째 인덱스를 기점으로 분리
+
+  ### split
+    - **split(array, 갯수나 인덱스벡터, axis=)**
+        - axis=0 : vsplit() 동일
+        - axis=1 : hsplit() 동일
+        - axis=2 : 3차원 이상에만 동장. dsplit() 동일
+    - **array_split(array, 갯수나 인덱스벡터, axis=)**
+        - split과의 차이점은 나눠지지 않은 정수로도 사용 가능
+

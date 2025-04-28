@@ -1,0 +1,78 @@
+#x(독립변수),y(종속변수)
+x = np.array([32, 64, 96, 118, 126, 144, 152.5, 158])
+y = np.array([18, 24, 61.5, 49, 52, 105, 130.3, 125])
+X = np.c_[x, np.ones(len(x))] # X = np.c_[x, np.ones(x.shape[0])] x가 1차원일때만 len 사용가능
+Y = y.reshape(-1,1)
+
+
+X.T, X.transpose() # 행이랑 열을 맞바꾸어주는 함수 T(전치행렬)
+# X가 정방행렬이 아닐 경우, X.T @ X로 정방행렬을 만든 후 역행렬을 곱
+np.linalg.inv(X_) @ X_
+
+11장. 데이터프레임과 시리즈(Pandas)
+- pip install pandas / conda install pandas (아나콘다 프롬프트)
+# 1절. 판다스 패키지
+- 데이터 분석을 위해 반드시 알아야 할 패키지. 넘파이 기반으로 다른 많은 라이브러리와 잘 통합되도록 설계
+- 1차원 구조를 갖는 시리즈, 2차원 구조를 갖는 데이터프레임(excel의 스프레드시트)을 제공
+- 판다스 장점 : 파일io, 부분 데이터 추출, 크기변경, 데이터 분할, 병합, 정렬, 결측치 처리, 데이터분할, 
+                피벗과 언피벗(와이드포멧과 롱포멧)에 용이
+
+- [Pandas API reference](https://pandas.pydata.org/docs/reference/index.html)
+- [Pandas docs](https://pandas.pydata.org/docs/)
+
+# 2절. 데이터 프레임 만들기
+## 2.1 딕셔너리를 이용해서 데이터프레임 만들기
+#### 딕셔너리 리스트를 데이터프레임으로
+#### 결측치가 있는 딕셔너리
+
+## 2.2 리스트를 이용해서 데이터 프레임 만들기
+## 2.3 pd.read_csv
+
+#### 판다스 디스플레이 옵션
+pd.options.display.max_columns = 39 # 열 프린트 옵션 기본값은 20. 39로 적으면 39열까지 display 가능
+pd.options.display.max_rows = 40 # 40행까지 display가능(기본값 60)
+df.head(1).T # 전치행렬(가로를 세로로)
+
+#### (1) CSV 파일 불러오기
+# (1) CSV 파일 불러오기(기본값)
+# encoding = 'utf-8', sep = ',', csv파일의 첫번째 줄을 header, #이 있는 줄도 데이터로 인식
+member = pd.read_csv('data/ch11_member.csv')
+member
+
+#### 형변환 Age열: int64 => int16
+# 형변환 Age열: int64 => int16
+import numpy as np
+import pandas as pd
+
+member['Age'] = member['Age'].astype(np.int16) # astrype('int') 할경우 int32
+print(member)
+member.info()
+
+#### # 형변환 member['Birth']열 : object(문자) => datetime64
+# 형변환 member['Birth']열 : object(문자) => datetime64
+member['Birth_as'] = member['Birth'].astype('datetime64[ns]')
+member.info()
+
+#### (2) 특정행 제외하고 csv파일 읽기
+# (2) 특정행 제외하고 csv파일 읽기
+member = pd.read_csv('data/ch11_membercp949.csv', encoding='cp949', skiprows=[1, 6]) #1,6번째 행은 제외하고 읽어오기
+member
+
+#### (3) 주석(#) 제외, datetime형 필드 지정하여 읽기
+# (3) 주석(#) 제외, datetime형 필드 지정하여 읽기
+member = pd.read_csv('data/ch11_membertab.csv', encoding='utf-8', sep='\t',
+                    comment='#', parse_dates=['Birth'])
+member.info()
+
+#### (4) sep='|', 상위 5행만 읽어오기
+member = pd.read_csv('data/ch11_membersep.csv', encoding='utf-8', sep='|',
+                    nrows=5)
+member
+
+
+## 2.4 패키지에서 가져오기 : iris 데이터
+### iris 가져오기 방법 1 : sklearn (머신러닝 패키지)
+### iris 가져오기 방법 2 : statsmodels (R 데이터, 통계 패키지);인터넷이되야만 import가능함
+### iris 가져오기 방법 3 : seaborn (시각화 패키지) 
+
+

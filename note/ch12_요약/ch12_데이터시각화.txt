@@ -1,0 +1,12 @@
+#12장 matplotlib
+# 시작전 설정
+import matplotlib.pyplot as plt
+%matplotlib inline
+%config InlineBackend.figure_format='retina'
+#한글설정
+plt.rc('font', family='Malgun Gothic')
+#plt.rc('font', family='AppleGothic') #mac
+plt.rc('axes', unicode_minus=False)
+# 경고 메세지 안보이게
+importwarnings
+warnings.filterwarnings(action='ignore')

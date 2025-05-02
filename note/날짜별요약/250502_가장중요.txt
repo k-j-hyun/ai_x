@@ -1,0 +1,192 @@
+✅ 1. 문자열 함수 (str 메서드)
+함수	설명	예제
+upper()	모든 문자를 대문자로	'hello'.upper() → 'HELLO'
+lower()	모든 문자를 소문자로	'HELLO'.lower() → 'hello'
+title()	각 단어의 첫 글자만 대문자	'hello world'.title() → 'Hello World'
+capitalize()	문자열 전체 중 첫 글자만 대문자	'hello world'.capitalize() → 'Hello world'
+strip()	양쪽 공백 제거	' hello '.strip() → 'hello'
+lstrip()	왼쪽 공백 제거	' hello'.lstrip() → 'hello'
+rstrip()	오른쪽 공백 제거	'hello '.rstrip() → 'hello'
+replace(a, b)	문자열 a를 b로 바꿈	'apple'.replace('p', 'b') → 'abble'
+find()	해당 문자 처음 위치 반환	'banana'.find('a') → 1
+count()	문자 개수 세기	'banana'.count('a') → 3
+split()	문자열 분리 → 리스트	'a,b,c'.split(',') → ['a', 'b', 'c']
+join()	리스트를 문자열로 합침	','.join(['a', 'b', 'c']) → 'a,b,c'
+startswith()	특정 문자열로 시작 여부	'hello'.startswith('he') → True
+endswith()	특정 문자열로 끝나는지	'world'.endswith('ld') → True
+
+✅ 2. 리스트 함수 (list 메서드)
+함수	설명	예제
+append()	맨 뒤에 값 추가	lst.append(4)
+extend()	리스트 확장	lst.extend([4, 5])
+insert(i, x)	i위치에 x 삽입	lst.insert(1, 'a')
+remove(x)	x 제거 (첫 번째만)	lst.remove(2)
+pop()	맨 끝 요소 반환 + 제거	lst.pop()
+index(x)	x의 인덱스 반환	lst.index(3)
+count(x)	x의 개수	lst.count(1)
+reverse()	리스트 뒤집기 (제자리)	lst.reverse()
+sort()	정렬 (제자리)	lst.sort()
+copy()	얕은 복사	lst2 = lst.copy()
+clear()	모든 요소 제거	lst.clear()
+
+✅ 3. 딕셔너리 함수 (dict 메서드)
+함수	설명	예제
+keys()	키 목록 반환	d.keys() → dict_keys([...])
+values()	값 목록 반환	d.values()
+items()	키-값 쌍 목록	d.items()
+get(key, default)	키의 값 반환, 없으면 default	d.get('name', 'N/A')
+pop(key)	키-값 제거 후 값 반환	d.pop('age')
+popitem()	마지막 아이템 제거	d.popitem()
+update()	값 추가 또는 갱신	d.update({'age': 30})
+clear()	모두 제거	d.clear()
+
+✅ 4. 세트 함수 (set 메서드)
+함수	설명	예제
+add(x)	원소 추가	s.add(1)
+remove(x)	x 제거 (없으면 에러)	s.remove(2)
+discard(x)	x 제거 (없으면 무시)	s.discard(3)
+pop()	임의 원소 제거 + 반환	s.pop()
+union()	합집합	s1.union(s2)
+intersection()	교집합	s1.intersection(s2)
+difference()	차집합	s1.difference(s2)
+clear()	전체 제거	s.clear()
+
+✅ 5. 파이썬 기본 내장 함수 (자주 사용)
+함수	설명	예제
+len()	길이 반환	len([1,2,3]) → 3
+type()	자료형 반환	type(3.5) → float
+range()	정수 범위 생성	range(5) → 0~4
+enumerate()	인덱스와 값 묶어서 반환	for i, v in enumerate(['a','b'])
+zip()	여러 리스트 묶음	zip([1,2], ['a','b'])
+sorted()	정렬 (새 리스트 반환)	sorted([3,1,2])
+sum()	합계	sum([1,2,3]) → 6
+max() / min()	최대 / 최소	max([1,2,3]) → 3
+abs()	절대값	abs(-5) → 5
+round()	반올림	round(3.456, 2) → 3.46
+all()	모두 True인지 검사	all([True, True]) → True
+any()	하나라도 True면 True	any([False, True]) → True
+eval()	문자열 계산	eval("2+3*4") → 14
+
+
+
+🔹 lambda, map(), filter(), reduce()
+▪ lambda
+익명 함수를 만들 때 사용.
+
+python
+복사
+편집
+square = lambda x: x**2
+print(square(4))  # 16
+▪ map()
+반복 가능한 객체의 요소들을 함수에 적용.
+
+python
+복사
+편집
+nums = [1, 2, 3]
+squared = list(map(lambda x: x**2, nums))
+print(squared)  # [1, 4, 9]
+▪ filter()
+조건에 맞는 요소만 필터링.
+
+python
+복사
+편집
+nums = [1, 2, 3, 4]
+even = list(filter(lambda x: x % 2 == 0, nums))
+print(even)  # [2, 4]
+▪ reduce()
+누적 집계. functools에서 import 필요.
+
+python
+복사
+편집
+from functools import reduce
+nums = [1, 2, 3, 4]
+result = reduce(lambda x, y: x + y, nums)
+print(result)  # 10
+🔹 def, class, with, try-except
+▪ def
+함수 정의 키워드
+
+python
+복사
+편집
+def add(a, b):
+    return a + b
+▪ class
+사용자 정의 객체
+
+python
+복사
+편집
+class Person:
+    def __init__(self, name):
+        self.name = name
+    def greet(self):
+        print(f"Hi, I'm {self.name}")
+
+p = Person("Alice")
+p.greet()  # Hi, I'm Alice
+▪ with
+파일 열기, DB 연결 등에서 자원 자동 해제.
+
+python
+복사
+편집
+with open("file.txt", "r") as f:
+    content = f.read()
+▪ try-except
+예외 처리
+
+python
+복사
+편집
+try:
+    x = 1 / 0
+except ZeroDivisionError:
+    print("0으로 나눌 수 없습니다.")
+🔹 Numpy / Pandas 관련 자주 쓰는 함수
+▪ NumPy
+python
+복사
+편집
+import numpy as np
+
+np.array([1,2,3])
+np.arange(10)  # 0~9
+np.zeros((2,3))  # 0으로 채운 배열
+np.ones((2,2))   # 1로 채운 배열
+np.reshape(a, (2,5))
+np.mean(a), np.std(a), np.max(a), np.min(a)
+np.concatenate([a, b], axis=0)  # 행방향 결합
+▪ Pandas
+python
+복사
+편집
+import pandas as pd
+
+df = pd.DataFrame({'a': [1,2], 'b': [3,4]})
+df.head(), df.tail()
+df.info(), df.describe()
+df['a']  # 특정 열 접근
+df.loc[0], df.iloc[0]
+df.drop('a', axis=1), df.sort_values('a')
+df.groupby('a').mean()
+🔹 파일 입출력 관련 함수
+python
+복사
+편집
+# 파일 쓰기
+with open('file.txt', 'w') as f:
+    f.write('Hello\nWorld')
+
+# 파일 읽기
+with open('file.txt', 'r') as f:
+    data = f.read()
+
+# 줄 단위 읽기
+with open('file.txt') as f:
+    for line in f:
+        print(line.strip())

@@ -10,3 +10,9 @@ plt.rc('axes', unicode_minus=False)
 # 경고 메세지 안보이게
 importwarnings
 warnings.filterwarnings(action='ignore')
+
+# 개별 폰트 설정을 위한 방법
+from matplotlib.font_manager import FontProperties
+
+# 윈도우 폰트 폴더 위치
+C:\Windows\Fonts

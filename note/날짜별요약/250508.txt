@@ -1,0 +1,48 @@
+# 패키지 import
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 선명도 높임
+%config InlineBackend.figure_format = 'retina'
+# from IPython.display import set_matplotlib_formats
+# set_matplotlib_formats('retina')
+
+# seaborn 설정
+sns.set(style='white', rc={'figure.figsize':(15,3)})
+
+# 한글 설정
+plt.rc('font', family='Malgun Gothic')
+plt.rc('axes', unicode_minus=False)
+
+# 데이터
+df_last = pd.read_csv('data/df_last.csv')
+df_last.sample()
+
+
+
+
+1) 데이터준비
+2) 미적속성설정 - sns.set(style='darkgrid',
+			   context='notebook', 배율
+	          sns.set_style...
+3) 그래프 함수
+ⓐ관계형그래프 : scatterplot(선점도), lineplot(선그래프) => relplot(서브플롯)
+
+ⓑ범주형그래프
+	stripplot(무작위 흩뿌림), swarmplot(겹치지않는산점도)
+       	barplot, barhplot(y의 평균으로 막대그래프), pointplot(y의 평균으로 line)
+     	countplot(count는 x의 빈도수가 높이)
+     	boxplot, violinplot, boxenplot
+      	> catplot(서브플롯)
+
+ⓒ쌍관계 그래프 : 모든 수치형 변수에 대해 산점도
+- pairplot : 데이터 프레임에 포함된 모든 수치형 변수 쌍에 대해 산점도(scatterplot)와 히스토그램
+
+ⓓ밀도그래프(도수분포표) : histplot, displot
+
+ⓔ회귀그래프 : regplot => lmplot(서브플롯)
+
+4) 다중 그래프를 위한 FacetGrid
+- https://seaborn.pydata.org/tutorial/axis_grids.html#conditional-small-multiples

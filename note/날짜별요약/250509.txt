@@ -1,0 +1,94 @@
+🌀 기본 흐름
+1. for, while 반복문
+for: 리스트나 range 돌 때
+
+python
+for i in range(5):
+    print(i)
+while: 조건이 참일 동안
+
+python
+x = 0
+while x < 5:
+    print(x)
+    x += 1
+
+2. if 조건문
+조건 따라 분기할 때
+
+python
+if x > 10:
+    print("크다")
+elif x == 10:
+    print("같다")
+else:
+    print("작다")
+🔧 함수 & 객체
+
+3. lambda (한 줄짜리 함수)
+
+python
+f = lambda x: x * 2
+print(f(3))  # 6
+
+4. def (함수 정의)
+python
+def add(a, b):
+    return a + b
+
+5. class (객체 만들기)
+python
+class Dog:
+    def __init__(self, name):
+        self.name = name
+
+    def bark(self):
+        print(f"{self.name} 멍멍!")
+
+dog = Dog("초코")
+dog.bark()
+📊 데이터 분석 (Pandas + 시각화)
+
+6. pivot_table & groupby
+python
+import pandas as pd
+
+# 예제 데이터
+df = pd.DataFrame({
+    '이름': ['철수', '영희', '철수', '영희'],
+    '과목': ['수학', '수학', '영어', '영어'],
+    '점수': [90, 95, 85, 80]
+})
+
+# groupby
+print(df.groupby('이름')['점수'].mean())
+
+# pivot_table
+print(df.pivot_table(index='이름', columns='과목', values='점수'))
+
+7. plot, 꾸미기
+python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3]
+y = [3, 2, 5]
+
+plt.plot(x, y, marker='o', linestyle='--', color='green')
+plt.title('예제 그래프')
+plt.xlabel('x축')
+plt.ylabel('y축')
+plt.grid(True)
+plt.show()
+
+8. plot 정렬 (sort 후 시각화)
+python
+df = pd.DataFrame({
+    '이름': ['철수', '영희', '민수'],
+    '점수': [88, 95, 78]
+})
+
+df_sorted = df.sort_values(by='점수')
+
+plt.bar(df_sorted['이름'], df_sorted['점수'])
+plt.title('점수 낮은 순')
+plt.show()

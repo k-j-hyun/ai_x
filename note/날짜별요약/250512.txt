@@ -1,0 +1,32 @@
+#Visual Studio 설치 방법
+*Visual Studio : "확장개발", ".net 데스크톱개발" 추가설치하기
+*iisexpress_amd64_ko-KR.msi (웹서버) 설치
+
+*ch02
+글자관련태그 ; h1~h6, p, del, i, b, strong, ins, pre, a
+목록태그 : ul-li, ol-li
+표 : table - tr(행) - td(열) - th는 굵고 중간위치
+이미지태그 : img의 src속성, alt속성
+오디오태그
+
+*ch03
+form태그
+공간분할태그
+
+*html, css, js
+<head>
+<link href="2.css" rel="stylesheet" type="text/css" />
+<script src="2.js"></script>
+</head>
+
+*css <style></style> 안에 들어갈 table 기본 설정
+table{background-color:red;}
+       		tr{background-color:yellow;}
+        		tr:hover{background-color:lightgreen;}
+        	caption{background-color:lightyellow;}
+
+
+*시험
+html로 저장 후 전송
+캡쳐 : 1번실행화면_고정현
+총 5개 압축해서 전송 : 고정현.

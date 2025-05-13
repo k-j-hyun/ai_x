@@ -1,0 +1,51 @@
+*CSS
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        tr {
+            #background-color: green;
+            border-top: 1px solid green;
+            border-bottom: 1px solid green;
+        }
+        th, td {
+            #background-color: white;            
+            padding: 5px 10px;
+        }
+    </style>
+
+# form태그
+    <form>
+        <table>
+            <caption><h2>게시판</h2></caption>
+            <tr>
+                <td>제목</td>
+                <td><input type="text" name="title" required="required" /></td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td><input type="text" name="name" /></td>
+            </tr>
+            <tr>
+                <td>본문</td>
+                <td><textarea name="content" rows="5" cols="24"></textarea></td>
+            </tr>
+            <tr>
+                <td>첨부파일</td>
+                <td><input type="file" name="file" /></td>
+            </tr>
+            <tr>
+                <th colspan="2">
+                    <input type="submit" value="글쓰기" />
+                    <input type="reset" value="초기화" />
+                </th>
+            </tr>
+        </table>
+    </form>
+
+*화면구현하기 예제 실습
+C:\ai_x\source\02_HTML_CSS\ch03_HTML-2_form공간분할
+화면구현평가1_고정현.html
+화면구현평가1_고정현.css
+외 실행화면캡쳐 1~6.png
+파일들을 zip하여 메일로 제출

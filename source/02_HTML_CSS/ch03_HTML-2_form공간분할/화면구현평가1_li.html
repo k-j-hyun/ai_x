@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        ul {
+            text-align: center;
+        }
+        li {
+            text-align: center;
+            list-style: none;
+            margin: 5px 0;
+        }
+        span {
+            color: red;
+        }
+    </style>
+
+    <script>
+        function chk() {
+            // 한줄 주석
+            /*
+                여러줄 주석
+            */
+            if (frm.id.value.length < 3) {
+                alert("아이디는 3글자 이상 필수입력입니다.");
+                frm.title.focus();
+                return false;
+            }
+            else if (frm.pw.value.length < 3) {
+                alert("비밀번호는 3글자 이상 입력하세요.");
+                frm.pw.focus();
+                return false;
+            }
+            else if (frm.pw.value != frm.pwChk.value) {
+                alert("비밀번호가 일치하지 않습니다.");
+                frm.pw.value = '';
+                frm.pwChk.value = '';
+                frm.pwChk.focus();
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <center>
+        <h1>회원가입</h1>
+    </center>
+    <form name="frm" onsubmit="return chk()">
+        <fieldset>
+            <legend>필수입력</legend>
+            <ul>
+                <li>
+                    <label for="name">이름<span>*</span></label>
+                    <input type="text" name="name" placeholder="이름은 2글자 이상"
+                           required="required minlength="2"
+                           id="name" autofocus="autofocus" />
+                </li>
+                <li>
+                    <label for="id">아이디<span>*</span></label>
+                    <input type="text" name="id" placeholder="ID는 4글자 이상"
+                           required="required minlength="4"
+                           id="id" />
+                </li>
+                <li>
+                    <label for="pw">비밀번호<span>*</span></label>
+                    <input type="password" name="pw" required="required"
+                           id="pw" />
+                </li>
+                <li>
+                    <label for="pwChk">비밀번호 확인<span>*</span></label>
+                    <input type="password" name="pwChk" required="required"
+                           id="pwChk" />
+                </li>
+                <li>
+                    <label for="tel">연락처 : </label>
+                    <input type="tel" name="tel" id="tel"
+                           required="required"
+                           placeholder="000-0000-0000/xx-xxx-xxxx"
+                           pattern="^\d{2,3}-\d{3,4}-\d{4}$"
+                           title="전화번호 형식이 맞지 않습니다.(000-0000-0000/xx-xxx-xxxx" />
+                </li>
+                <li>
+                    <label for="email">이메일 : </label>
+                    <input type="email" name="email" id="email"
+                           placeholder="id@domain.com또는co.kr"
+                           pattern="[a-zA-Z0-9가-힣]+@[a-zA-Z0-9]+(\.[a-zA-Z]+){1,2}"
+                           title="이메일 형식이 맞지 않습니다." />
+                </li>
+            </ul>
+        </fieldset>
+
+        <fieldset>
+            <legend>추가 입력 사항</legend>
+            <ul>
+                <li>
+                    <td>결혼유 무</td>
+                    <td>
+                        <input type="radio" name="gender" value="soldout" />기혼)
+                        <input type="radio" name="gender" value="solo" checked="checked" />미혼
+                    </td>
+                </li>
+                <tr>
+                    <td>자식</td>
+                    <td>
+                        <input type="checkbox" name="lang" value="son" />아들
+                        <input type="checkbox" name="lang" value="doughter" />딸
+                    </td>
+                </tr>
+                <tr>
+                    <td>좋아하는 음식</td>
+                    <td>
+                        <select name="food" multiple="multiple" size="1">
+                            <option>볶음밥</option>
+                            <option>비빔밥</option>
+                            <option>주먹밥</option>
+                            <option>덮밥</option>
+                        </select>
+                    </td>
+                </tr>
+            </ul>
+        </fieldset>
+        <center>
+            <input type="submit" value="가입" />
+            <input type="button" value="취소" onclick="location.href='/'" />
+        </center>
+        <hr />
+        <footer>
+            <p>
+                서울시 서대문구 신촌로 141 은하빌딩 203호
+            </p>
+            <p>
+                Copyright ⓒ XX All rights reserved.
+            </p>
+        </footer>
+    </form>
+</body>
+</html>

@@ -1,0 +1,14 @@
+﻿/* 화면구현평가1.css */
+header, footer {
+    text-align: center; /* 글씨 가운데 정렬 */
+}
+
+    footer p { /*footer태그 안의 p만 적용*/
+        margin: 0; /* 밖 여백 : 위 오른쪽 아래 왼쪽 */
+        color: gray;
+        font-size: 15px; /* 글자 크기 */
+    }
+
+span {
+    color: red;
+}

@@ -1,0 +1,68 @@
+과제
+    <style>
+1. 여기다가 보더를 넣어줌
+        #wrap { 
+            width: 600px;
+            margin: 0 auto; /* wrap을 가운데 정렬 */
+	border: 1px solid #999999;
+        }
+2. 반응형 선택자 사용하면 예뻐짐 : 마우스를 올리면 진해지고 색깔 변함
+        #nav ul li:hover { /* li에 마우스를 올렸을 때만 */
+            color: pink;
+            font-weight: bold;
+        }
+3. 인풋에 포커스할때 배경색 변환
+    <style>
+        input:focus { /* input태그중에 포커스가 되면 */
+            background-color: lightyellow;
+        }
+    </style>
+
+4. 밑줄없애기
+        #nav ul li a { /* 밑줄 없애기, 글씨 색상 - a 태그에 */
+            text-decoration: none;
+            color: black;
+        }
+
+5. 짝수번째랑 홀수번째 선택하기
+        #nav ul li:nth-child(2n+1) { /* ul 밑의 li중 홀수번째, 첫번째가 1 */
+            background-color: orange;
+        }
+        #nav ul li:nth-child(2n) { /* ul 밑의 li중 짝수번째 */
+            background-color: yellow;
+        }
+
+6. 래디어스 적용하기
+        #nav ul li:first-child { /* ul 밑의 첫번째 li */
+            border-radius: 20px 20px 0 0; /* 좌상, 우상, 우하, 좌하 */
+        }
+
+7. 가로로 변경하기
+	#width 크기를 갯수로 나눠서 하나당 100씩으로 800 조정
+        div#nav {
+            width: 800px;
+            margin: 10px auto;
+        }
+	#각 li에 with 계산해서 width값 추가하기100-(2+20+4)
+#nav ul li {
+    width: 74px;
+    float:left;
+    list-style: none;
+    border: 1px solid gray;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 2px;
+}
+	# 부모단 생성해서 오버플로우:히든 적용
+        #nav ul {
+            overflow: hidden;
+        }
+	# 플롯 레프트로 정렬하기
+        #nav ul li {
+            float:left;
+
+8. 링크선택자
+        #content a:after { /* 링크 선택자 */
+            content: ' - ' attr(href);

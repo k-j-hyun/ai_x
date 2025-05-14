@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        input:focus { /* input태그중에 포커스가 되면 */
+            background-color: lightyellow;
+        }
+        input:enabled {
+            color: green;
+        }
+        input:disabled {
+            font-size: .6em;
+        }
+        input:read-only { /* 사용자 수정 불가한 것들에 적용 */
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        이름 <input type="text" name="name" /><br />
+        아뒤 <input type="text" name="id" /><br />
+        시급 <input type="text" name="sal" value="100000" disabled="disabled" /><br />
+        <!--disabled="disabled" 입력 제한(회색으로마스킹됨)-->
+        생일 <input type="text" name="birth" value="951212" readonly="readonly" /><br />
+        <!--readonly="readonly" 입력 제한(정상표시됨)-->
+        <input type="submit" /><br />
+    </form>
+</body>
+</html>

@@ -1,0 +1,124 @@
+﻿/* quiz_고정현.css 
+        opacity background 설정 시작*/
+#wrap .bg-inside {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('ch05/sulhyun.jpg') center/cover no-repeat;
+    opacity: 0.5;
+    z-index: 0;
+}
+
+/* 내용 위에 올라오도록 설정 */
+#wrap > *:not(.bg-inside) {
+    position: relative;
+    z-index: 1;
+}
+/*opacity background 끝*/
+
+* {
+    margin: 0 auto;
+    padding: 0;
+}
+
+#wrap {
+    border: 1px solid gray;
+    position: relative;
+    width: 1000px;
+    margin: 0 auto;
+    text-align: justify;
+    padding: 10px;
+    overflow: hidden; /* wrap 크기 밖으로 배경 안 나가게 */
+}
+
+#header {
+    background-color: yellow;
+    border: 1px solid black;
+    text-align: center;
+    padding: 40px;
+    z-index: 1;
+}
+
+/*      navigation nav ul li 설정(menu1~5)*/
+#navigation {
+    z-index: 1;
+}
+
+    #navigation .nav {
+        width: 1000px;
+        margin: 5px auto;
+    }
+
+        #navigation .nav ul {
+            overflow: hidden;
+            border: 1px solid black;
+            text-align: center;
+            padding: 20px;
+        }
+
+            #navigation .nav ul > p {
+                padding-top: 0;
+                padding-bottom: 20px;
+            }
+/*             menu 색, 위치 모양 조정 */
+            #navigation .nav ul li {
+                width: 167px;
+                float: left;
+                list-style: none;
+                /*                        border: 1px solid gray;*/
+                padding: 10px;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                margin: 2px;
+                background-color: pink;
+            }
+
+                #navigation .nav ul li a { /* 밑줄 없애기, 글씨 색상 - a 태그에 */
+                    text-decoration: none;
+                    color: #d800ff;
+                }
+
+                #navigation .nav ul li.menu1 { /* ul 밑의 첫번째 li */
+                    border-radius: 20px 0 0 20px; /* 좌상, 우상, 우하, 좌하 */
+                }
+
+                #navigation .nav ul li.menu5 { /* ul 밑의 마지막 li */
+                    border-radius: 0 20px 20px 0;
+                }
+/*      navigation nav ul li 설정 끝 (menu1~5)
+
+      content left right 화면 분할 설정하기*/
+#content {
+    overflow: hidden;
+    z-index: 1;
+    border: 1px solid black;
+}
+
+    #content .left {
+        float: left;
+        border: 1px solid black;
+        text-align: center;
+        width: 674px;
+        height: 400px;
+        margin: 5px;
+    }
+
+    #content .right {
+        float: right;
+        border: 1px solid black;
+        text-align: center;
+        width: 300px;
+        height: 400px;
+        margin: 5px;
+    }
+
+#footer > p {
+    background-color: yellow;
+    border: 1px solid black;
+    text-align: center;
+    padding: 40px;
+    z-index: 1;
+}

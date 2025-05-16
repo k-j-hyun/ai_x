@@ -1,0 +1,111 @@
+﻿/* css/header.css : 페이지 초기화, header부분 */
+/* 페이지 초기화 */
+@font-face { /* font 설정 */
+    font-family: 'Merriweather-Light';
+    src: url('../font/Merriweather-Light.ttf')
+}
+@font-face {
+    font-family: 'Merriweather-Regular';
+    src: url('../font/Merriweather-Regular.ttf')
+}
+* {
+    margin: 0;
+    padding: 0;    
+}
+a {
+    text-decoration: none;
+    color: black;
+    display: block; /* 사용자 클릭 범위 넓히기 */
+}
+li {
+    list-style: none;
+}
+
+/* header 시작 */
+
+/* header .gnb 시작 */
+header .gnb {
+    min-width: 1000px;
+    background-color: black;
+    overflow: hidden;
+    font-family: 'Merriweather-Regular';
+}
+    header .gnb ul {
+        width: 1000px;
+        margin: 0 auto;
+        /*border: 1px solid white;*/ /* 영역 잡힌것 확인 */
+    }
+        header .gnb ul li {/* 메뉴 수평 작업 */
+            float: left;
+            width: 8%;
+            margin: 0 1%;
+            text-align: center;
+            line-height: 30px;
+        }
+    header .gnb a {
+        color: white;
+    }
+
+/* header .logo 시작 */
+header .logo {
+    width: 100px;
+    margin: 30px auto;
+    border: 1px solid gray;
+    text-align: center;
+    font-size: 2em;
+    font-family: "Pacifico", cursive;
+    font-weight: 400;
+    font-style: normal;
+    padding: 15px 20px;
+}
+
+/* header .hitmenu 시작 */
+header .hitmenu {
+    background-color: white;
+    overflow: hidden;
+}
+    header .hitmenu ul {
+        width: 1000px;
+        margin: 0 auto 3px;
+        /*border: 1px solid white;*/ /* 영역 잡힌것 확인 */
+    }
+
+        header .hitmenu ul li { /* 메뉴 수평 작업 */
+            width: 100px;
+            float: right;
+            border: 1px solid black;
+            box-sizing: border-box;
+            text-align: center;
+            line-height: 50px;
+            font-family: 'Merriweather-Regular';
+            margin-bottom: 3px;
+        }
+            header .hitmenu ul li:nth-child(1) {
+                border-radius: 0 20px 20px 0;
+            }
+            header .hitmenu ul li:nth-child(4) {
+                border-radius: 20px 0 0 20px;
+            }
+
+/* header .lnb 시작 */
+header .lnb {
+    min-width: 1000px;
+    background-color: white;
+    overflow: hidden;
+    border-top: 1px dotted black;
+    border-bottom: 1px dotted black;
+}
+    header .lnb ul {
+        width: 1000px;
+        margin: 0 auto;
+        /*border: 1px solid white;*/ /* 영역 잡힌것 확인 */
+    }
+
+        header .lnb ul li { /* 메뉴 수평 작업 */
+            float: left;
+            width: 10.5%;
+            margin: 0 1%;
+            text-align: center;
+            line-height: 30px;
+        }
+

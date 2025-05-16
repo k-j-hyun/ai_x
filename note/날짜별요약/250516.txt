@@ -1,0 +1,25 @@
+test에 필요한 소스 모음
+1. 폰트 설정하기
+@font-face { /* font 설정 */
+    font-family: 'Merriweather-Light';
+    src: url('../font/Merriweather-Light.ttf')
+}
+@font-face {
+    font-family: 'Merriweather-Regular';
+    src: url('../font/Merriweather-Regular.ttf')
+}
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Merriweather-Regular';
+}
+2. 앵커태그 없애기(a href에 있는 밑줄 없애기)
+a {
+    text-decoration: none;
+    color: black;
+    display: block; /* 사용자 클릭 범위 넓히기 */
+}
+3. ul li에 앞에 동그라미 없애기
+li {
+    list-style: none;
+}

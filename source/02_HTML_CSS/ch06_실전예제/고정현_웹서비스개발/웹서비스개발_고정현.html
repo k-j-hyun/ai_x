@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <!--css-->
+    <link href="css/웹서비스개발_고정현.css" rel="stylesheet" type="text/css" />
+
+
+</head>
+<body>
+    
+    <!--nav 시작-->
+    <nav>
+        <!--nav .nav_left 시작-->
+        <div id="nav_left">
+            <ul>
+                <li>
+                    <a href="#">LOGO</a>
+                </li>
+                <li>
+                    <a href="#">참여하기</a>
+                </li>
+                <li>
+                    <a href="#">개설하기</a>
+                </li>
+                <li>
+                    <a href="#">검색하기</a>
+                </li>
+            </ul>
+        </div>
+        
+        <!--nav .nav_right 시작-->
+        <div id="nav_right">
+            <ul>
+                <li>
+                    <a href="#">고객센터</a>
+                </li>
+                <li>
+                    <a href="#">로그아웃</a>
+                </li>
+                <li>
+                    <a href="#">홍길동님</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <!--#content 시작-->
+    <div id="content">
+        <!--#content #title 시작-->
+        <div id="title">
+            <p>
+                마이페이지
+            </p>
+        </div>
+
+        <!--#content #lnb 시작-->
+        <div id="lnb">
+            <ul>
+                <li>
+                    <a href="#">나의여행</a>
+                </li>
+                <li>
+                    <a href="#">참여여행</a>
+                </li>
+                <li>
+                    <a href="#">관심여행</a>
+                </li>
+                <li>
+                    <a href="#">개인정보변경</a>
+                </li>
+                <li>
+                    <a href="#">비밀번호변경</a>
+                </li>
+            </ul>
+        </div>
+
+        <!--#content #my_content 시작-->
+        <div id="my_content">
+            <!--#content #my_content #subtitle 시작-->
+            <div id="sub_title">
+                <p>
+                    개인정보변경
+                </p>
+            </div>
+                <!--#content #my_content #subtitle #modify 시작-->
+            <div id="modify">
+                <form>
+                    <table>
+                        <tr>
+                            <td>
+                                <label for="name">이름</label>
+                            </td>
+                            <td>
+                                <input type="text" name="name" placeholder=" 이름"
+                                       required="required" pattern="[a-zA-Z가-힣]{2,}"
+                                       id="name" autofocus="autofocus" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="id">아이디</label>
+                            </td>
+                            <td>
+                                <input type="text" name="id" placeholder=" ID"
+                                       required="required"
+                                       id="id" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="email">이메일</label>
+                            </td>
+                            <td>
+                                <input type="email" name="email" id="email"
+                                       required="required"
+                                       placeholder=" id@domain.com또는co.kr"
+                                       pattern="[a-zA-Z0-9가-힣]+@[a-zA-Z0-9]+(\.[a-zA-Z]+){1,2}"
+                                        />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="tel">전화</label>
+                            </td>
+                            <td>
+                                <input type="text" name="tel" id="tel"
+                                       required="required"
+                                       placeholder=" 000-0000-0000/xx-xxx-xxxx"
+                                       pattern="^\d{2,3}-\d{3,4}-\d{4}$"
+                                        />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="birth">생년월일</label>
+                            </td>
+                            <td>
+                                <input type="text" name="birth" placeholder=" 19xx-xx-xx"
+                                       required="required" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+                                        />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="address">주소</label>
+                            </td>
+                            <td>
+                                <input type="text" name="address" placeholder=" OO시 OO구 OO동"
+                                       required="required"
+                                       id="address" />
+                            </td>
+                        </tr>
+                        <tr><td></td></tr><tr><tr><td></td></tr><td></td></tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="submit" value=" 저장 " />
+                            </td>
+                        </tr>
+                    </table>                   
+                </form>
+            </div>            
+        </div>
+    </div>
+
+
+
+    <!--footer 시작-->
+    <footer>
+        <p>footer</p>
+    </footer>
+
+
+
+</body>
+</html>

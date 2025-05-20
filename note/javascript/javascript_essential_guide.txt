@@ -1,0 +1,93 @@
+
+📘 자바스크립트 필수 문법 요약 + 예제
+
+1. ✅ 변수 선언
+let a = 10;     // 변경 가능한 변수
+const b = 20;   // 변경 불가능한 상수
+var c = 30;     // (예전 방식) 변수 선언
+
+2. 📊 데이터 타입
+let num = 10;           // 숫자
+let str = "hello";      // 문자열
+let isOk = true;        // 불린 (true/false)
+let nothing = null;     // null
+let notDefined;         // undefined
+let obj = {name: "Tom", age: 20}; // 객체
+let arr = [1, 2, 3];     // 배열
+
+3. 🔁 조건문
+if (num > 5) {
+    console.log("5보다 큼");
+} else {
+    console.log("5보다 작거나 같음");
+}
+
+4. 🔄 반복문
+for (let i = 1; i <= 5; i++) {
+    console.log("i =", i);
+}
+
+let i = 1;
+while (i <= 5) {
+    console.log("while i =", i);
+    i++;
+}
+
+5. 🧩 함수
+function greet(name) {
+    return "Hello, " + name;
+}
+console.log(greet("Alice"));
+
+화살표 함수 (짧은 함수 표현)
+const add = (a, b) => a + b;
+console.log(add(3, 4));  // 7
+
+6. 📦 객체와 배열
+let person = {
+    name: "Tom",
+    age: 25
+};
+console.log(person.name);  // "Tom"
+
+let fruits = ["apple", "banana", "cherry"];
+console.log(fruits[1]);    // "banana"
+
+7. 🎯 배열 메서드
+let nums = [1, 2, 3, 4, 5];
+let doubled = nums.map(x => x * 2);     // [2, 4, 6, 8, 10]
+let even = nums.filter(x => x % 2 === 0); // [2, 4]
+let total = nums.reduce((acc, cur) => acc + cur, 0); // 15
+
+8. 💬 문자열
+let name = "Tom";
+console.log(`안녕하세요, ${name}님`); // 템플릿 리터럴
+
+9. 🧪 비교 & 논리 연산자
+console.log(1 == "1");    // true (값만 비교)
+console.log(1 === "1");   // false (값과 타입 모두 비교)
+console.log(true && false); // false
+console.log(true || false); // true
+
+10. ⏱️ 타이머 함수
+setTimeout(() => {
+    console.log("1초 후 실행");
+}, 1000);  // 1000ms = 1초
+
+setInterval(() => {
+    console.log("매 1초마다 실행");
+}, 1000);
+
+11. 🧱 클래스 (기초)
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+
+    sayHi() {
+        console.log(`Hi, I'm ${this.name}`);
+    }
+}
+
+let p1 = new Person("Tom");
+p1.sayHi();  // "Hi, I'm Tom"

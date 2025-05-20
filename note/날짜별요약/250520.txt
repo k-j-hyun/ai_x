@@ -1,0 +1,42 @@
+Ch 02 기본문법
+자료형(string, number, boolean, object(array), function, undefined)
+내장함수(alert, prompt, confirm) cf. https://www.w3schools.com/jsref, http://devdocs.io/javascript
+
+자료형(string, number, boolean, object(array), function, undefined)
+증감연산자(++, --), 삼항연산자, 논리연산자(&&, ||)
+내장함수(alert, prompt, confirm) cf. https://www.w3schools.com/jsref, http://devdocs.io/javascript
+
+JavaScript는 HTML 종속적인 언어(HTML을 동적으로 바꿔 주는 기능)
+브라우저마다 JavaScript 해석 엔진 ex)크롬의 V8엔진
+V8 + 알파 => node.js
+
+// var : 변수선언시 사용. 변수 재선언 가능. 전역변수로 주로 사용
+// let : 변수선언시 사용. 변수 재선언 불가. 블록{} 레벨 범위에서만 적용
+// const : 상수 선언시 사용.
+
+비교연산자(==, ===)
+          == : 값이 같은지 여부(타입이 일치하지 않는 경우 타입을 일치시킨 후 같은지 여부)
+
+자료형 : undefined, string, number, boolean, function, object(array)
+
+예시
+// 자료형 : undefined, string, number, boolean, function, object(array)
+        var variable;
+        document.write('1.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        variable = '이름은 "홍길동"입니다';
+        document.write('2.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        variable = -301010.2;
+        document.write('3.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        variable = true;
+        document.write('4.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        variable = function(){ 
+            i = 10;
+            alert(i);
+        };
+        document.write('5.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        // variable(); // 함수호출
+        variable = {'name':'홍길동','age':20};
+        document.write('6.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');
+        document.write(variable.name+'<br>');
+        variable = [10, "홍길동", function(){}, {'name':'홍길동'}]; // 배열
+        document.write('7.variable타입:'+typeof(variable)+'-값:'+variable+'<br>');

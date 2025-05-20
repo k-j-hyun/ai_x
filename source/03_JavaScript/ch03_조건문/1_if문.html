@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+        img {
+            width: 300px;
+        }
+    </style>
+    <script>
+        const hour = new Date().getHours(); // 0~23
+        // hour = 19
+        document.write(hour);
+        // 0~6시 새벽그림 7~17시 낮그림 18시~23시 밤그림
+        if (hour<=6){
+            document.write('<h1>조용한 새벽시간입니다</h1>');
+            document.write('<img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjA4MDZfNTgg%2FMDAxNjU5NzE4MzcwNjcw.4uEwcDx7qTaWvCqSFlQS2Fc_mJu1BPfJNpSUN0RY8WMg.P9aZ1OOYrWL2XIugtEN8-y0YbEU6YD2Bgak-KS6v6X8g.JPEG.claire43%2FIMG_6972.jpg&type=a340">')
+        } else if (7<=hour && hour<=17) {
+            document.write('<h1>따뜻한 낮시간입니다</h1>');
+            document.write('<img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEwMjlfMTQ2%2FMDAxNjM1NDg5MDc5MzAy.ikFEX90AyLb_1_V8MGabEL29In-Td2l3aM4o0bdeaxQg.P5SUjZ3ncpt9Ex4RSduicmyGqIPdKfhmiykuQ5E-STUg.JPEG.mhjyt%2F20211029%25A3%25DF141612.jpg&type=a340">')
+        } else {
+            document.write('<h1>피로를 충전할 밤시간입니다</h1>');
+            document.write('<img src="https://search.pstatic.net/sunny/?src=http%3A%2F%2Fwww.indica.or.kr%2Fxe%2Ffiles%2Fattach%2Fimages%2F1977470%2F997%2F217%2F005%2F0b4028483f72ca3724b4d0140191d71d.jpg&type=a340">')
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

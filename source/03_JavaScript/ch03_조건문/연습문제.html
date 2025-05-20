@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            color: black;
+
+        }
+        #header {
+            border: 1px solid black;
+            box-sizing: border-box;
+            width: 300px;
+            height: 140px;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        #header table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+        }
+        #header table tr {
+            height: 30px;
+        }
+        #header table tr td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        #header table tr td input[type="text"] {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        #header table tr td input[type="submit"] {
+            width: 60px;
+            height: 100%;
+            box-sizing: border-box;
+            background-color: darkgray;
+            color: black;
+            font-weight: bold;
+            border: none;            
+        }
+        #header table tr td:nth-child(2n) {
+            
+        }
+
+    </style>
+    <script>
+        function chk() {
+            let int1 = parseInt(frm.int1.value);
+            let int2 = parseInt(frm.int2.value);
+
+            if (isNaN(int1) || isNaN(int2)) {
+                alert("숫자를 입력해주세요!");
+                return false;
+            }
+
+            if (int1 > int2) {
+                let result = int1 - int2;
+                alert("첫번째 수가 " + result + "만큼 더 큽니다.");
+                document.body.innerHTML += "<h1>첫번째 수가 " + result + "만큼 더 큽니다.</h1>";
+                frm.int1.value = int1;
+                frm.int2.value = int2;
+            } else if (int1 < int2) {
+                let result = int2 - int1;
+                alert("첫번째 수가 " + result + "만큼 더 작습니다.");
+                document.body.innerHTML += "<h1>첫번째 수가 " + result + "만큼 더 작습니다.</h1>";
+                frm.int1.value = int1;
+                frm.int2.value = int2;
+            } else {
+                alert("두 수가 같습니다.");
+                document.body.innerHTML += "<h1>두 수가 같습니다.</h1>";
+                frm.int1.value = int1;
+                frm.int2.value = int2;
+            }
+
+        return false;
+        }
+    </script>
+</head>
+<body>
+    <div id="header">
+        <form name="frm" onsubmit="return chk()">
+            <table>
+                <tr>
+                    <td>첫번째수</td>
+                    <td><input type="text" name="int1" /></td>
+                </tr>
+                <tr>
+                    <td>두번째수</td>
+                    <td><input type="text" name="int2" /></td>
+                </tr>        
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="결과" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+Node.js 기초 정리
+==================
+
+✅ Node.js란?
+--------------
+자바스크립트를 웹 브라우저 밖에서도 실행할 수 있게 해주는 런타임 환경.
+예: 서버 만들기, 파일 입출력, API 연결 등.
+
+✅ Node.js의 특징
+------------------
+- 빠르고 비동기 처리에 강함
+- 자바스크립트를 백엔드에서도 사용 가능
+- npm으로 다양한 오픈소스 패키지 사용 가능
+
+✅ 설치 확인
+--------------
+터미널에서:
+    node -v   // Node.js 버전 확인
+    npm -v    // npm (패키지 관리자) 버전 확인
+
+✅ 간단한 예제
+--------------
+1. hello.js 파일 작성
+    console.log('Hello, Node.js!');
+
+2. 실행
+    node hello.js
+
+
+✅ 파일 저장 예제 (fs 모듈)
+-----------------------------
+```js
+const fs = require('fs');
+
+fs.writeFileSync('test.txt', 'Node.js에서 파일 쓰기');
+console.log('파일 저장 완료');
+```
+
+✅ 서버 만들기 예제 (http 모듈)
+-------------------------------
+```js
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.write('Hello from Node.js server!');
+    res.end();
+});
+
+server.listen(3000, () => {
+    console.log('서버 실행 중 → http://localhost:3000');
+});
+```
+
+✅ 외부 패키지 설치 (npm)
+--------------------------
+```bash
+npm init -y               // package.json 생성
+npm install axios         // HTTP 요청용 라이브러리 설치
+```
+
+```js
+const axios = require('axios');
+
+axios.get('https://api.github.com').then(res => {
+    console.log(res.data);
+});
+```
+
+✅ 추천 학습 순서
+------------------
+1. require/module.exports (모듈화)
+2. 파일 입출력 (fs 모듈)
+3. 웹 서버 만들기 (http, express)
+4. 외부 API 연동 (axios 등)
+5. CLI 만들기, JSON 다루기
+
+정리 일자: 2025-05-21

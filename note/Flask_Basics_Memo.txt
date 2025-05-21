@@ -1,0 +1,110 @@
+Flask 기초 정리
+==================
+
+✅ Flask란?
+--------------
+- Python 기반의 경량 웹 프레임워크
+- 단순하고 배우기 쉬워 빠르게 웹 서버 구축 가능
+- RESTful API, 웹 애플리케이션, 관리자 페이지 등에 활용
+
+✅ 설치 방법
+--------------
+pip install flask
+
+✅ 기본 예제 (Hello, Flask!)
+-----------------------------
+# app.py
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return 'Hello, Flask!'
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+실행 → python app.py
+접속 → http://127.0.0.1:5000/
+
+✅ 라우팅 예제
+-----------------
+@app.route('/about')
+def about():
+    return '소개 페이지입니다.'
+
+✅ HTML 렌더링
+-----------------
+from flask import render_template
+
+@app.route('/')
+def index():
+    return render_template('index.html')  # templates 폴더 필요
+
+✅ GET / POST 처리
+--------------------
+from flask import request
+
+@app.route('/form', methods=['GET', 'POST'])
+def form():
+    if request.method == 'POST':
+        name = request.form['name']
+        return f'안녕하세요, {name}님!'
+    return '''
+        <form method="post">
+            이름: <input name="name">
+            <input type="submit">
+        </form>
+    '''
+
+✅ JSON 응답 API
+-----------------
+from flask import jsonify
+
+@app.route('/api')
+def api():
+    return jsonify({'name': '홍길동', 'age': 30})
+
+✅ 디렉토리 구조 예시
+----------------------
+myapp/
+├── app.py
+├── templates/
+│   └── index.html
+└── static/
+    └── style.css
+
+
+✅ 추가로 배워볼 것
+----------------------
+
+1. Flask + HTML + CSS  
+→ `templates/` 폴더에 HTML 파일 작성  
+→ `static/` 폴더에 CSS 파일 저장  
+→ `render_template('index.html')` 사용
+
+2. Flask + JS (fetch)  
+→ HTML에서 `<script>`로 fetch로 Flask API 호출  
+→ Flask에서 JSON 응답 만들어줌  
+예:
+```js
+fetch('/api').then(res => res.json()).then(data => console.log(data));
+```
+
+3. Flask + DB (SQLite 또는 MySQL)
+→ `sqlite3` 모듈 또는 `SQLAlchemy` 사용  
+→ 예:
+```python
+import sqlite3
+conn = sqlite3.connect('my.db')
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM users')
+```
+또는
+```python
+from flask_sqlalchemy import SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+db = SQLAlchemy(app)
+```
+
+정리 일자: 2025-05-21

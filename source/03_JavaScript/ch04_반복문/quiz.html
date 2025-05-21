@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+        p {
+            padding: 10px;
+            margin: 0 auto;
+            position: relative;
+            top: 40%;
+            left: 10%;
+            font-weight: bold;
+            font-size: 24px;
+            color: gray;
+        }
+        span {
+            font-size: 30px;
+            color: black;
+        }
+        span:first-child {
+            color: red;
+        }
+        span:nth-child(3) {
+            color: rgb(169, 191, 0);
+        }
+        fieldset {
+            margin-left: 300px;
+            padding-bottom: 20px;
+            width: 50%;
+        }
+    </style>
+    <script>        
+        let total = 0; 
+        let right = 0; 
+        let wrong = 0; 
+
+        while (confirm('누적할래?')) {
+        let input = prompt('누적할 점수?', '0');
+
+        if (input === null) {            
+            continue;
+        }
+
+        let score = Number(input);
+
+        if (!isNaN(score) && score >= 0 && score <= 100) {
+            total += score;
+            right++;
+        } else {
+            alert('누적할 점수 입력(숫자(1~100))');
+            wrong++;
+        }
+    }        
+        let cnt = right + wrong;
+        document.write(`<fieldset>`);
+        document.write(`<p><span>${cnt} </span>번 입력<br>
+        누적 점수 : <span>${total} </span>점<br>
+        점수를 제대로 입력한 횟수 : <span>${right} </span>번<br>
+        점수를 잘못 입력한 횟수 : <span>${wrong} </span>번</p>`);
+        document.write(`</fieldset>`);
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+        
+    </style>
+    <script>
+        var arr = [273, 32, '홍길동']; // {0:273, 1:32, 2:'홍길동'}으로 인식함
+        //var person = {'name':'홍길동', 'age':20};
+        document.write('<h3>1. 일반for문 이용</h3>');
+        document.write('0번째 : ' + arr[0] + '<br>');
+        document.write('1번째 : ' + arr[1] + '<br>');
+        document.write('2번째 : ' + arr[2] + '<br>');
+        document.write('<br><br>');
+
+        for (var idx=0; idx < arr.length; idx++) {
+            document.write(idx + '번째 : ' + arr[idx] + '<br>');
+        }
+        document.write('<br><br>');
+//선생님 버전
+        for(let idx=0 ; idx<arr.length ; idx++) {
+            document.write(idx + '번째 : ' + arr[idx] + '<br>');
+        }
+        document.write('<br><br>');
+
+        // 2. for ~ in 문(배열이나 객체에서 이용)
+        document.write('<h3>2. for-in문 이용</h3>');
+        for(let idx in arr){
+            document.write(idx + '번째 : ' + arr[idx] + '<br>');
+        }
+        document.write('<br><br>');
+
+        // 3. for ~ of 문(배열이나 객체에서 이용)
+        document.write('<h3>3. for-of문 이용</h3>');
+        for(let data of arr){
+            document.write('값: ' + data + '<br>');
+        }
+        document.write('<br><br>');
+
+        // 4. forEach 함수1
+        document.write('<h3>4. forEach함수 이용</h3>');
+        //배열변수: arr
+        // data: 273, 32, '홍길동'
+        // idx : 0   , 1,    2
+        arr.forEach(function(data, idx) {
+            document.write(idx + ' : ' + data + '<br>');
+        });
+        document.write('<br><br>');
+        
+        // 5. forEach 함수 이용(idx 안씀)
+        document.write('<h3>5. forEach함수 이용(idx 안씀)</h3>');
+        arr.forEach(function(data) {
+            document.write('값 : ' + data + '<br>');
+        });
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

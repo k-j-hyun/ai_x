@@ -1,0 +1,53 @@
+1.객체와 배열
+/* 
+    class Person:
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+    person = Person('홍길동', 20)
+    print(person.name, person.age)
+*/
+const person = {'name':'홍길동', 'age':20};
+console.log('person : ', person['name'], person['age']);
+console.log('person : ', person.name, person.age);
+
+const arr = ['홍길동', 20]; // {0:'홍길동'. 1:20}
+console.log('arr : ', arr[0], arr[1]);
+
+2.객체출력
+var arr = ['홍길동', 20]; // {0:'홍길동'. 1:20}
+        for (let idx in arr) {
+            document.write(idx + ' : ' + arr[idx] + '<br>');
+        }
+        var obj = {'name':'홍길동', 'age':20}; // for-in문
+        for (let key in obj) {
+            document.write(key + ' : ' + obj[key] + '<br>');
+        }
+        obj.address = '서울시 관악구';
+        obj.hobby = '집가서 열공하기';
+        document.write('<h3>obj에 속성 추가한 후</h3>');
+        for (let key in obj) {
+            document.write(key + ' : ' + obj[key] + '<br>');
+        }
+
+
+Ch07 생성자 함수
+7.1 생성자 함수 개요
+생성자는 객체지향 프로그램에서 객체를 생성할 때 호출되는 단위 메서드를 말한다.
+function 생성자함수명(속성값들) {
+            ...
+       }
+       var 객체명 = new 생성자함수명(속성값들); 
+new 키워드로 객체를 생성하므로 생성자함수. 생성자 함수로 만든 객체를 객체 또는 인스턴스라 부른다. 해당 객체가 어떠한 생성자 함수로 생성됐는지 확인할 때 instanceof 키워드를 사용할 수 있다. 
+
+
+Ch08 기본객체
+w3schools(https://www.w3schools.com/jsref) 자바스크립트의 기본 내장객체의 속성과 메소드
+devdocs.io(http://devdocs.io/javascript ) 각각의 속성, 메소드에 대한 자세한 정보 제공
+String : 문자열을 다루기 위한 객체
+Array : 배열을 만들어 주는 객체
+Date : 날짜와 시간을 처리하기 위한 객체
+Math : 수학 계산을 위한 객체
+
+
+        

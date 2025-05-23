@@ -1,0 +1,8 @@
+Ch09 브라우저 객체 모델
+브라우저 객체 모델(BOM, Browser Object Model)은 웹 브라우저와 관련된 객체의 집합을 의미한다.
+	URL : 열고자 하는 HTML 페이지의 URL
+	name : 윈도우 간 통신하는데 사용하는 윈도우 이름 또는 target속성
+	features : 윈도우 출력 모양을 지정하는 옵션
+
+Ch 10 문서 객체 모델(Document Object Model : DOM)
+	; 넓은 의미로 HTML 페이지를 인식하는 방식이고 좁은 의미로 document객체와 관련된 객체의 집합

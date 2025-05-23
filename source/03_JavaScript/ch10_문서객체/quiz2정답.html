@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+  <title></title>
+  <style>
+    div{width:300px; margin:0 auto; border:1px solid blue; text-align:center;}
+  </style>
+  <script>
+    let url = ['http://www.naver.com',
+              'http://www.daum.net',
+              'http://www.google.com',
+              'http://www.youtube.com'];
+    const go = n=> location.href = url[n];
+  </script>
+</head>
+<body>
+  <div>
+    <h3>quiz2. 메뉴</h3>
+    <p>
+      <button onclick="go(0)">네이버</button>
+      <button onclick="go(1)">다음</button>
+      <button onclick="go(2)">구글</button>
+      <button onclick="go(3)">유투브</button>
+    </p>
+  </div>  
+</body>
+</html>

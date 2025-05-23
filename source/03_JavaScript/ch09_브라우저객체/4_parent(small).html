@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+        body {
+            height: 100vh; /* 전체 창 높이 */
+            margin: 0;
+            display: flex;
+            justify-content: center; /* 수평 가운데 */
+            align-items: center;    /* 수직 가운데 */
+        }
+        table {
+            text-align: center;
+        }
+        img {
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        let child;
+        function openChild() { // 새창 열기
+            child = open('4_child(large).html','',
+            'width=389, height=600, left=710, top=-1000');
+            if (!child) {
+                alert('팝업차단 해제 요망');
+            }
+        }
+    </script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <h2>작은 그림의 parent창</h2>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="img/small.jpg" alt="작은그림" 
+                onmouseover="openChild()" onmouseout="child.close()">
+                
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

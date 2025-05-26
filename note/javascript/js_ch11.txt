@@ -1,0 +1,17 @@
+var div;
+        window.onload = () => {
+            div = document.getElementById('wrap'); //id로 가져오기
+            div = document.getElementsByClassName('content')[0]; //class로 가져오기(배열)
+            div = document.getElementsByTagName('div')[0]; //tag이름으로 가져오기(배열)
+            div = document.getElementsByName('name')[0]; //name으로 가져오기(배열)
+            div = document.querySelector('div#wrap'); //첫번째 선택자로 가져오기
+            div = document.querySelectorAll('div.content')[0]; //선택자들 가져오기(배열)
+        }
+Ch11 이벤트
+11.1 이벤트 관련 용어 정리
+­	이벤트란 키보드를 이용해 버튼을 입력하거나 마우스 클릭과 같이 다른 것에 영향을 미치는 것. 자바 스크립트에는 다음과 같은 이벤트가 있다
+­	사전적 정의 : 자바 스크립트에서 DOM을 통해 동적인 화면처리를 위해 처리하는 내용
+	마우스 이벤트, 키보드 이벤트, HTML 프레임 이벤트, HTML 입력 양식 이벤트, 유저 인터페이스 이벤트, 구조 변화 이벤트, 터치 이벤트
+(ex) onclick, onmouseover, onmouseout, onkeyup(키보드의 특정키를 눌렀다가 올라올 때, event.keyCode 해당키의 고유 코드값..)
+­	이벤트를 연결한다. Window 객체의 onload 속성에 함수 자료형을 할당하는 것
+­	load는 이벤트 이름, 이벤트 타입

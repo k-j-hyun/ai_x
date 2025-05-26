@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <style>
+    table {
+        width:500px; 
+        margin: 10px auto; 
+        background-color: darkgreen;
+    }
+    td {
+        background-color: white; 
+        padding: 50px; 
+        text-align: center;
+    }
+    </style>
+    <script>
+        window.onkeyup = () => {
+            const tds = document.querySelectorAll("td");
+            tds.forEach(td => td.style.backgroundColor = "white");
+            
+            let key = event.keyCode;
+            if (key >= 96 && key <= 105) {
+                num = key - 96;
+                tds[num].style.backgroundColor = "yellow";               
+            } else if (key >= 48 && key <= 57) {
+                num = key - 48;
+                tds[num].style.backgroundColor = "red";                
+            } else {
+                tds[num].style.backgroundColor = "black";
+            };
+        };
+    </script>
+</head>
+<body>
+    <table>
+    <tr><td>0</td><td>1</td><td>2</td></tr>
+    <tr><td>3</td><td>4</td><td>5</td></tr>
+    <tr><td>6</td><td>7</td><td>8</td></tr>
+    </table>
+</body>
+</html>

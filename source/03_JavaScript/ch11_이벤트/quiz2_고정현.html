@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        ul {
+            overflow: hidden;
+        }
+        li {
+            float: left; 
+            list-style: none; 
+            margin: 3px;
+        }
+    </style>
+    <script>
+        var overImg = ['img/0over.jpg', 'img/1over.jpg', 'img/2over.jpg', 'img/3over.jpg'];
+        var outImg = ['img/0out.jpg', 'img/1out.jpg', 'img/2out.jpg', 'img/3out.jpg'];
+
+        function onmouse(idx) {
+            document.getElementById(`img${idx}`).src = overImg[idx];
+        }
+
+        function outmouse(idx) {
+            document.getElementById(`img${idx}`).src = outImg[idx];
+        }
+    </script>
+</head>
+<body>
+    <ul>
+        <li><a href="#"><img id="img0" src="img/0out.jpg" onmouseover="onmouse(0)" onmouseout="outmouse(0)" /></a></li>
+        <li><a href="#"><img id="img1" src="img/1out.jpg" onmouseover="onmouse(1)" onmouseout="outmouse(1)" /></a></li>
+        <li><a href="#"><img id="img2" src="img/2out.jpg" onmouseover="onmouse(2)" onmouseout="outmouse(2)" /></a></li>
+        <li><a href="#"><img id="img3" src="img/3out.jpg" onmouseover="onmouse(3)" onmouseout="outmouse(3)" /></a></li>
+    </ul>
+</body>
+</html>

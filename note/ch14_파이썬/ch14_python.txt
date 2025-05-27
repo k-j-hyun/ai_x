@@ -1,0 +1,8 @@
+1. XML 데이터의 경우
+<bus>
+	<id>405a001</id>
+	<loc-id>abc</loc-id>
+	<loc-name>신림3동</loc-name>
+</bus>
+
+2.json 데이터의 경우

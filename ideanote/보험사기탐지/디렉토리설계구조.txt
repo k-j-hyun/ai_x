@@ -1,0 +1,24 @@
+insurance_fraud_project/
+│
+├── app/                       # Flask 웹 앱
+│   ├── static/               # 정적 파일 (CSS, JS, 이미지 등)
+│   ├── templates/            # HTML 템플릿
+│   ├── routes.py             # 라우팅 정의
+│   ├── models.py             # DB 모델 정의
+│   ├── forms.py              # 사용자 입력 폼 정의
+│   └── __init__.py           # Flask 앱 초기화
+│
+├── ai_model/                 # 보험사기 탐지 모델
+│   ├── train_model.py
+│   ├── model.pkl             # 저장된 모델
+│   └── predict.py            # 입력값 분석 함수
+│
+├── database/                 # DB 파일
+│   └── schema.sql
+│
+├── utils/                    # 유틸 함수들 (크롤링 등)
+│   └── news_crawler.py
+│
+├── config.py
+├── run.py                    # 앱 실행 스크립트
+└── README.md

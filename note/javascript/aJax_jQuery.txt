@@ -47,17 +47,3 @@ jQuery에서는 Ajax와 관련하여 몇 개의 메소드를 제공하고 있다
 jQuery Ajax메소드를 사용하게 되면 외부데이터를 로딩해서 보여질 수 있다.
 jQuery를 이용하지 않으면 Ajax이용이 어려울 수 있으나 jQuery를 이용하면 쉬운 코딩이 될 수 있다.
 
-
-test.
-AJAX / 4_ajax_get.html/ exists.html, nonExists.html
-
-
-1. XML 데이터의 경우
-<bus>
-	<id>405a001</id>
-	<loc-id>abc</loc-id>
-	<loc-name>신림3동</loc-name>
-</bus>
-
-2.json 데이터의 경우
-

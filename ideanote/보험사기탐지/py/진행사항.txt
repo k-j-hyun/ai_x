@@ -1,0 +1,58 @@
+===========주소===========
+python run.py
+http://127.0.0.1:5000/
+cd c:\ai_x\ideanote\보험사기탐지\py\insurance_fraud_app
+=========================
+
+최신 전체구조
+insurance_fraud_app/
+├── app/
+│   ├── __init__.py          # 앱 생성 함수
+│   ├── routes.py            # Flask 라우팅
+│   ├── templates/           # HTML 템플릿
+│   │   └── index.html
+│   ├── static/              # CSS, JS, 이미지
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   ├── js/
+│   │   │   └── main.js
+│   │   └── img/
+│   │       └── logo.png
+├── run.py                   # 실행 파일
+├── requirements.txt         # 패키지 목록
+└── README.md        
+
+
+python run.py
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+ * Restarting with watchdog (windowsapi)
+ * Debugger is active!
+ * Debugger PIN: 795-111-705
+
+
+ 다음 단계는 공지사항, 뉴스 영상 캐러셀, 게시판 등 실제 콘텐츠를 index.html에 넣어보는 일이야.
+계속 진행할까? 아니면 지금까지 내용을 먼저 코드로 만들어볼래?
+
+insurance_fraud_app/
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── templates/
+│   │   └── index.html
+├── run.py
+
+
+전체과정
+insurance_fraud_app/
+├── app/
+│   ├── __init__.py          # 앱 생성 함수
+│   ├── routes.py            # Flask 라우팅 (URL 연결)
+│   ├── templates/           # HTML 파일 위치
+│   ├── static/              # CSS, JS, 이미지
+├── run.py                   # 실행 파일
+├── requirements.txt         # 설치할 패키지 목록
+└── README.md                # 프로젝트 설명

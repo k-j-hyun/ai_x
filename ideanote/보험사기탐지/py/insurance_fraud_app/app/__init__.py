@@ -1,12 +1,23 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from .models import db, User  # db는 models.py에서 정의됨
+
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'your-secret-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+    
+    db.init_app(app)
+    login_manager.init_app(app)
 
-    # 설정 추가 가능
-    app.config['SECRET_KEY'] = 'your-secret-key'  # 로그인 등 세션 필요할 때 사용
-
-    from .routes import main  # 블루프린트 가져오기
+    from .routes import main
     app.register_blueprint(main)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     return app

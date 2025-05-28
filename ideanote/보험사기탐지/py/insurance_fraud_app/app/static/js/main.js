@@ -1,12 +1,23 @@
-// main.js
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('보험 사기 탐지 앱이 정상적으로 로딩되었습니다.');
+document.addEventListener("DOMContentLoaded", function () {
+    const track = document.querySelector('.carousel-track');
+    const items = document.querySelectorAll('.carousel-item');
+    const leftBtn = document.querySelectorAll('.carousel-btn')[0];
+    const rightBtn = document.querySelectorAll('.carousel-btn')[1];
+    
+    let index = 0;
 
-    // 버튼 예시 추가용 (나중에 실제 버튼이 생기면 연결 가능)
-    const testBtn = document.getElementById('test-button');
-    if (testBtn) {
-        testBtn.addEventListener('click', function () {
-            alert('테스트 버튼이 클릭되었습니다!');
-        });
+    function updateCarousel() {
+        const width = items[0].offsetWidth + 10; // width + margin
+        track.style.transform = `translateX(-${index * width}px)`;
     }
+
+    leftBtn.addEventListener("click", () => {
+        index = Math.max(index - 1, 0);
+        updateCarousel();
+    });
+
+    rightBtn.addEventListener("click", () => {
+        index = Math.min(index + 1, items.length - 1);
+        updateCarousel();
+    });
 });

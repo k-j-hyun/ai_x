@@ -1,0 +1,17 @@
+<h2>{{ category }} 게시판</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.title.label }} {{ form.title(size=40) }}<br>
+    {{ form.content.label }}<br>
+    {{ form.content(rows=5, cols=60) }}<br>
+    {{ form.submit() }}
+</form>
+
+<hr>
+{% for post in posts %}
+    <h3>{{ post.title }}</h3>
+    <p>{{ post.content }}</p>
+    <small>{{ post.created_at }}</small>
+    <hr>
+{% endfor %}

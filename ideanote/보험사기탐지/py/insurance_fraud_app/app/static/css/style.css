@@ -1,12 +1,55 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
+    padding: 20px;
+    background: #f9f9f9;
 }
 
-h1 {
-    color: #333;
+#notice-bar {
+    background-color: yellow;
+    padding: 10px;
+    font-weight: bold;
+}
+
+#nav {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+#detection-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background: #fff;
+    margin-bottom: 30px;
+}
+
+.carousel {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.3s ease-in-out;
+}
+
+.carousel-item {
+    min-width: 100px;
+    height: 80px;
+    background-color: #eee;
+    margin: 0 5px;
     text-align: center;
-    margin-top: 50px;
+    line-height: 80px;
+    font-size: 24px;
+}
+
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.board-grid button {
+    padding: 15px;
+    font-size: 16px;
 }

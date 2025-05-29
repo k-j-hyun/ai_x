@@ -2,75 +2,76 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>보험사기 탐지</title>
+    <title>보험사기 탐지 시스템</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 <body>
-
-    <!-- 상단 공지사항 -->
-    <div id="notice-bar">
-        📢 공지사항: 보험사기 탐지 시스템이 새롭게 업그레이드 되었습니다!
+    <!-- 상단 배경 이미지 -->
+    <div class="hero-section">
+        <div class="overlay-text">
+            <h1>보험사기 탐지 시스템</h1>
+            <p>AI로 보험사기를 예방하세요</p>
+        </div>
     </div>
 
-    <!-- 상단 네비게이션 -->
-    <div id="nav">
-    {% if current_user.is_authenticated %}
-        <span>👤 {{ current_user.username }}님 환영합니다!</span>
-        <span><a href="{{ url_for('main.logout') }}">로그아웃</a></span>
-    {% else %}
-        <span><a href="{{ url_for('main.register') }}">회원가입</a></span>
-        <span><a href="{{ url_for('main.login') }}">로그인</a></span>
-    {% endif %}
-</div>
+    <!-- 네비게이션 바 -->
+    <header class="nav-bar">
+        <div class="logo">보험사기탐지</div>
+        <nav class="nav-menu" id="nav-menu">
+            <a href="/">홈</a>
+            <a href="/board/case">사례</a>
+            <a href="/board/prevention">예방</a>
+            <a href="/board/report">신고</a>
+            <a href="/board/free">자유게시판</a>
+            <a href="/board/qna">문의</a>
+            {% if current_user.is_authenticated %}
+                <span class="user-info">👤 {{ current_user.username }} | <a href="{{ url_for('main.logout') }}">로그아웃</a></span>
+            {% else %}
+                <a href="{{ url_for('main.register') }}">회원가입</a>
+                <a href="{{ url_for('main.login') }}">로그인</a>
+            {% endif %}
+        </nav>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
 
-    <!-- 메인 타이틀 -->
-    <h1>보험사기 탐지</h1>
-
-    <!-- 탐지 기능 입력창 -->
-    <div id="detection-box">
-        <h2>보험사기 탐지기능</h2>
+    <!-- 탐지 폼 -->
+    <section class="detect-form">
         <form id="detect-form" action="/detect" method="POST">
             <input type="text" name="incident" placeholder="의심사건 입력" value="{{ incident if incident else '' }}"><br>
             <input type="text" name="result" placeholder="AI 분석결과" value="{{ result if result else '' }}" readonly><br>
             <button type="submit">검색</button>
         </form>
-    </div>
+    </section>
 
-    <!-- 뉴스 영상 캐러셀 -->
-    <h2>보험사기 뉴스 영상</h2>
-    <div class="carousel">
-        <button class="carousel-btn">&lt;</button>
-        <div class="carousel-track">
-            <div class="carousel-item">▶</div>
-            <div class="carousel-item">▶</div>
-            <div class="carousel-item">▶</div>
+    <!-- 이미지 갤러리 -->
+    <section class="image-slider-container">
+        <button class="slider-btn left" onclick="slideLeft()">&#10094;</button>
+        <div class="image-slider" id="imageSlider">
+            {% for i in range(1, 8) %}
+            <div class="slider-image">
+                <img src="{{ url_for('static', filename='images/slide' ~ i ~ '.jpg') }}" alt="Slide {{ i }}">
+            </div>
+            {% endfor %}
         </div>
-        <button class="carousel-btn">&gt;</button>
-    </div>
+        <button class="slider-btn right" onclick="slideRight()">&#10095;</button>
+    </section>
 
-    <!-- 게시판 메뉴 타이틀 -->
-    <h2>게시판 메뉴</h2>
-
-    <!-- 글쓰기 버튼 (로그인한 사용자만 가능) -->
-    <div class="write-button">
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.write_post') }}"><button>글쓰기</button></a>
-        {% else %}
-            <p>✋ 글 작성은 로그인 후 이용 가능합니다.</p>
-            <a href="{{ url_for('main.login') }}"><button>로그인하기</button></a>
-        {% endif %}
-    </div>
-
-    <!-- 게시판 카테고리 버튼 -->
-    <div class="board-grid">
-        <a href="/board/case"><button>보험사기 사례 모음집</button></a>
-        <a href="/board/report"><button>보험사기 신고</button></a>
-        <a href="/board/prevention"><button>보험사기 예방, 대응방법</button></a>
-        <a href="/board/humor"><button>유머게시판</button></a>
-        <a href="/board/free"><button>자유게시판</button></a>
-        <a href="/board/qna"><button>문의게시판</button></a>
-    </div>
-
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/">홈</a>
+                <a href="#">소셜아이콘링크</a>
+            </div>
+            <div class="footer-copy">&copy; 2025 보험사기탐지. 모든 권리 보유.</div>
+        </div>
+    </footer>
 </body>
 </html>

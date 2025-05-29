@@ -64,3 +64,10 @@ def write_post():
         # DB에 저장하는 코드 생략
         return redirect(url_for('main.board', category='free'))
     return render_template('write.html')
+
+@main.route('/board/<int:post_id>/comment', methods=['POST'])
+@login_required
+def comment(post_id):
+    comment_text = request.form['comment']
+    # DB에 댓글 저장 로직 생략
+    return redirect(url_for('main.view_post', post_id=post_id))

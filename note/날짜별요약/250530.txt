@@ -1,0 +1,29 @@
+## 3.1. 동적 웹데이터 수집
+### 문법
+```
+pip install selenium
+```
+- Docs : https://www.selenium.dev/documentation/ <br>
+         https://selenium-python.readthedocs.io/
+
+*필요한 라이브러리
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+import pandas as pd
+
+*자동화 동적 웹데이터수집
+driver = webdriver.Chrome()
+
+*자동화 중 로딩시간 고려하여 잠깐 시간 sleep하기
+time.sleep(0.5)
+
+driver.get('https://www.daum.net/')
+input_elem = driver.find_element(By.NAME, 'q')
+input_elem.send_keys('다음 번역기')
+input_elem.send_keys(Keys.RETURN)
+
+*파일 내보내기 및 가져오기
+with open('data/ch14_자동화영어번역본.txt', 'w', encoding='utf-8') as f:
+    f.write(results)

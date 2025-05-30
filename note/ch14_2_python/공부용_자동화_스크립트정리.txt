@@ -1,0 +1,93 @@
+
+# === 1. 파일 텍스트 불러오기 및 300자 단위로 자르기 ===
+with open('data/ch14_맞춤법전.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+ready_list = []
+while len(text) > 300:
+    temp = text[:300]
+    cut_idx = temp.rfind('\n')  # 줄 끝에서 자르기
+    ready_list.append(text[:cut_idx])
+    text = text[cut_idx:]
+ready_list.append(text)
+
+# === 2. 네이버 맞춤법 검사 자동화 ===
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import time
+
+driver = webdriver.Chrome()
+driver.get('https://www.naver.com/')
+time.sleep(0.5)
+
+# 네이버 검색창에 '맞춤법 검사기' 검색
+input_elem = driver.find_element(By.CSS_SELECTOR, 'input[name="query"]')
+input_elem.send_keys('맞춤법 검사기')
+input_elem.send_keys(Keys.RETURN)
+time.sleep(0.5)
+
+# 검사기 영역의 textarea 사용
+textarea = driver.find_element(By.CLASS_NAME, 'txt_gray')
+results = ''
+
+for ready in ready_list:
+    time.sleep(2)
+    textarea.send_keys(Keys.CONTROL, 'a')
+    textarea.send_keys(ready)
+
+    driver.find_element(By.CLASS_NAME, 'btn_check').click()
+    time.sleep(2)
+
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    result = soup.select_one('p._result_text.stand_txt').text
+    results += result + '\n\n'
+
+driver.close()
+
+with open('data/ch14_맞춤법후_한글원본.txt', 'w', encoding='utf-8') as f:
+    f.write(results)
+
+# === 3. 맞춤법 검사 후 텍스트 다시 300자 단위로 분할 ===
+with open('data/ch14_맞춤법후_한글원본.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+ready_list = []
+while len(text) > 300:
+    temp = text[:300]
+    cut_idx = temp.rfind('\n')
+    ready_list.append(text[:cut_idx])
+    text = text[cut_idx:]
+ready_list.append(text)
+
+# === 4. 다음 번역기 자동화로 영어 번역 ===
+driver = webdriver.Chrome()
+driver.get('https://www.daum.net/')
+time.sleep(0.5)
+
+# 검색창에 '다음 번역기' 입력
+input_elem = driver.find_element(By.NAME, 'q')
+input_elem.send_keys('다음 번역기')
+input_elem.send_keys(Keys.RETURN)
+time.sleep(0.5)
+
+results = ''
+textarea = driver.find_element(By.ID, 'textareaWrite')
+
+for ready in ready_list:
+    time.sleep(2)
+    textarea.send_keys(Keys.CONTROL, 'a')
+    textarea.send_keys(ready)
+
+    driver.find_element(By.LINK_TEXT, '번역하기').click()
+    time.sleep(2)
+
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    result = soup.select_one('div#resultRender > div.result_area.area_item.txt_eng.translate_many').text
+    results += result + '\n\n'
+
+driver.close()
+
+with open('data/ch14_자동화영어번역본.txt', 'w', encoding='utf-8') as f:
+    f.write(results)

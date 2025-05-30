@@ -1,0 +1,152 @@
+
+==================== 1. 원본 텍스트 불러와서 300자 단위로 자르기 ====================
+
+# 파일을 열어서 내용을 읽고, 300자 이하로 끊어 맞춤법 검사에 사용할 준비를 합니다.
+with open('data/ch14_맞춤법전.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+# ready_list는 자른 텍스트 조각들을 담을 리스트입니다.
+ready_list = []
+while len(text) > 300:
+    temp = text[:300]
+    cut_idx = temp.rfind('\n')  # 줄 바꿈 기준으로 끊기
+    ready_list.append(text[:cut_idx])
+    text = text[cut_idx:]
+ready_list.append(text)  # 남은 마지막 부분도 추가
+
+=======================================================================================
+
+
+======================== 2. 네이버 맞춤법 검사기 자동화 ==========================
+
+# 필요한 라이브러리 불러오기
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import time
+
+# 크롬 브라우저 열기
+driver = webdriver.Chrome()
+driver.get('https://www.naver.com/')
+time.sleep(0.5)  # 웹페이지 로딩 대기
+
+# 검색창에 '맞춤법 검사기' 입력
+input_elem = driver.find_element(By.CSS_SELECTOR, 'input[name="query"]')
+input_elem.send_keys('맞춤법 검사기')
+input_elem.send_keys(Keys.RETURN)
+time.sleep(0.5)
+
+# 텍스트 입력 영역 찾기 (여기서 맞춤법 검사할 내용을 입력함)
+textarea = driver.find_element(By.CLASS_NAME, 'txt_gray')
+results = ''
+
+# 자른 텍스트 리스트에서 하나씩 꺼내서 검사하고 결과 저장
+for ready in ready_list:
+    time.sleep(2)
+    textarea.send_keys(Keys.CONTROL, 'a')  # 전체 선택
+    textarea.send_keys(ready)  # 입력
+    driver.find_element(By.CLASS_NAME, 'btn_check').click()  # 검사 버튼 클릭
+    time.sleep(2)
+
+    # 검사 결과 가져오기
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    result = soup.select_one('p._result_text.stand_txt').text
+    results += result + '\n\n'
+
+driver.close()
+
+# 맞춤법 적용된 텍스트 파일로 저장
+with open('data/ch14_맞춤법후_한글원본.txt', 'w', encoding='utf-8') as f:
+    f.write(results)
+
+=======================================================================================
+
+
+================== 3. 맞춤법 적용된 텍스트 다시 300자 이하로 자르기 ==================
+
+# 다시 번역을 위해 300자 기준으로 텍스트 자르기
+with open('data/ch14_맞춤법후_한글원본.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+ready_list = []
+while len(text) > 300:
+    temp = text[:300]
+    cut_idx = temp.rfind('\n')
+    ready_list.append(text[:cut_idx])
+    text = text[cut_idx:]
+ready_list.append(text)
+
+=======================================================================================
+
+
+========================= 4. 다음 번역기를 이용한 자동 번역 ==========================
+
+# 다시 크롬 브라우저 실행
+driver = webdriver.Chrome()
+driver.get('https://www.daum.net/')
+time.sleep(0.5)
+
+# 검색창에 '다음 번역기' 입력
+input_elem = driver.find_element(By.NAME, 'q')
+input_elem.send_keys('다음 번역기')
+input_elem.send_keys(Keys.RETURN)
+time.sleep(0.5)
+
+# 번역기 텍스트 입력 영역 찾기
+textarea = driver.find_element(By.ID, 'textareaWrite')
+results = ''
+
+# 텍스트 조각들을 하나씩 번역하고 결과 저장
+for ready in ready_list:
+    time.sleep(2)
+    textarea.send_keys(Keys.CONTROL, 'a')
+    textarea.send_keys(ready)
+    driver.find_element(By.LINK_TEXT, '번역하기').click()
+    time.sleep(2)
+
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    result = soup.select_one('div#resultRender > div.result_area.area_item.txt_eng.translate_many').text
+    results += result + '\n\n'
+
+driver.close()
+
+# for문 자세하게 설명
+📌 전체 흐름 정리 요약
+한 문장씩 꺼내서
+기존 내용 지우고 새 문장 입력
+번역 버튼 클릭
+2초 기다리고 결과 가져오기
+results에 누적 저장
+
+#ready_list는 300자 이하로 자른 문장 조각들이 들어있는 리스트
+이 리스트 안에 있는 텍스트들을 하나씩 꺼내서 다음 번역기에 입력 → 번역 → 결과 저장 하는 과정을 반복
+for ready in ready_list:
+⏱️ 텍스트 입력 전 잠시 대기
+time.sleep(2)
+🧹 입력창 초기화 및 텍스트 입력
+첫 줄: Ctrl + A 키를 눌러 기존 텍스트 전체 선택
+두 번째 줄: 선택된 영역에 ready 문자열 입력 (기존 텍스트를 덮어쓰기)
+textarea.send_keys(Keys.CONTROL, 'a')
+textarea.send_keys(ready)
+🖱️ 번역 버튼 클릭
+driver.find_element(By.LINK_TEXT, '번역하기').click()
+⏱️ 번역 완료 대기
+time.sleep(2)
+📄 번역 결과 가져오기
+BeautifulSoup을 이용해서 현재 페이지의 HTML을 파싱함
+select_one(...)으로 번역된 텍스트가 있는 위치를 CSS 선택자로 찾아서 .text로 가져옴
+soup = BeautifulSoup(driver.page_source, "html.parser")
+result = soup.select_one('div#resultRender > div.result_area.area_item.txt_eng.translate_many').text
+📝 결과 누적 저장
+번역된 결과 result를 results라는 문자열에 누적해서 저장
+문단 구분을 위해 두 줄 띄움 (\n\n)
+results += result + '\\n\\n'
+🛑 마지막에 브라우저 닫기
+driver.close()
+
+# 번역된 내용을 파일로 저장
+with open('data/ch14_자동화영어번역본.txt', 'w', encoding='utf-8') as f:
+    f.write(results)
+
+=======================================================================================

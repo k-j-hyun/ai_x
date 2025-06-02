@@ -1,0 +1,344 @@
+마리아DB, mysql, 오라클
+
+oracle
+Destination Folder: C:\oraclexe\
+Oracle Home: C:\oraclexe\app\oracle\product\11.2.0\server\
+Oracle Base:C:\oraclexe\
+Port for 'Oracle Database Listener': 1521
+Port for 'Oracle Services for Microsoft Transaction Server': 2030
+Port for 'Oracle HTTP Listener': 8080
+
+* 오라클(Oracle Database 11g Express Edition) 설치(서버용)
+★	설치 : https://www.oracle.com/downloads/ 
+1.	오라클11g XE:
+https://www.oracle.com/database/technologies/xe-prior-release-downloads.html  
+2.	SQL Developer https://www.oracle.com/tools/downloads/sqldev-downloads.html
+
+* 오라클 설치 후 할 것
+1. Oracle setup후, cmd창을 띄워 다음을 실행합니다.(관리자cmdX)
+2. system계정 접속 후, scott 계정 생성, 권한 부여
+	C:\Users\Admin> sqlplus system/oracle(오라클비밀번호)
+	비밀번호 모를경우 : sqlplus "/as sysdba
+3. SQL> create user scott(아이디) identified by tiger(비밀번호) ;
+4. 권한주기 SQL> grant dba to scott ;
+5. SQL > exit;
+6. scott계정 접속 후, 데이터 확인
+	C:\Users\Admin> sqlplus scott/tiger
+7. SQL> SELECT * FROM TAB ; --소유 테이블 확인
+8. 수업에 사용 할 데이터 넣기
+	SQL> @C:/ai_x/lecNote/04_DBMS/demo.sql;
+**DEMO 그대로 설치**
+--
+-- Copyright (c) Oracle Corporation 1999. All Rights Reserved.
+--
+-- NAME
+-- demobld.sql
+--
+-- DESCRIPTION
+-- This script creates the SQL*Plus demonstration tables in the
+-- current schema. It should be STARTed by each user wishing to
+-- access the tables. To remove the tables use the demodrop.sql
+-- script.
+--
+-- USAGE
+-- SQL> START demobld.sql
+--
+-- 
+
+alter session set nls_territory = 'AMERICA';
+alter session set nls_language = 'AMERICAN';
+
+SET TERMOUT ON
+PROMPT Building demonstration tables. Please wait.
+SET TERMOUT OFF
+
+DROP TABLE EMP;
+DROP TABLE DEPT;
+DROP TABLE BONUS;
+DROP TABLE SALGRADE;
+DROP TABLE DUMMY;
+
+CREATE TABLE DEPT
+(DEPTNO NUMBER(2) primary key,
+DNAME VARCHAR2(14),
+LOC VARCHAR2(13) );
+
+INSERT INTO DEPT VALUES (10, 'ACCOUNTING', 'NEW YORK');
+INSERT INTO DEPT VALUES (20, 'RESEARCH', 'DALLAS');
+INSERT INTO DEPT VALUES (30, 'SALES', 'CHICAGO');
+INSERT INTO DEPT VALUES (40, 'OPERATIONS', 'BOSTON');
+
+CREATE TABLE EMP
+(EMPNO NUMBER(4) primary key,
+ENAME VARCHAR2(10),
+JOB VARCHAR2(9),
+MGR NUMBER(4),
+HIREDATE DATE,
+SAL NUMBER(7, 2),
+COMM NUMBER(7, 2),
+DEPTNO NUMBER(2) references dept(deptno));
+
+INSERT INTO EMP VALUES
+(7369, 'SMITH', 'CLERK', 7902,
+TO_DATE('17-DEC-1980', 'DD-MON-YYYY'), 800, NULL, 20);
+INSERT INTO EMP VALUES
+(7499, 'ALLEN', 'SALESMAN', 7698,
+TO_DATE('20-FEB-1981', 'DD-MON-YYYY'), 1600, 300, 30);
+INSERT INTO EMP VALUES
+(7521, 'WARD', 'SALESMAN', 7698,
+TO_DATE('22-FEB-1981', 'DD-MON-YYYY'), 1250, 500, 30);
+INSERT INTO EMP VALUES
+(7566, 'JONES', 'MANAGER', 7839,
+TO_DATE('2-APR-1981', 'DD-MON-YYYY'), 2975, NULL, 20);
+INSERT INTO EMP VALUES
+(7654, 'MARTIN', 'SALESMAN', 7698,
+TO_DATE('28-SEP-1981', 'DD-MON-YYYY'), 1250, 1400, 30);
+INSERT INTO EMP VALUES
+(7698, 'BLAKE', 'MANAGER', 7839,
+TO_DATE('1-MAY-1981', 'DD-MON-YYYY'), 2850, NULL, 30);
+INSERT INTO EMP VALUES
+(7782, 'CLARK', 'MANAGER', 7839,
+TO_DATE('9-JUN-1981', 'DD-MON-YYYY'), 2450, NULL, 10);
+INSERT INTO EMP VALUES
+(7788, 'SCOTT', 'ANALYST', 7566,
+TO_DATE('09-DEC-1982', 'DD-MON-YYYY'), 3000, NULL, 20);
+INSERT INTO EMP VALUES
+(7839, 'KING', 'PRESIDENT', NULL,
+TO_DATE('17-NOV-1981', 'DD-MON-YYYY'), 5000, NULL, 10);
+INSERT INTO EMP VALUES
+(7844, 'TURNER', 'SALESMAN', 7698,
+TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 1500, 0, 30);
+INSERT INTO EMP VALUES
+(7876, 'ADAMS', 'CLERK', 7788,
+TO_DATE('12-JAN-1983', 'DD-MON-YYYY'), 1100, NULL, 20);
+INSERT INTO EMP VALUES
+(7900, 'JAMES', 'CLERK', 7698,
+TO_DATE('3-DEC-1981', 'DD-MON-YYYY'), 950, NULL, 30);
+INSERT INTO EMP VALUES
+(7902, 'FORD', 'ANALYST', 7566,
+TO_DATE('3-DEC-1981', 'DD-MON-YYYY'), 3000, NULL, 20);
+INSERT INTO EMP VALUES
+(7934, 'MILLER', 'CLERK', 7782,
+TO_DATE('23-JAN-1982', 'DD-MON-YYYY'), 1300, NULL, 10);
+
+CREATE TABLE BONUS
+(ENAME VARCHAR2(10),
+JOB VARCHAR2(9),
+SAL NUMBER,
+COMM NUMBER);
+
+CREATE TABLE SALGRADE
+(GRADE NUMBER,
+LOSAL NUMBER,
+HISAL NUMBER);
+
+INSERT INTO SALGRADE VALUES (1, 700, 1200);
+INSERT INTO SALGRADE VALUES (2, 1201, 1400);
+INSERT INTO SALGRADE VALUES (3, 1401, 2000);
+INSERT INTO SALGRADE VALUES (4, 2001, 3000);
+INSERT INTO SALGRADE VALUES (5, 3001, 9999);
+
+CREATE TABLE DUMMY
+(DUMMY NUMBER);
+
+INSERT INTO DUMMY VALUES (0);
+
+COMMIT;
+
+SET TERMOUT ON
+PROMPT Demonstration table build is complete.
+
+EXIT
+
+**DEMO 끝** 
+
+9. scott 계정 접속 후, 데이터 확인
+sqlplus scott/tiger
+SQL> select * from tab ;
+SQL> select * from dept ;
+exit
+
+[ II ] Select문 가장 많이 쓰이는 DML(데이터 조작 언어) 질의어
+
+SELECT [DISTINCT] {*, column [Alias], ….}
+FROM 데이블명
+[WHERE condition]
+[ORDER BY {column, expression} [ASC|DESC]] ;
+
+SELECT : 원하는 컬럼 선택
+*	: 테이블의 모든 column 출력
+alias	: 해당 column에 대한 다른 이름 부여
+DISTINCT: 중복 행 제거 옵션
+FROM  : 원하는 데이터가 저장된 테이블 명을 기술
+WHERE : 조회되는 행을 제한하기 위한 조건 추가
+condition : column, 표현식, 상수 및 비교연산자
+ORDER BY:정렬을 위한 옵션 (ASC :오름차순이며 default, DECS 내림차순)
+
+
+
+
+✅ 1. DDL (Data Definition Language) – 데이터 정의어
+DDL은 데이터베이스의 구조(스키마) 를 정의하거나 수정할 때 사용합니다.
+
+주요 명령어와 기능:
+CREATE: 테이블, 인덱스, 뷰 등 생성
+예:
+
+sql
+복사
+편집
+CREATE TABLE 회원 (
+    회원ID NUMBER PRIMARY KEY,
+    이름 VARCHAR2(50),
+    가입일 DATE
+);
+ALTER: 기존 테이블 구조 수정 (열 추가, 수정, 삭제 등)
+예:
+
+sql
+복사
+편집
+ALTER TABLE 회원 ADD 전화번호 VARCHAR2(20);
+DROP: 객체(테이블, 뷰 등) 삭제
+예:
+
+sql
+복사
+편집
+DROP TABLE 회원;
+TRUNCATE: 테이블의 모든 데이터를 빠르게 삭제 (구조는 유지)
+
+✅ 2. DML (Data Manipulation Language) – 데이터 조작어
+DML은 테이블에 저장된 실제 데이터를 조작할 때 사용합니다.
+
+주요 명령어와 기능:
+INSERT: 데이터 삽입
+예:
+
+sql
+복사
+편집
+INSERT INTO 회원 (회원ID, 이름, 가입일)
+VALUES (1, '홍길동', SYSDATE);
+UPDATE: 데이터 수정
+예:
+
+sql
+복사
+편집
+UPDATE 회원 SET 이름 = '김철수' WHERE 회원ID = 1;
+DELETE: 데이터 삭제
+예:
+
+sql
+복사
+편집
+DELETE FROM 회원 WHERE 회원ID = 1;
+SELECT: 데이터 조회
+예:
+
+sql
+복사
+편집
+SELECT * FROM 회원 WHERE 가입일 > TO_DATE('2024-01-01', 'YYYY-MM-DD');
+✅ 3. DCL (Data Control Language) – 데이터 제어어
+DCL은 사용자의 권한을 제어하거나 트랜잭션(거래)의 완료/취소를 제어하는 명령어입니다.
+
+주요 명령어와 기능:
+👉 권한 제어 관련:
+GRANT: 권한 부여
+예:
+
+sql
+복사
+편집
+GRANT SELECT, INSERT ON 회원 TO 사용자A;
+REVOKE: 권한 회수
+예:
+
+sql
+복사
+편집
+REVOKE INSERT ON 회원 FROM 사용자A;
+👉 트랜잭션 제어 관련 (일부는 TCL에 포함되기도 함):
+COMMIT: 변경 사항 저장 (트랜잭션 완료)
+예:
+
+sql
+복사
+편집
+COMMIT;
+ROLLBACK: 변경 사항 취소 (트랜잭션 취소)
+예:
+
+sql
+복사
+편집
+ROLLBACK;
+SAVEPOINT: 롤백 시점 설정
+예:
+
+sql
+복사
+편집
+SAVEPOINT 저장점1;
+요약표:
+구분	설명	주요 명령어
+DDL	데이터 구조 정의	CREATE, ALTER, DROP, TRUNCATE
+DML	데이터 삽입/수정/삭제/조회	INSERT, UPDATE, DELETE, SELECT
+DCL	권한 및 트랜잭션 제어	GRANT, REVOKE, COMMIT, ROLLBACK, SAVEPOINT
+
+✅ 4. TCL (Transaction Control Language) – 트랜잭션 제어어
+TCL은 데이터베이스의 트랜잭션 처리를 제어하는 명령어입니다.
+트랜잭션은 하나의 작업 단위를 의미하며, TCL 명령어를 통해 작업을 완료하거나 취소할 수 있습니다.
+
+주요 명령어와 기능:
+COMMIT:
+변경사항을 데이터베이스에 영구 저장합니다.
+예:
+
+sql
+복사
+편집
+COMMIT;
+ROLLBACK:
+트랜잭션 중 발생한 변경사항을 취소합니다.
+예:
+
+sql
+복사
+편집
+ROLLBACK;
+SAVEPOINT:
+롤백을 위한 중간 저장점을 설정합니다.
+예:
+
+sql
+복사
+편집
+SAVEPOINT 저장점1;
+ROLLBACK TO SAVEPOINT:
+특정 저장점까지 롤백합니다.
+예:
+
+sql
+복사
+편집
+ROLLBACK TO 저장점1;
+📌 DCL vs TCL 차이
+항목	DCL	TCL
+목적	사용자 권한 및 접근 제어	트랜잭션 처리 (작업의 완료/취소)
+주요 명령어	GRANT, REVOKE	COMMIT, ROLLBACK, SAVEPOINT
+기능	사용자에게 권한을 부여하거나 회수	데이터 변경 작업을 저장하거나 취소
+
+요약하면, DCL 다음에 있는 건 TCL이고, 주로 COMMIT, ROLLBACK, SAVEPOINT 같은 트랜잭션 제어 관련 명령어를 포함합니다.
+
+필기 다시 정리할 때 아래 순서로 하면 좋아요:
+
+DDL (데이터 정의어)
+
+DML (데이터 조작어)
+
+DCL (데이터 제어어)
+
+TCL (트랜잭션 제어어) ✅

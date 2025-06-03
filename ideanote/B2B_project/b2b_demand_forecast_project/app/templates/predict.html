@@ -1,0 +1,16 @@
+<h2>제품 수요 예측</h2>
+<form method="post">
+    <label>제품 선택:
+        <select name="product_id">
+            {% for p in products %}
+            <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br><br>
+    
+    <label>날짜 입력:
+        <input type="date" name="date" required>
+    </label><br><br>
+    
+    <button type="submit">예측하기</button>
+</form>

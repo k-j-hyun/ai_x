@@ -1,0 +1,16 @@
+INSERT : INSERT INTO 테이블명 (필드명1, 필드명2,...) VALUES (값1, 값2,...);
+--         INSERT INTO 테이블명 VALUES (값1,값2,값3,...값N);
+UPDATE : UPDATE 테이블명 SET 필드명1=값1, [필드명2=값2,... 필드명n=값n] [WHERE 조건]; []생략가능
+DELETE : DELETE FROM 테이블명 [WHERE 조건];
+
+-- 테이블 복사하여 테이블명만 다른 테이블 생성 방법
+	CREATE TABLE EMP01 
+   		 AS SELECT * FROM EMP;
+	SELECT * FROM EMP01;
+
+모델링 툴 EXERD
+
+-- 테이블에 CHECK 추가하는 방법 
+    ALTER TABLE STUDENT
+        ADD CONSTRAINT CHK_sSCORE_MAX CHECK (sSCORE <= 100);
+

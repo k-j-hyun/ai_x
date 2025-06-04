@@ -1,0 +1,34 @@
+[V] Sequence
+1.	Sequence
+(1)	시퀀스의 정의 : 순차적인 번호를 자동으로 생성하는 객체로 테이블과 독립적으로 생성 및 저장 가능
+(2)	특징
+	시퀀스에서 생성되는 번호는 유일하기 때문에 기본 테이블에서 인조 Primary Key 생성시 주로 사용
+	여러 테이블에 의해 공유도 가능
+	시퀀스는 테이블과 관계없이 생성, 저장. 오라클 내부 루틴에 의해 발생되고 증가, 감소된다.
+(3)	문법 : CREATE SEQUENCE sequence_name 
+[INCREMENT BY n]  [START WITH n] 
+[MAXVALUE n] [MINVALUE n]
+[CYCLE | NOCYCLE]
+[CACHE n | NOCACHE];
+(4)	예시 :
+	CREATE TABLE FRIENDS (
+ 	ID NUMBER CONSTRAINT ORDERNO PRIMARY KEY,
+NAME VARCHAR2(10) NOT NULL,
+  	TEL VARCHAR2(20) UNIQUE,
+	ADDRESS VARCHAR2(100),
+  	LAST_MODIFIED DATE DEFAULT SYSDATE);
+	CREATE SEQUENCE FRIENDS_SEQno INCREMENT BY 1 START WITH 1 MAXVALUE 999 NOCACHE;
+	INSERT INTO FRIENDS (ID, NAME, PHONE) VALUES (FRIENDS_SEQno.NEXTVAL,'홍길동','010-9999-9999');
+	INSERT INTO FRIENDS (ID, NAME, PHONE) VALUES (FRIENDS_SEQno.NEXTVAL,'김길동,'010-9999-9888');
+	INSERT INTO FRIENDS 
+VALUES (FRIENDS_SEQno.NEXTVAL, '김길동,' 010-9999-9888', NULL, TO_DATE(‘20201231’,’YYYYMMDD’);
+	SELECT * FROM FRIENDS;
+	SELECT FRIENDS_SEQno.CURRVAL FROM DUAL; --시퀀스 현재값
+(5)	시퀀스 삭제
+	DROP SEQUENCE sequence_name;
+(6)	시퀀스 수정
+	ALTER SEQUENCE sequence_name [INCREAMENT BY n] [START WITH n] [MAXVALUE n][MINVALUE n];
+(7)	예시
+	초기값1부터 최대값999,999까지 1씩 증가하는 test_seq 시퀀스를 생성하라
+	위에서 생성한 시퀀스를 삭제하라.
+	CURRVAL과 NEXTVAL를 설명하라

@@ -1,0 +1,62 @@
+[ MySQL ]
+1.	MySQL의 특징
+	SQL에 기반을 둔 관계형 DBMS 중 하나
+	Oracle, Infomix 등의 데이터베이스는 고가이지만 MySQL 은 무료(배포판)
+	리눅스, 유닉스, 윈도우 등 거의 모든 운영체제에서 사용가능
+	처리 속도가 상당히 빠르고 대용량의 데이터 처리 용이
+	설치방법이 쉽고 초보자도 익히기 쉬움.
+	보안성이 우수
+
+-- * MYSQL
+-- DCL(계성생성, 권한부여, 권한박탈, 계정삭제, 트랜젝션 명령어)
+-- 계정 생성하기
+create user user01 identified by 'password';
+-- 모든 권한 부여하기
+grant all privileges on *.* to user01;
+-- 모든 권한 삭제하기
+revoke all privileges on *.* from user01;
+-- 계정 삭제하기
+drop user user01;
+-- DDL(테이블생성, 테이블삭제, 제약조건, 시퀀스없음)
+	- MySQL 타입 : numeric(n, d), varchar(n), date
+	정수 : tinyint(1byte), smallint(2byte), mediumint(3byte),
+		  int/integer(4byte), bigint(8byte)
+	실수 : float(n, d)(4byte), double(n, d)(8byte)
+	문자 : char(n), text, mediumtext(16MB), longtext(4GB)
+	날짜 : date, datetime, time, year, timestamp
+-- workbench 껐다가 키면 무조건 사용할 데이터베이스 use해야함
+use devdb;
+-- 한글 오류날 경우
+	select database();
+	alter database devdb charset = utf8;
+-- mySQL에는 시퀀스가 없음
+-- mySQL에서 1, 2, 3,.. (기본값)을 대체할 인위적인 primary key
+-- 테이블 만들때 auto_increment primary key 설정
+-- create table 테이블명 (auto_increment primary key) auto_increment = 1(시작값설정)
+set @@auto_increment_increment = 1; -- 1씩증가
+-- DML(INSERT, UPDATE, DELETE, SELECT)
+	-- OUTER JOIN, AND=&&, OR=||, CONCAT함수를 이용하여 연결연산자 대체
+
+
+
+※ DML ※
+-- 현제 데이터베이스 내의 테이블 list
+	show tables;
+
+-- oracle과 다른 함수들
+-- || : or 연산자 (concat을 사용해야함)
+select concat(pname, '는 ', job) message from personal;
+-- 현재 시점
+select sysdate();
+-- 날짜형을 문자로 출력 / 문자형을 날짜형으로 출력
+-- date_format(날짜/시간, 포멧) / oracle = to_char(hiredate, 'yy/mm/dd')
+-- date_format(문자, 포멧) 
+	-- %Y(년도4자리), %y(년도2자리), %m(월01,02,..), %c(월1,2,..),
+    -- %d(일01,02,00)(날짜), %e(일1,2,..)(날짜), %H(24시간), %h(12시간),
+    -- %p(오전,오후), %i(분), %s(초)
+	select date_format(sysdate(), '%Y-%m-%d %p %h:%i:%s') now;
+-- 오라클의 nvl() => if()나 ifnull()함수 이용
+select * from personal;
+select pname, pay, ifnull(bonus, 0) bonus from personal;
+select pname, pay, if(bonus is null, 0, bonus) bonus from personal;
+select pname, pay, if(pay>=3000, '부자', '평범') pay2 from personal;

@@ -1,0 +1,103 @@
+2025/06/09 ~ 07/25
+1차 팀프로젝트 팀 발표
+
+박광수 최장호 김경태 유성미 양예인
+고정현 정서희 김영신 장슬찬
+정종혁 박선우 김도현 조명환
+장선호 김진경 김민준 한창희
+
+k디지털 트레이닝 해커통 6/9월 ~ 6/27금
+박진성 박동현 심재성 주용곤
+
+b2b 아이디어
+
+① 크롤링 대상 선정
+식자재몰https://www.sfresh.co.kr/ (B2B 식자재 쇼핑몰)
+다나와https://www.danawa.com/ (전자제품 도매 가격 확인 가능)
+카페24 샘플몰https://store.cafe24.com/kr/apps (가상의 쇼핑몰)
+공공데이터 오픈 API https://www.data.go.kr/(크롤링 대신 API도 가능)
+숙박(호텔,펜션,풀빌라,리조트,바다)(야놀자,여기어때,익스피디아,아고다)
+
+
+② 크롤링 구현 예시 (BeautifulSoup 사용)
+python
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://www.example-b2b.com/products'
+headers = {'User-Agent': 'Mozilla/5.0'}
+res = requests.get(url, headers=headers)
+soup = BeautifulSoup(res.text, 'html.parser')
+
+# 예시: 상품 이름과 가격 추출
+products = soup.select('.product-item')
+for item in products:
+    name = item.select_one('.product-name').text
+    price = item.select_one('.price').text
+    print(name, price)
+③ 수집 데이터 저장 및 가공
+Pandas로 처리: DataFrame에 저장 후 누적 저장
+
+SQLite나 Oracle에 저장 가능
+
+python
+import pandas as pd
+
+data = {
+    '상품명': ['김치', '두부', '계란'],
+    '가격': [4500, 1200, 3300],
+    '날짜': pd.Timestamp.now()
+}
+df = pd.DataFrame(data)
+df.to_csv('product_data.csv', mode='a', header=False, index=False)
+④ 머신러닝 수요 예측 모델 적용 (예: XGBoost)
+python
+from xgboost import XGBRegressor
+from sklearn.model_selection import train_test_split
+
+# 예시용 데이터
+df = pd.read_csv('product_data.csv')
+X = df[['가격']]  # 예: 입력은 가격
+y = df['수요']    # 예: 과거 판매량 (수요)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+model = XGBRegressor()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+⑤ 시각화 & 웹 대시보드 (Streamlit or Flask 추천)
+python
+import streamlit as st
+import matplotlib.pyplot as plt
+
+st.title("B2B 재고 수요 예측 대시보드")
+st.line_chart(df['가격'])
+✅ 최종 구조 요약
+bash
+복사
+편집
+├── crawler/
+│   └── crawl_data.py         # 웹에서 실시간 상품 데이터 수집
+├── model/
+│   └── predict_demand.py     # 머신러닝 모델로 수요 예측
+├── dashboard/
+│   └── app.py                # Streamlit/Flask 대시보드
+├── data/
+│   └── product_data.csv      # 수집한 데이터 저장
+└── README.md                 # 프로젝트 설명
+✅ 부가기능 아이디어
+기능	설명
+스케줄러	schedule, APScheduler로 자동 크롤링 실행
+알림 시스템	특정 품목 수요 급증 시 이메일/텔레그램 알림
+사용자 로그인	Flask 로그인 시스템 연동
+DB 저장	SQLite 또는 Oracle 연동
+가격 트렌드 분석	품목별 가격 변동 그래프
+
+✅ 마무리 조언
+이 프로젝트는 크롤링 + ML + 웹 구현이 함께 포함되어 있어서,
+기술 역량을 종합적으로 보여주는 포트폴리오로 매우 강력합니다.
+원하시면 제가 함께 만들 수 있도록:
+1단계씩 코드 구현 도와드리기
+전체 GitHub 구조 세팅
+Streamlit or Flask 버전 제안
+B2B 가상 회사 이름/기획서 제작

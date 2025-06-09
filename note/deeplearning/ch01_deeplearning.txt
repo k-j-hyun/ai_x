@@ -1,0 +1,52 @@
+딥러닝기초
+–인공지능의이해
+✓인공지능 : 사고나 학습등 인간이 가진 지적 능력을 컴퓨터를 통해 구현하는 기술
+✓머신러닝 : 컴퓨터가 스스로 학습하여 인공지능의 성능을 향상 시키는 기술 방법
+✓딥러닝 : 인간의 뉴런과 빗ㅅ한 인공신경망 방식으로 정보를 처리
+–딥러닝개념이해
+–딥러닝예제실습
+
+✓머신러닝 입문
+# 머신러닝 프로그램 방식
+1. 데이터 확보 및 생성
+2. 데이터 전처리 : 
+    스케일 조정
+    전체데이터셋에서 훈련데이터(학습데이터셋), 검증데이터셋, 시험데이터셋으로 분할
+3. 모델 구성
+4. 모델 학습과정 설정
+5. 모델 학습시키기
+6. 모델 평가(시험데이터셋으로)
+7. 모델 저장 및 사용(입력값이 주어지면 예측값 받기)
+
+window10의 경우 GPU사용 설정 설치 방법
+✓win10 + WSL2 + Ubuntu 22.04(24버전ok) + Tensorflow 2.19 
++ CUDA 12.5 + cuDNN 9.3 설치
+
+환경설정1. 가상환경만들기
+✓현재 존재하는 가상환경 목록 확인
+conda env list
+✓가상환경 생성
+conda create -n ml-dl-nlp python=3.9
+✓생성된 가상환경으로 들어가기
+conda activate ml-dl-nlp
+✓가상환경 나오기
+conda deactivate
+✓가상환경 지우기
+conda env remove --name 가상환경이름
+
+환경설정2. 설치 라이브러리
+✓python.exe -m pip install --upgrade pip
+✓pip install jupyter numpy==1.23.5 pandas==1.5.3 matplotlib==3.7.0 seaborn==0.12.2 scikit-learn==1.2.1
+✓pip install tensorflow==2.10.0
+
+환경설정3. 가상환경을 jupyter에서 선택가능한 커널로 등록
+✓가상환경에 들어가서 jupyter 설치
+conda install ipykernel
+✓Jupyter에서 선택가능한 커널로 등록
+python -m ipykernel install --user --name ml-dl-nlp --display-name "ml-dl-nlp"
+✓Jupyter 커널 목록 확인
+jupyter kernelspec list
+✓Jupter 커널 목록에서 삭제
+jupyter kernelspec remove display이름
+✓Jupyter lab 실행
+Jupyter lab –notebook-dir=d:\ai_x\source\05_deepLearning

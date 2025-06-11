@@ -1,0 +1,23 @@
+tensorflow 버전 1로 이진분류 해보기
+XOR을 버전1로 해본 후 XOR을 버전2로 해보기
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import SGD
+
+1. 데이터 준비
+2. 모델 구성 model = Sequential([Dense(units, input_shape=(2,), activation='relu','sigmoid'])
+3. 컴파일 (손실함수, 최적화, 평가지표 설정)
+model.compile(optimizer=SGD(learning_rate=0.01),
+		loss='bynary_crossentropy',
+		metrics=['accuracy'])
+4.학습
+model.fir(X_data, y_data, epochs=1000, verbose=0)
+5.예측결과 확인
+predictions = model.predict(X_data)
+print("\n예측 결과:")
+for i, pred in enumerate(predictions):
+    print(f"{X_data[i]} => {pred[0]:.4f} (분류: {int(pred[0] > 0.5)})")

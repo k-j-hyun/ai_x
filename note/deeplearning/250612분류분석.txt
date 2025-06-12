@@ -1,0 +1,119 @@
+dataset = np.loadtxt('data/pima-indians-diabetes.csv', encoding='utf-8',
+                    delimiter=',',
+#                     comments='#',
+                    )
+dataset.shape
+
+# 훈련셋(600), 검증셋(100), 테스트셋(68)
+X_train = dataset[:600, :-1]
+y_train = dataset[:600, -1]
+
+X_val = dataset[600:700, :-1]
+y_val = dataset[600:700, -1]
+
+X_test = dataset[700:, :-1]
+y_test = dataset[700:, -1]
+
+X_train.shape, y_train.shape, X_val.shape, y_val.shape, X_test.shape, y_test.shape
+
+
+원핫인코딩
+# 타겟변수의 원핫인코딩 (분류분석)
+print(y_train[:5])
+print(utils.to_categorical(y_train[:5]))
+Y_train = utils.to_categorical(y_train)
+Y_val = utils.to_categorical(y_val)
+Y_test = utils.to_categorical(y_test)
+y_train.shape, Y_train.shape, Y_val.shape, Y_test.shape
+
+
+덴스설정
+from tensorflow.keras.layers import Dropout
+model = Sequential()
+model.add(Input(shape=(8,)))
+model.add(Dense(32, activation='relu'))
+
+model.add(Dropout(0.2)) # 과적합을 해결하고자 두루뭉실하게 넘김
+
+model.add(Dense(64, activation='relu'))
+
+model.add(Dropout(0.1))
+
+model.add(Dense(16, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(2, activation='softmax'))
+model.summary()
+
+
+컴파일
+model.compile(loss='categorical_crossentropy',optimizer='nadam',metrics=['accuracy'])
+
+
+모델 학습
+hist = model.fit(X_train, Y_train,
+                epochs=300,
+                validation_data=(X_val, Y_val),
+                verbose=1)
+
+
+그래프그리기
+hist.history.keys()
+
+fig, loss_ax = plt.subplots(figsize=(12,6))
+loss_ax.plot(hist.history['loss'], 'y', label='train loss')
+loss_ax.plot(hist.history['val_loss'], 'r', label='val loss')
+
+acc_ax = loss_ax.twinx()
+acc_ax.plot(hist.history['accuracy'], 'g', label='train accuracy')
+acc_ax.plot(hist.history['val_accuracy'], 'b', label='val accuracy')
+
+loss_ax.set_xlabel('epochs')
+loss_ax.set_ylabel('loss')
+acc_ax.set_ylabel('accuracy')
+
+loss_ax.legend(loc='center right')
+acc_ax.legend()
+
+
+
+모델평가 & 교차표
+loss, accuracy = model.evaluate(X_test, Y_test, verbose=0)
+print(f"loss : {loss}, 정확도 : {accuracy}")
+
+# 교차표
+Y_test.argmax(axis=1) # 실제값(y_test)
+
+y_hat = model.predict(X_test) # 예측값(왼쪽:0이나올확률, 오른쪽:1이나올확률)
+y_hat = model.predict(X_test).argmax(axis=1)
+y_hat
+
+
+
+pd.crosstab(y_test, y_hat, rownames=['실제값'], colnames=['예측값'])
+
+
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test, y_hat)
+
+
+모델 저장 및 사용
+from tensorflow.keras.models import save_model, load_model
+#model.save('model/06_pima.h5')
+save_model(model, 'model/06_pima.h5')
+
+model2 = load_model('model/06_pima.h5')
+
+
+데이터 검증
+# X_test[1]
+
+
+pred = model2.predict( [[2.   , 122.   ,  76.   ,  27.   , 200.   ,  35.9  ,   0.483,
+        26.],
+                [6.   , 125.   ,  78.   ,  31.   ,   0.   ,  27.6  ,   0.565,
+        49. ]])
+pred.argmax(axis=1)
+
+검증2
+np.argmax(pred, axis=1)

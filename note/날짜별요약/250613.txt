@@ -1,0 +1,12 @@
+#DNN 임포트 목록
+import numpy as np
+import pandas as pd # get_dummies, 원핫인코딩
+from tensorflow.keras.datasets import mnist # mnist 데이터셋
+from tensorflow.keras import utils
+from tensorflow.keras.utils import to_categorical # 원핫인코딩
+from tensorflow.keras.models import Sequential, save_model, load_model # 모델생성
+from tensorflow.keras.layers import Input, Dense, Dropout
+import matplotlib.pyplot as plt # 학습과정 loss와 acc 시각화
+from sklearn.metrics import confusion_matrix # 혼동행렬
+from sklearn.preprocessing import MinMaxScaler, StandardScaler # 스케일조정
+from sklearn.model_selection import train_test_split # 데이터 분리

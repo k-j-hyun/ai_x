@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 AI 로또 예측기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status.loading {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .status.success {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .status.error {
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .lotto-numbers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .lotto-ball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .ball-1to10 { background: linear-gradient(45deg, #ffa726, #ff7043); }
+        .ball-11to20 { background: linear-gradient(45deg, #42a5f5, #1e88e5); }
+        .ball-21to30 { background: linear-gradient(45deg, #ef5350, #e53935); }
+        .ball-31to40 { background: linear-gradient(45deg, #66bb6a, #43a047); }
+        .ball-41to45 { background: linear-gradient(45deg, #ab47bc, #8e24aa); }
+        .ball-bonus { background: linear-gradient(45deg, #ffd54f, #ff8f00); }
+
+        .prediction-item {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .prediction-rank {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .confidence {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .data-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 AI 로또 예측기</h1>
+            <p>딥러닝으로 분석하는 차세대 로또 번호 예측</p>
+        </div>
+
+        <!-- 데이터 정보 카드 -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">📊 데이터 현황</h3>
+            <div class="data-info">
+                <div class="info-item">
+                    <div class="info-value" id="totalDraws">-</div>
+                    <div class="info-label">총 회차</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="latestDraw">-</div>
+                    <div class="info-label">최신 회차</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="updateData()" id="updateBtn">
+                🔄 데이터 업데이트
+            </button>
+            
+            <div id="updateStatus" class="status hidden">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px;">데이터 업데이트 중...</div>
+            </div>
+        </div>
+
+        <!-- 예측 실행 카드 -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">🎯 번호 예측</h3>
+            
+            <button class="btn btn-primary" onclick="generatePredictions()" id="predictBtn">
+                ✨ AI 번호 생성
+            </button>
+            
+            <div id="predictionStatus" class="status hidden">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px;">AI가 번호를 분석 중...</div>
+            </div>
+            
+            <div class="progress-bar hidden" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- 예측 결과 카드 -->
+        <div class="card hidden" id="resultsCard">
+            <h3 style="margin-bottom: 20px;">🏆 추천 번호 조합</h3>
+            <div id="predictionResults"></div>
+        </div>
+
+        <div class="footer">
+            <p>⚠️ 로또는 순수한 확률 게임입니다</p>
+            <p>책임감 있는 복권 구매를 권장합니다</p>
+        </div>
+    </div>
+
+    <script>
+        // 가상의 로또 데이터 및 AI 모델 시뮬레이션
+        let lottoData = [];
+        let isModelTrained = false;
+
+        // 초기 데이터 로드
+        window.onload = function() {
+            initializeData();
+        };
+
+        function initializeData() {
+            // 실제로는 서버에서 CSV 데이터를 불러옴
+            // 여기서는 시뮬레이션용 데이터 생성
+            document.getElementById('totalDraws').textContent = '1175';
+            document.getElementById('latestDraw').textContent = '1175';
+        }
+
+        async function updateData() {
+            const updateBtn = document.getElementById('updateBtn');
+            const updateStatus = document.getElementById('updateStatus');
+            
+            updateBtn.disabled = true;
+            updateStatus.classList.remove('hidden');
+            updateStatus.className = 'status loading';
+            
+            try {
+                // 실제로는 웹크롤링 실행
+                await simulateDataUpdate();
+                
+                updateStatus.className = 'status success';
+                updateStatus.innerHTML = '✅ 데이터 업데이트 완료!';
+                
+                // 최신 회차 업데이트
+                const currentDraw = parseInt(document.getElementById('latestDraw').textContent);
+                document.getElementById('latestDraw').textContent = currentDraw + 1;
+                
+            } catch (error) {
+                updateStatus.className = 'status error';
+                updateStatus.innerHTML = '❌ 업데이트 실패: ' + error.message;
+            }
+            
+            setTimeout(() => {
+                updateStatus.classList.add('hidden');
+                updateBtn.disabled = false;
+            }, 3000);
+        }
+
+        async function generatePredictions() {
+            const predictBtn = document.getElementById('predictBtn');
+            const predictionStatus = document.getElementById('predictionStatus');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const resultsCard = document.getElementById('resultsCard');
+            
+            predictBtn.disabled = true;
+            predictionStatus.classList.remove('hidden');
+            predictionStatus.className = 'status loading';
+            progressBar.classList.remove('hidden');
+            
+            try {
+                // 진행률 시뮬레이션
+                for (let i = 0; i <= 100; i += 10) {
+                    progressFill.style.width = i + '%';
+                    await sleep(200);
+                }
+                
+                // AI 모델 실행 시뮬레이션
+                const predictions = await simulateAIPrediction();
+                
+                predictionStatus.className = 'status success';
+                predictionStatus.innerHTML = '🎉 AI 분석 완료!';
+                
+                displayPredictions(predictions);
+                resultsCard.classList.remove('hidden');
+                resultsCard.classList.add('fade-in');
+                
+            } catch (error) {
+                predictionStatus.className = 'status error';
+                predictionStatus.innerHTML = '❌ 예측 실패: ' + error.message;
+            }
+            
+            setTimeout(() => {
+                predictionStatus.classList.add('hidden');
+                progressBar.classList.add('hidden');
+                predictBtn.disabled = false;
+            }, 3000);
+        }
+
+        function displayPredictions(predictions) {
+            const resultsContainer = document.getElementById('predictionResults');
+            resultsContainer.innerHTML = '';
+            
+            predictions.forEach((pred, index) => {
+                const predItem = document.createElement('div');
+                predItem.className = 'prediction-item';
+                
+                predItem.innerHTML = `
+                    <div class="prediction-header">
+                        <div class="prediction-rank">${index + 1}</div>
+                        <div class="confidence">신뢰도 ${(pred.confidence * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="lotto-numbers">
+                        ${pred.main.map(num => `<div class="lotto-ball ${getBallClass(num)}">${num}</div>`).join('')}
+                        <div style="margin: 0 10px; font-size: 1.2em; font-weight: bold;">+</div>
+                        <div class="lotto-ball ball-bonus">${pred.bonus}</div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(predItem);
+            });
+        }
+
+        function getBallClass(num) {
+            if (num <= 10) return 'ball-1to10';
+            if (num <= 20) return 'ball-11to20';
+            if (num <= 30) return 'ball-21to30';
+            if (num <= 40) return 'ball-31to40';
+            return 'ball-41to45';
+        }
+
+        // 시뮬레이션 함수들
+        async function simulateDataUpdate() {
+            // 실제로는 Python 웹크롤링 스크립트 실행
+            await sleep(2000);
+            return true;
+        }
+
+        async function simulateAIPrediction() {
+            // 실제로는 Python 딥러닝 모델 실행
+            await sleep(3000);
+            
+            // 현실적인 로또 번호 조합 생성
+            const predictions = [];
+            
+            for (let i = 0; i < 10; i++) {
+                const mainNumbers = generateRealisticNumbers();
+                const bonusNumber = Math.floor(Math.random() * 45) + 1;
+                
+                // 메인 번호와 보너스 번호가 겹치지 않도록
+                while (mainNumbers.includes(bonusNumber)) {
+                    bonusNumber = Math.floor(Math.random() * 45) + 1;
+                }
+                
+                predictions.push({
+                    main: mainNumbers,
+                    bonus: bonusNumber,
+                    confidence: Math.random() * 0.3 + 0.4 // 0.4-0.7 사이
+                });
+            }
+            
+            // 신뢰도 순으로 정렬
+            return predictions.sort((a, b) => b.confidence - a.confidence);
+        }
+
+        function generateRealisticNumbers() {
+            const numbers = [];
+            const zones = [
+                { min: 1, max: 15, count: 2 },   // 1-15 구간에서 2개
+                { min: 16, max: 30, count: 2 },  // 16-30 구간에서 2개  
+                { min: 31, max: 45, count: 2 }   // 31-45 구간에서 2개
+            ];
+            
+            zones.forEach(zone => {
+                for (let i = 0; i < zone.count; i++) {
+                    let num;
+                    do {
+                        num = Math.floor(Math.random() * (zone.max - zone.min + 1)) + zone.min;
+                    } while (numbers.includes(num));
+                    numbers.push(num);
+                }
+            });
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // PWA 관련 기능
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // 설치 프롬프트
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 표시 (필요시)
+        });
+    </script>
+</body>
+</html>

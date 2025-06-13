@@ -1,0 +1,57 @@
+funproject/
+├── 📁 backend/                 # 백엔드 서버
+│   ├── 📁 models/              # AI 모델 관련
+│   │   ├── lotto_model.py      # 딥러닝 모델 클래스
+│   │   ├── model_weights/      # 학습된 모델 가중치
+│   │   └── __init__.py
+│   ├── 📁 crawler/             # 웹크롤링 관련
+│   │   ├── lotto_crawler.py    # 로또 데이터 크롤링
+│   │   └── __init__.py
+│   ├── 📁 data/                # 데이터 저장소
+│   │   ├── lotto_numbers.csv   # 로또 번호 데이터
+│   │   └── logs/               # 로그 파일들
+│   ├── 📁 api/                 # API 엔드포인트
+│   │   ├── routes.py           # API 라우트 정의
+│   │   ├── models.py           # 데이터 모델 (Pydantic)
+│   │   └── __init__.py
+│   ├── 📁 utils/               # 유틸리티 함수들
+│   │   ├── data_processor.py   # 데이터 전처리
+│   │   ├── validators.py       # 검증 함수들
+│   │   └── __init__.py
+│   ├── app.py                  # 메인 FastAPI 앱
+│   ├── config.py               # 설정 파일
+│   └── requirements.txt        # Python 패키지 목록
+├── 📁 frontend/                # 프론트엔드 웹앱
+│   ├── 📁 static/              # 정적 파일들
+│   │   ├── 📁 css/
+│   │   │   ├── main.css        # 메인 스타일
+│   │   │   ├── mobile.css      # 모바일 전용 스타일
+│   │   │   └── animations.css  # 애니메이션 스타일 
+│   │   ├── 📁 js/
+│   │   │   ├── app.js          # 메인 앱 로직
+│   │   │   ├── api.js          # API 통신
+│   │   │   └── utils.js        # 유틸리티 함수들
+│   │   ├── 📁 images/
+│   │   │   ├── icon-192.png    # PWA 아이콘
+│   │   │   ├── icon-512.png
+│   │   │   └── logo.png
+│   │   └── manifest.json       # PWA 매니페스트
+│   ├── index.html              # 메인 HTML
+│   └── sw.js                   # 서비스 워커 (PWA)
+├── 📁 scripts/                 # 유틸리티 스크립트들
+│   ├── setup.py                # 프로젝트 초기 설정
+│   ├── train_model.py          # 모델 학습 스크립트
+│   └── backup_data.py          # 데이터 백업
+├── 📁 tests/                   # 테스트 파일들
+│   ├── test_crawler.py
+│   ├── test_model.py
+│   └── test_api.py
+├── 📁 docs/                    # 문서화
+│   ├── API.md                  # API 문서
+│   ├── SETUP.md               # 설치 가이드
+│   └── README.md              # 프로젝트 설명
+├── .env                        # 환경 변수 (비밀키 등)
+├── .gitignore                  # Git 무시 파일
+├── docker-compose.yml          # Docker 설정 (선택사항)
+├── Dockerfile                  # Docker 이미지 설정
+└── README.md                   # 프로젝트 메인 문서

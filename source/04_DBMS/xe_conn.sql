@@ -1,0 +1,4 @@
+-- SQL Worksheet (Ctrl + Shift + N) 열고 아래 입력
+CREATE USER dev_user IDENTIFIED BY dev1234;
+GRANT CONNECT, RESOURCE TO dev_user;
+ALTER USER dev_user DEFAULT TABLESPACE USERS;

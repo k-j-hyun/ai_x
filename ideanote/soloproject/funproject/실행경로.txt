@@ -1,0 +1,2 @@
+cd C:\ai_x\ideanote\soloproject\funproject
+python quick_start.py

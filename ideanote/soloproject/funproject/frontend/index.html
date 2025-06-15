@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 AI 로또 예측기</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/static/images/icon-192.png">
+    <meta name="theme-color" content="#764ba2">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .status.loading {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .status.success {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .status.error {
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .status.warning {
+            background: linear-gradient(45deg, #ffa726 0%, #ff7043 100%);
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .lotto-numbers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .lotto-ball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .lotto-ball:hover {
+            transform: scale(1.1);
+        }
+
+        .ball-1to10 { background: linear-gradient(45deg, #ffa726, #ff7043); }
+        .ball-11to20 { background: linear-gradient(45deg, #42a5f5, #1e88e5); }
+        .ball-21to30 { background: linear-gradient(45deg, #ef5350, #e53935); }
+        .ball-31to40 { background: linear-gradient(45deg, #66bb6a, #43a047); }
+        .ball-41to45 { background: linear-gradient(45deg, #ab47bc, #8e24aa); }
+        .ball-bonus { 
+            background: linear-gradient(45deg, #ffd54f, #ff8f00);
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px rgba(255, 213, 79, 0.5);
+        }
+
+        .prediction-item {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .prediction-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .prediction-rank {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .confidence {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .data-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .info-item:hover {
+            transform: scale(1.05);
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 30px;
+            font-size: 0.9em;
+            animation: fadeIn 1s ease-in 0.5s both;
+        }
+
+        /* 애니메이션 정의 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .lotto-ball {
+                width: 35px;
+                height: 35px;
+                font-size: 12px;
+            }
+        }
+
+        /* 다크모드 감지 */
+        @media (prefers-color-scheme: dark) {
+            .card {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .prediction-item {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .info-item {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 AI 로또 예측기</h1>
+            <p>딥러닝으로 분석하는 차세대 로또 번호 예측</p>
+        </div>
+
+        <!-- 시스템 상태 카드 -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">📊 시스템 상태</h3>
+            <div class="data-info">
+                <div class="info-item">
+                    <div class="info-value" id="totalDraws">-</div>
+                    <div class="info-label">총 회차</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="latestDraw">-</div>
+                    <div class="info-label">최신 회차</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="modelStatus">❌</div>
+                    <div class="stat-label">AI 모델</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="dataStatus">❌</div>
+                    <div class="stat-label">데이터</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="updateData()" id="updateBtn">
+                🔄 데이터 업데이트
+            </button>
+            
+            <div id="updateStatus" class="status hidden">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px;" id="updateMessage">데이터 업데이트 중...</div>
+            </div>
+            
+            <div class="progress-container hidden" id="updateProgressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="updateProgressFill"></div>
+                </div>
+                <div class="progress-text" id="updateProgressText">0%</div>
+            </div>
+        </div>
+
+        <!-- AI 모델 관리 카드 -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">🤖 AI 모델 관리</h3>
+            
+            <button class="btn btn-success" onclick="trainModel()" id="trainBtn">
+                🎯 AI 모델 학습
+            </button>
+            
+            <div id="trainStatus" class="status hidden">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px;" id="trainMessage">AI 모델 학습 중...</div>
+            </div>
+        </div>
+
+        <!-- 예측 실행 카드 -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">🎯 번호 예측</h3>
+            
+            <button class="btn btn-primary" onclick="generatePredictions()" id="predictBtn">
+                ✨ AI 번호 생성 (10개 조합)
+            </button>
+            
+            <div id="predictionStatus" class="status hidden">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px;">AI가 번호를 분석 중...</div>
+            </div>
+        </div>
+
+        <!-- 예측 결과 카드 -->
+        <div class="card hidden" id="resultsCard">
+            <h3 style="margin-bottom: 20px;">🏆 추천 번호 조합</h3>
+            <div id="predictionResults"></div>
+        </div>
+
+        <!-- 통계 정보 카드 -->
+        <div class="card hidden" id="statsCard">
+            <h3 style="margin-bottom: 15px;">📈 통계 정보</h3>
+            <div id="statsContent"></div>
+        </div>
+
+        <div class="footer">
+            <p>⚠️ 로또는 순수한 확률 게임입니다</p>
+            <p>책임감 있는 복권 구매를 권장합니다</p>
+            <p style="margin-top: 10px; opacity: 0.7;">
+                Made with ❤️ by AI & Human
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // API 기본 URL
+        const API_BASE = window.location.origin + '/api';
+        
+        // 전역 상태
+        let systemStatus = {
+            dataExists: false,
+            totalDraws: 0,
+            latestDraw: 0,
+            modelReady: false
+        };
+        
+        // 페이지 로드시 초기화
+        window.addEventListener('load', function() {
+            initializeApp();
+            
+            // 5초마다 자동 상태 체크
+            setInterval(checkSystemStatus, 5000);
+            
+            // PWA 설치 이벤트 처리
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            }
+        });
+        
+        async function initializeApp() {
+            showLoadingStatus('시스템 초기화 중...');
+            await checkSystemStatus();
+            hideLoadingStatus();
+        }
+        
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/data/status`);
+                const data = await response.json();
+                
+                // 상태가 변경되었을 때만 UI 업데이트
+                if (systemStatus.totalDraws !== data.total_draws || 
+                    systemStatus.latestDraw !== data.latest_draw) {
+                    
+                    systemStatus = data;
+                    updateUI();
+                    
+                    console.log(`📊 상태 업데이트: ${data.total_draws}회차, 최신 ${data.latest_draw}회`);
+                }
+                
+                // 모델 상태도 확인
+                const modelResponse = await fetch(`${API_BASE}/model/status`);
+                const modelData = await modelResponse.json();
+                updateModelStatus(modelData);
+                
+            } catch (error) {
+                console.error('상태 확인 실패:', error);
+            }
+        }
+        
+        function updateUI() {
+            // 숫자 업데이트 시 애니메이션 효과
+            const totalEl = document.getElementById('totalDraws');
+            const latestEl = document.getElementById('latestDraw');
+            
+            if (totalEl) {
+                totalEl.style.transform = 'scale(1.1)';
+                totalEl.style.color = '#4caf50';
+                totalEl.textContent = systemStatus.totalDraws || 0;
+                
+                setTimeout(() => {
+                    totalEl.style.transform = 'scale(1)';
+                    totalEl.style.color = '#667eea';
+                }, 300);
+            }
+            
+            if (latestEl) {
+                latestEl.style.transform = 'scale(1.1)';
+                latestEl.style.color = '#4caf50';
+                latestEl.textContent = systemStatus.latestDraw || 0;
+                
+                setTimeout(() => {
+                    latestEl.style.transform = 'scale(1)';
+                    latestEl.style.color = '#667eea';
+                }, 300);
+            }
+            
+            // 데이터 상태 업데이트
+            const dataStatusEl = document.getElementById('dataStatus');
+            if (dataStatusEl) {
+                dataStatusEl.textContent = systemStatus.dataExists ? '✅' : '❌';
+                dataStatusEl.style.color = systemStatus.dataExists ? '#4caf50' : '#f44336';
+            }
+        }
+        
+        function updateModelStatus(modelData) {
+            const modelStatusEl = document.getElementById('modelStatus');
+            if (modelStatusEl) {
+                const isReady = modelData.ready && modelData.trained;
+                modelStatusEl.textContent = isReady ? '✅' : '❌';
+                modelStatusEl.style.color = isReady ? '#4caf50' : '#f44336';
+                systemStatus.modelReady = isReady;
+            }
+        }
+        
+        async function updateData() {
+            const updateBtn = document.getElementById('updateBtn');
+            const updateStatus = document.getElementById('updateStatus');
+            const progressContainer = document.getElementById('updateProgressContainer');
+            
+            updateBtn.disabled = true;
+            updateStatus.classList.remove('hidden');
+            updateStatus.className = 'status loading';
+            if (progressContainer) {
+                progressContainer.classList.remove('hidden');
+            }
+            
+            try {
+                // 업데이트 시작
+                const response = await fetch(`${API_BASE}/data/update`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateStatus.className = 'status success';
+                    updateStatus.innerHTML = '✅ ' + result.message;
+                    
+                    // 즉시 상태 새로고침
+                    setTimeout(checkSystemStatus, 1000);
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('데이터 업데이트 실패:', error);
+                updateStatus.className = 'status error';
+                updateStatus.innerHTML = '❌ 업데이트 실패: ' + error.message;
+            }
+            
+            setTimeout(() => {
+                updateStatus.classList.add('hidden');
+                if (progressContainer) {
+                    progressContainer.classList.add('hidden');
+                }
+                updateBtn.disabled = false;
+            }, 3000);
+        }
+        
+        async function trainModel() {
+            if (!systemStatus.dataExists) {
+                showError('학습할 데이터가 없습니다. 먼저 데이터를 업데이트하세요.');
+                return;
+            }
+        
+            const trainBtn = document.getElementById('trainBtn');
+            const trainStatus = document.getElementById('trainStatus');
+            
+            if (trainBtn) trainBtn.disabled = true;
+            if (trainStatus) {
+                trainStatus.classList.remove('hidden');
+                trainStatus.className = 'status loading';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/model/train`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (trainStatus) {
+                        trainStatus.className = 'status success';
+                        trainStatus.innerHTML = '✅ ' + result.message;
+                    }
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('모델 학습 실패:', error);
+                if (trainStatus) {
+                    trainStatus.className = 'status error';
+                    trainStatus.innerHTML = '❌ 학습 실패: ' + error.message;
+                }
+            }
+            
+            setTimeout(() => {
+                if (trainStatus) trainStatus.classList.add('hidden');
+                if (trainBtn) trainBtn.disabled = false;
+                checkSystemStatus(); // 상태 새로고침
+            }, 3000);
+        }
+        
+        async function generatePredictions() {
+            const predictBtn = document.getElementById('predictBtn');
+            const predictionStatus = document.getElementById('predictionStatus');
+            const resultsCard = document.getElementById('resultsCard');
+            
+            if (predictBtn) predictBtn.disabled = true;
+            if (predictionStatus) {
+                predictionStatus.classList.remove('hidden');
+                predictionStatus.className = 'status loading';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ num_predictions: 10 })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (predictionStatus) {
+                        predictionStatus.className = 'status success';
+                        predictionStatus.innerHTML = '🎉 AI 분석 완료!';
+                    }
+                    
+                    displayPredictions(result.predictions);
+                    if (resultsCard) {
+                        resultsCard.classList.remove('hidden');
+                        resultsCard.classList.add('fade-in');
+                    }
+                    
+                    // 통계 정보도 로드
+                    loadStatistics();
+                    
+                } else {
+                    throw new Error(result.message);
+                }
+                
+            } catch (error) {
+                console.error('예측 실패:', error);
+                if (predictionStatus) {
+                    predictionStatus.className = 'status error';
+                    predictionStatus.innerHTML = '❌ 예측 실패: ' + error.message;
+                }
+            }
+            
+            setTimeout(() => {
+                if (predictionStatus) predictionStatus.classList.add('hidden');
+                if (predictBtn) predictBtn.disabled = false;
+            }, 3000);
+        }
+        
+        function displayPredictions(predictions) {
+            const resultsContainer = document.getElementById('predictionResults');
+            if (!resultsContainer) return;
+            
+            resultsContainer.innerHTML = '';
+            
+            predictions.forEach((pred, index) => {
+                const predItem = document.createElement('div');
+                predItem.className = 'prediction-item';
+                predItem.style.animationDelay = `${index * 0.1}s`;
+                
+                predItem.innerHTML = `
+                    <div class="prediction-header">
+                        <div class="prediction-rank">${index + 1}</div>
+                        <div class="confidence">신뢰도 ${(pred.confidence * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="lotto-numbers">
+                        ${pred.main.map(num => `<div class="lotto-ball ${getBallClass(num)}">${num}</div>`).join('')}
+                        <div style="margin: 0 10px; font-size: 1.2em; font-weight: bold; color: #666;">+</div>
+                        <div class="lotto-ball ball-bonus">${pred.bonus}</div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(predItem);
+            });
+        }
+        
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+                
+                if (stats.data_exists) {
+                    const statsCard = document.getElementById('statsCard');
+                    const statsContent = document.getElementById('statsContent');
+                    
+                    if (statsCard && statsContent) {
+                        const recent = stats.recent_analysis;
+                        
+                        statsContent.innerHTML = `
+                            <div style="margin-bottom: 15px;">
+                                <h4>📊 ${recent.period} 분석</h4>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value">${recent.odd_even.odd}</div>
+                                    <div class="stat-label">홀수</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">${recent.odd_even.even}</div>
+                                    <div class="stat-label">짝수</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">${recent.zone_distribution.zone1_1to15}</div>
+                                    <div class="stat-label">1~15구간</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">${recent.zone_distribution.zone2_16to30}</div>
+                                    <div class="stat-label">16~30구간</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 15px;">
+                                <h5>🔥 자주 나온 번호 (Top 5)</h5>
+                                <div style="display: flex; gap: 5px; justify-content: center; margin: 10px 0;">
+                                    ${recent.most_common.slice(0, 5).map(([num, count]) => 
+                                        `<div class="lotto-ball ${getBallClass(num)}">${num}</div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        `;
+                        
+                        statsCard.classList.remove('hidden');
+                        statsCard.classList.add('fade-in');
+                    }
+                }
+            } catch (error) {
+                console.error('통계 로드 실패:', error);
+            }
+        }
+        
+        function getBallClass(num) {
+            if (num <= 10) return 'ball-1to10';
+            if (num <= 20) return 'ball-11to20';
+            if (num <= 30) return 'ball-21to30';
+            if (num <= 40) return 'ball-31to40';
+            return 'ball-41to45';
+        }
+        
+        function showLoadingStatus(message) {
+            console.log(message);
+        }
+        
+        function hideLoadingStatus() {
+            // 로딩 상태 숨김
+        }
+        
+        function showError(message) {
+            alert(message);
+        }
+        
+        // PWA 설치 관련
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+# frontend/static/manifest.json
+{
+  "name": "AI 로또 예측기",
+  "short_name": "로또AI",
+  "description": "딥러닝 기반 로또 번호 예측 앱",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#764ba2",
+  "orientation": "portrait",
+  "categories": ["entertainment", "games", "utilities"],
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/images/screenshot1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
+
+# frontend/sw.js - 서비스 워커
+const CACHE_NAME = 'lotto-ai-v1.0.0';
+const STATIC_CACHE = 'lotto-ai-static-v1.0.0';
+const API_CACHE = 'lotto-ai-api-v1.0.0';
+
+// 캐시할 정적 파일들
+const STATIC_FILES = [
+  '/',
+  '/static/css/main.css',
+  '/static/css/mobile.css', 
+  '/static/css/animations.css',
+  '/static/js/app.js',
+  '/static/js/api.js',
+  '/static/js/utils.js',
+  '/static/images/icon-192.png',
+  '/static/images/icon-512.png',
+  '/manifest.json'
+];
+
+// 캐시할 API 엔드포인트들
+const API_ENDPOINTS = [
+  '/api/data/status',
+  '/api/model/status',
+  '/api/stats'
+];
+
+// 서비스 워커 설치
+self.addEventListener('install', (event) => {
+  console.log('🔧 서비스 워커 설치 중...');
+  
+  event.waitUntil(
+    Promise.all([
+      // 정적 파일 캐시
+      caches.open(STATIC_CACHE).then((cache) => {
+        console.log('📦 정적 파일 캐시 중...');
+        return cache.addAll(STATIC_FILES);
+      }),
+      // API 캐시 초기화
+      caches.open(API_CACHE).then((cache) => {
+        console.log('🌐 API 캐시 초기화...');
+        return Promise.resolve();
+      })
+    ]).then(() => {
+      console.log('✅ 서비스 워커 설치 완료');
+      self.skipWaiting();
+    }).catch((error) => {
+      console.error('❌ 서비스 워커 설치 실패:', error);
+    })
+  );
+});
+
+// 서비스 워커 활성화
+self.addEventListener('activate', (event) => {
+  console.log('🚀 서비스 워커 활성화 중...');
+  
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          // 오래된 캐시 삭제
+          if (cacheName !== STATIC_CACHE && cacheName !== API_CACHE) {
+            console.log('🗑️ 오래된 캐시 삭제:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      console.log('✅ 서비스 워커 활성화 완료');
+      return self.clients.claim();
+    })
+  );
+});
+
+// 네트워크 요청 가로채기
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  const url = new URL(request.url);
+  
+  // GET 요청만 처리
+  if (request.method !== 'GET') {
+    return;
+  }
+  
+  // API 요청 처리
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(handleApiRequest(request));
+    return;
+  }
+  
+  // 정적 파일 처리
+  event.respondWith(handleStaticRequest(request));
+});
+
+// 정적 파일 요청 처리 (Cache First 전략)
+async function handleStaticRequest(request) {
+  try {
+    // 캐시에서 먼저 확인
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // 캐시에 없으면 네트워크에서 가져오기
+    const networkResponse = await fetch(request);
+    
+    // 성공적인 응답이면 캐시에 저장
+    if (networkResponse.ok) {
+      const cache = await caches.open(STATIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+    
+  } catch (error) {
+    console.error('정적 파일 요청 실패:', error);
+    
+    // 오프라인 시 기본 페이지 반환
+    if (request.destination === 'document') {
+      const cache = await caches.open(STATIC_CACHE);
+      return cache.match('/') || new Response('오프라인 상태입니다.', {
+        status: 503,
+        statusText: 'Service Unavailable'
+      });
+    }
+    
+    throw error;
+  }
+}
+
+// API 요청 처리 (Network First 전략)
+async function handleApiRequest(request) {
+  const url = new URL(request.url);
+  
+  try {
+    // 네트워크 요청 먼저 시도
+    const networkResponse = await fetch(request);
+    
+    // 성공적인 응답이면 캐시에 저장 (읽기 전용 API만)
+    if (networkResponse.ok && isReadOnlyApi(url.pathname)) {
+      const cache = await caches.open(API_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+    
+  } catch (error) {
+    console.error('API 요청 실패:', error);
+    
+    // 네트워크 실패 시 캐시에서 반환 (읽기 전용 API만)
+    if (isReadOnlyApi(url.pathname)) {
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        console.log('📦 캐시에서 API 응답 반환:', url.pathname);
+        return cachedResponse;
+      }
+    }
+    
+    // 캐시에도 없으면 오프라인 응답
+    return new Response(JSON.stringify({
+      success: false,
+      message: '인터넷 연결을 확인해주세요.',
+      offline: true
+    }), {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+// 읽기 전용 API 확인 (캐시 가능한 API)
+function isReadOnlyApi(pathname) {
+  const readOnlyPaths = [
+    '/api/data/status',
+    '/api/model/status', 
+    '/api/stats',
+    '/api/test'
+  ];
+  
+  return readOnlyPaths.includes(pathname);
+}
+
+// 푸시 알림 (선택사항)
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  
+  const data = event.data.json();
+  const options = {
+    body: data.body || '새로운 알림이 있습니다.',
+    icon: '/static/images/icon-192.png',
+    badge: '/static/images/icon-192.png',
+    tag: 'lotto-notification',
+    requireInteraction: false,
+    actions: [
+      {
+        action: 'open',
+        title: '열기'
+      },
+      {
+        action: 'close', 
+        title: '닫기'
+      }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'AI 로또 예측기', options)
+  );
+});
+
+// 알림 클릭 처리
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  if (event.action === 'open' || !event.action) {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// 백그라운드 동기화 (선택사항)
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(
+      console.log('🔄 백그라운드 동기화 실행')
+    );
+  }
+});
+
+// 메시지 처리
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+console.log('🎲 AI 로또 예측기 서비스 워커 로드 완료');

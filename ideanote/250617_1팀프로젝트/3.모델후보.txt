@@ -1,0 +1,7 @@
+✅ 3. 모델 후보
+모델 유형	사용 목적	추천 알고리즘
+시계열 예측	강우량 예측	LSTM, Facebook Prophet, ARIMA
+침수 위험도 분류	위험 등급화	XGBoost, RandomForest, LightGBM
+공간분석/시각화	침수위험지도	GeoPandas, Folium, QGIS
+
+※ 보너스: 위성 이미지 분석(딥러닝)은 고급 옵션으로 팀 여유 있을 때 고려

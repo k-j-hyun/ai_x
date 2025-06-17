@@ -1,0 +1,25 @@
+✅ 6. 역할 분담 (최종본)
+markdown
+복사
+편집
+팀원별 전문성과 기술 스택을 고려하여 효율적으로 역할 분담합니다.
+
+👨‍💼 팀장  
+- 전체 기획 및 발표자료 작성  
+- Flask 기반 백엔드 서버 개발, Oracle 연동
+
+🧑‍💻 팀원1  
+- 기상청, 공공 데이터 수집 및 정리  
+- Pandas 기반 전처리, Oracle 데이터 저장
+
+🧑‍🔬 팀원2  
+- 예측/분류 모델링 및 평가  
+- ARIMA, Prophet, XGBoost, TensorFlow(LSTM) 실험 및 비교 분석
+
+🧑‍🎨 팀원3  
+- 웹 대시보드 구축  
+- 지도 시각화(Folium), 차트 시각화(Plotly), HTML/CSS 디자인
+
+📡 팀원4  
+- 침수 경보 기능 기획 및 구현  
+- 이메일 알림, Firebase, 위치기반 지도 API(Firebase/Kakao/Naver 등)

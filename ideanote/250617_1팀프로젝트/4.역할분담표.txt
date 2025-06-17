@@ -1,0 +1,7 @@
+✅ 4. 역할 분담표
+팀원	역할	주요 기술/도구
+팀장 (너)	전체 기획, 발표자료 정리, Flask 백엔드	Python, Flask
+팀원1	데이터 수집 및 전처리	Pandas, API, 정규표현식
+팀원2	모델링 및 평가	Scikit-learn, XGBoost, Prophet
+팀원3	시각화 + 웹 대시보드	Plotly, Folium, HTML/CSS, Streamlit or Flask
+팀원4	침수 알림 기능 개발	Firebase, 위치 기반 서비스 API (Kakao, Naver 지도 등)

@@ -1,0 +1,9 @@
+C:\Program Files\Java\jdk-17
+자바 설치 폴더를 시스템환경변수(JAVA_HOME)로 등록
+
+내PC -> 속성 -> 고급시스템 설정 -> 환경변수 -> 시스템변수 새로만들기
+변수이름 JAVA_HOME
+변수 값 C:\Program Files\Java\jdk-17
+
+사용자변수 -> Path -> 새로만들기 -> %JAVA_HOME%\bin
+-> 새로만들기 -> %JAVA_HOME%\bin\server

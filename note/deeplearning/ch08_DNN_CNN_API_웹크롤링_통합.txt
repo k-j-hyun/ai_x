@@ -1,0 +1,19 @@
+가상환경접속
+conda activate ml-dl-nlp
+※ mnist 중간에 설치한것
+pip install opencv-contrib-python
+
+※ 자연어처리에 설치한 것
+# 영어권 자연어 처리
+pip install nltk==3.7
+# 한글 자연어 처리에 필요한 install(java필요)
+pip install konlpy
+# 한글 자연어 처리(C++필요)
+pip install python-mecab-ko
+pip install wordcloud
+pip install gensim
+# .env(api주소)
+pip install python-dotenv
+# django
+pip install python-decouple
+

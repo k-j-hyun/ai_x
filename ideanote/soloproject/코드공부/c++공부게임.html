@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ 워크샵 - 시스템 프로그래밍 마스터 ⚙️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #60a5fa 50%, #93c5fd 75%, #dbeafe 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #1e3a8a 0%, #2563eb 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #3b82f6 0%, #60a5fa 100%);
+            transition: all 0.3s ease;
+            color: #1e293b;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #0f172a;
+            border: 2px solid #1e40af;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            color: #93c5fd;
+        }
+        .code-editor:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .output-box {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+        }
+        .error-box {
+            background: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+        .success-box {
+            background: #14532d;
+            border-left: 4px solid #22c55e;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 64, 175, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(30, 64, 175, 0.1);
+            color: rgba(30, 41, 59, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(30, 64, 175, 0.2);
+            color: #1e293b;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid rgba(30, 64, 175, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #0f172a;
+            border: 1px solid #1e40af;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .gear-spin {
+            animation: spin 4s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .circuit-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.3) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-slate-800">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center mb-4">
+                <h1 class="text-5xl font-bold mr-4">⚙️ C++ 워크샵</h1>
+                <div class="gear-spin text-2xl">🔧</div>
+            </div>
+            <p class="text-xl opacity-90">고성능 시스템 프로그래밍의 세계로 떠나보세요!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-blue-200 circuit-pattern">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👨‍🔧</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">C++ 엔지니어</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge text-white px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 견습생</span>
+                            <span class="text-sm">⚡ 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 해결한 문제: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🛠️ 습득한 기술:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-blue-200 bg-opacity-50 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-blue-200">
+            <div class="text-center mb-6">
+                <div id="areaEmoji" class="text-6xl mb-4">⚙️</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">C++ 워크샵 메인홀</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    정밀한 기계음이 울려퍼지는 C++ 워크샵에 오신 것을 환영합니다! 
+                    이곳에서 시스템의 심장부를 다루는 진정한 시스템 프로그래머로 성장해보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-blue-900 bg-opacity-30 rounded-lg p-4 mb-6 hidden border border-blue-600">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2 text-blue-900"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 border border-blue-200">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 워크샵 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 코딩 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 성장 분석
+                </button>
+            </div>
+
+            <!-- 워크샵 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ C++ 워크샵 탐험 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 해결한 C++ 문제들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 C++ 성장 분석</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-blue-50 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto border-4 border-blue-600">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">⚙️</div>
+                <h2 class="text-3xl font-bold mb-2 text-blue-900">C++ 코딩 미션!</h2>
+                <h3 id="skillName" class="text-xl text-blue-700"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-blue-100 rounded-lg p-6 border border-blue-300">
+                    <h4 class="text-xl font-bold mb-4 text-blue-800">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4 text-gray-800"></p>
+                    <div class="bg-green-100 rounded-lg p-4 mb-4 border border-green-300">
+                        <h5 class="font-bold mb-2 text-green-800">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm text-green-700"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-yellow-300">⚡ 예제 코드</h5>
+                        <pre><code id="exampleCode" class="text-cyan-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- 코딩 미션 -->
+                <div class="bg-blue-100 rounded-lg p-6 border border-blue-300">
+                    <h4 class="text-xl font-bold mb-4 text-blue-800">🚀 코딩 미션</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-700">📝 문제:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-100 p-3 rounded border border-purple-300"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-700">💻 C++ 코드를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-sm resize-none" 
+                                  placeholder="// C++ 코드를 여기에 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 코드 실행
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-700">🔍 실행 결과:</h5>
+                        <pre id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></pre>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-700">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-100 p-3 rounded text-sm border border-yellow-300"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-700">📝 정답 코드:</h5>
+                        <pre id="answerCode" class="bg-red-100 p-3 rounded text-sm font-mono text-gray-800 border border-red-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 미션 완료하기!
+                </button>
+                <p class="text-sm text-gray-600 mt-2">코드를 실행해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'main_hall',
+            player: {
+                name: 'C++ 엔지니어',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['main_hall'],
+                problemHistory: []
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // C++ 스킬 데이터
+        const skills = {
+            // === 1단계: C++ 기초 ===
+            variables: {
+                name: "변수와 자료형",
+                category: "C++ 기초",
+                explanation: "C++은 강타입 언어로 int, double, char, string 등의 자료형을 명시해야 합니다. iostream을 사용해 입출력을 처리합니다.",
+                application: "게임 엔진, 시스템 소프트웨어, 임베디드 시스템 등 고성능이 필요한 모든 영역에 사용됩니다.",
+                example: `#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    int age = 25;
+    double height = 175.5;
+    string name = "홍길동";
+    
+    cout << "이름: " << name << endl;
+    cout << "나이: " << age << "살" << endl;
+    cout << "키: " << height << "cm" << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "학생의 이름(string name)과 학번(int studentId)을 변수로 선언하고, '학번: [학번], 이름: [이름]'을 출력하세요.",
+                    expectedOutput: "학번: 20231001, 이름: 김철수",
+                    hint: "string name = \"김철수\"; int studentId = 20231001; 로 선언하고 cout으로 출력하세요.",
+                    answer: `#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string name = "김철수";
+    int studentId = 20231001;
+    
+    cout << "학번: " << studentId << ", 이름: " << name << endl;
+    
+    return 0;
+}`
+                }
+            },
+            pointers: {
+                name: "포인터와 참조",
+                category: "C++ 기초",
+                explanation: "포인터는 메모리 주소를 저장하는 변수입니다. C++에서 메모리를 직접 제어할 수 있는 강력한 기능입니다.",
+                application: "동적 메모리 할당, 함수 매개변수 최적화, 자료구조 구현 등에 핵심적으로 사용됩니다.",
+                example: `#include <iostream>
+using namespace std;
+
+int main() {
+    int value = 42;
+    int* ptr = &value;  // 포인터 선언
+    int& ref = value;   // 참조 선언
+    
+    cout << "value: " << value << endl;
+    cout << "포인터로 접근: " << *ptr << endl;
+    cout << "참조로 접근: " << ref << endl;
+    cout << "주소: " << ptr << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "int 변수 num = 100을 선언하고, 포인터를 사용해서 '값: [값], 주소: [주소]'를 출력하세요.",
+                    expectedOutput: "값: 100, 주소: 0x...",
+                    hint: "int* ptr = &num; 으로 포인터를 선언하고 *ptr과 ptr을 사용하세요.",
+                    answer: `#include <iostream>
+using namespace std;
+
+int main() {
+    int num = 100;
+    int* ptr = &num;
+    
+    cout << "값: " << *ptr << ", 주소: " << ptr << endl;
+    
+    return 0;
+}`
+                }
+            },
+            functions: {
+                name: "함수와 오버로딩",
+                category: "C++ 기초",
+                explanation: "C++의 함수는 코드 재사용성을 높이며, 같은 이름으로 다른 매개변수를 가진 함수를 정의할 수 있습니다(오버로딩).",
+                application: "모듈화된 프로그래밍, 라이브러리 설계, API 개발 등에 필수적입니다.",
+                example: `#include <iostream>
+using namespace std;
+
+// 함수 오버로딩
+int add(int a, int b) {
+    return a + b;
+}
+
+double add(double a, double b) {
+    return a + b;
+}
+
+int main() {
+    cout << "정수 덧셈: " << add(5, 3) << endl;
+    cout << "실수 덧셈: " << add(5.5, 3.2) << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "두 정수의 곱셈을 하는 multiply 함수를 만들고, 4와 7을 곱한 결과를 출력하세요.",
+                    expectedOutput: "28",
+                    hint: "int multiply(int a, int b) { return a * b; } 형태로 함수를 정의하세요.",
+                    answer: `#include <iostream>
+using namespace std;
+
+int multiply(int a, int b) {
+    return a * b;
+}
+
+int main() {
+    cout << multiply(4, 7) << endl;
+    
+    return 0;
+}`
+                }
+            },
+
+            // === 2단계: 객체지향 ===
+            classes_cpp: {
+                name: "클래스와 생성자",
+                category: "객체지향",
+                explanation: "C++의 클래스는 데이터와 함수를 하나로 묶는 캡슐화를 제공합니다. 생성자와 소멸자로 객체의 생명주기를 관리합니다.",
+                application: "게임 객체, GUI 컴포넌트, 데이터베이스 연결 등 복잡한 시스템 설계에 사용됩니다.",
+                example: `#include <iostream>
+#include <string>
+using namespace std;
+
+class Rectangle {
+private:
+    int width, height;
+    
+public:
+    Rectangle(int w, int h) : width(w), height(h) {}
+    
+    int getArea() {
+        return width * height;
+    }
+    
+    void display() {
+        cout << "사각형 - 너비: " << width << ", 높이: " << height << endl;
+    }
+};
+
+int main() {
+    Rectangle rect(5, 3);
+    rect.display();
+    cout << "넓이: " << rect.getArea() << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "Circle 클래스를 만들고 radius 멤버 변수와 getArea() 메서드를 구현하세요. 반지름 5인 원의 넓이를 출력하세요.",
+                    expectedOutput: "78.5",
+                    hint: "class Circle { private: double radius; public: Circle(double r) : radius(r) {} }; 형태로 시작하세요.",
+                    answer: `#include <iostream>
+using namespace std;
+
+class Circle {
+private:
+    double radius;
+    
+public:
+    Circle(double r) : radius(r) {}
+    
+    double getArea() {
+        return 3.14 * radius * radius;
+    }
+};
+
+int main() {
+    Circle circle(5);
+    cout << circle.getArea() << endl;
+    
+    return 0;
+}`
+                }
+            },
+
+            // === 3단계: STL ===
+            vectors: {
+                name: "Vector 컨테이너",
+                category: "STL",
+                explanation: "vector는 C++ STL의 동적 배열입니다. 크기가 자동으로 조절되며 다양한 멤버 함수를 제공합니다.",
+                application: "동적 데이터 저장, 알고리즘 구현, 게임 객체 관리 등에 광범위하게 사용됩니다.",
+                example: `#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    vector<int> numbers = {1, 2, 3, 4, 5};
+    
+    numbers.push_back(6);
+    
+    cout << "벡터 크기: " << numbers.size() << endl;
+    
+    for (int num : numbers) {
+        cout << num << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "vector<string>을 만들고 \"사과\", \"바나나\", \"오렌지\"를 추가한 후, 모든 요소를 출력하세요.",
+                    expectedOutput: "사과 바나나 오렌지",
+                    hint: "vector<string> fruits; 로 선언하고 push_back()으로 추가한 후 for문으로 출력하세요.",
+                    answer: `#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int main() {
+    vector<string> fruits;
+    fruits.push_back("사과");
+    fruits.push_back("바나나");
+    fruits.push_back("오렌지");
+    
+    for (string fruit : fruits) {
+        cout << fruit << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}`
+                }
+            },
+            maps: {
+                name: "Map 컨테이너",
+                category: "STL",
+                explanation: "map은 키-값 쌍을 저장하는 연관 컨테이너입니다. 자동으로 정렬되며 빠른 검색이 가능합니다.",
+                application: "데이터 매핑, 캐싱, 설정 관리, 인덱싱 등에 사용되며 실무에서 매우 중요합니다.",
+                example: `#include <iostream>
+#include <map>
+#include <string>
+using namespace std;
+
+int main() {
+    map<string, int> scores;
+    
+    scores["철수"] = 95;
+    scores["영희"] = 87;
+    scores["민수"] = 92;
+    
+    cout << "철수의 점수: " << scores["철수"] << endl;
+    cout << "총 학생 수: " << scores.size() << endl;
+    
+    return 0;
+}`,
+                challenge: {
+                    description: "map<string, string>을 사용해 국가-수도 정보를 저장하고 (\"한국\"-\"서울\", \"미국\"-\"워싱턴\"), \"한국\"의 수도를 출력하세요.",
+                    expectedOutput: "서울",
+                    hint: "map<string, string> capitals; 로 선언하고 capitals[\"한국\"] = \"서울\"; 로 추가하세요.",
+                    answer: `#include <iostream>
+#include <map>
+#include <string>
+using namespace std;
+
+int main() {
+    map<string, string> capitals;
+    
+    capitals["한국"] = "서울";
+    capitals["미국"] = "워싱턴";
+    
+    cout << capitals["한국"] << endl;
+    
+    return 0;
+}`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            main_hall: {
+                title: "C++ 워크샵 메인홀",
+                emoji: "⚙️",
+                description: "정밀한 기계음이 울려퍼지는 C++ 워크샵에 오신 것을 환영합니다! 이곳에서 시스템의 심장부를 다루는 진정한 시스템 프로그래머로 성장해보세요.",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'variables', npc: '🔧', name: '시스템 엔지니어', message: 'C++의 기본기! 변수와 자료형부터 시작해보세요. 메모리 관리의 첫걸음입니다!' },
+                    { skill: 'pointers', npc: '🎯', name: '메모리 마스터', message: '포인터는 C++의 핵심입니다! 메모리를 직접 제어하는 힘을 배워보세요!' },
+                    { skill: 'functions', npc: '⚡', name: '함수 설계자', message: '효율적인 함수 설계로 코드를 모듈화해보세요!' }
+                ]
+            },
+            oop_lab: {
+                title: "객체지향 연구실",
+                emoji: "🏗️",
+                description: "C++의 객체지향 프로그래밍을 깊이 탐구하는 곳입니다. 클래스 설계와 캡슐화의 예술을 배워보세요!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'classes_cpp', npc: '🏗️', name: 'OOP 아키텍트', message: 'C++의 클래스로 현실 세계를 모델링해보세요!' }
+                ]
+            },
+            stl_library: {
+                title: "STL 라이브러리",
+                emoji: "📚",
+                description: "C++ STL(Standard Template Library)의 강력한 컨테이너들을 마스터하는 곳입니다. 효율적인 데이터 구조를 활용해보세요!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'vectors', npc: '📊', name: 'Vector 전문가', message: '동적 배열 vector로 데이터를 자유자재로 다뤄보세요!' },
+                    { skill: 'maps', npc: '🗂️', name: 'Map 큐레이터', message: 'map 컨테이너로 효율적인 키-값 관리를 배워보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "견습생", 2: "기술자", 3: "엔지니어", 4: "시니어", 5: "전문가",
+            6: "아키텍트", 7: "마스터", 8: "전설", 9: "구루", 10: "C++의 신"
+        };
+
+        // C++ 코드 실행 시뮬레이션
+        function simulateCppCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            try {
+                // cout 찾기
+                const coutMatches = code.match(/cout\s*<<.*?;/g);
+                if (coutMatches) {
+                    const results = [];
+                    
+                    // 변수 정의 찾기
+                    const variables = {};
+                    const varMatches = code.match(/(int|string|double|float)\s+(\w+)\s*=\s*(.+?);/g);
+                    if (varMatches) {
+                        varMatches.forEach(varDef => {
+                            const match = varDef.match(/(int|string|double|float)\s+(\w+)\s*=\s*(.+?);/);
+                            if (match) {
+                                const [_, type, varName, varValue] = match;
+                                try {
+                                    if (type === 'string') {
+                                        variables[varName] = varValue.replace(/"/g, '');
+                                    } else if (type === 'int') {
+                                        variables[varName] = parseInt(varValue);
+                                    } else if (type === 'double' || type === 'float') {
+                                        variables[varName] = parseFloat(varValue);
+                                    }
+                                } catch (e) {
+                                    // 복잡한 표현식은 무시
+                                }
+                            }
+                        });
+                    }
+                    
+                    // 각 cout 처리
+                    coutMatches.forEach(coutStatement => {
+                        const content = coutStatement.replace(/cout\s*<<\s*/, '').replace(/\s*;\s*$/, '');
+                        
+                        if (content.includes('<<')) {
+                            // 여러 요소가 연결된 경우
+                            const parts = content.split('<<').map(part => part.trim());
+                            let result = '';
+                            
+                            parts.forEach(part => {
+                                if (part.startsWith('"') && part.endsWith('"')) {
+                                    result += part.slice(1, -1);
+                                } else if (part === 'endl') {
+                                    result += '\n';
+                                } else if (variables[part]) {
+                                    result += variables[part];
+                                } else if (!isNaN(part)) {
+                                    result += part;
+                                }
+                            });
+                            
+                            results.push(result.replace(/\n$/, ''));
+                        } else if (content.startsWith('"') && content.endsWith('"')) {
+                            results.push(content.slice(1, -1));
+                        } else if (variables[content]) {
+                            results.push(variables[content]);
+                        }
+                    });
+                    
+                    output = results.join('\n');
+                }
+                
+                success = output.trim() === expectedOutput.trim();
+                
+            } catch (error) {
+                throw new Error("코드 실행 중 오류가 발생했습니다.");
+            }
+            
+            return { success, output: output || "출력 없음" };
+        }
+
+        // 코드 실행 함수
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ 코드를 입력해주세요!", "error");
+                return;
+            }
+            
+            gameState.currentSession.userCode = code;
+            
+            try {
+                const result = simulateCppCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 정답입니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 훌륭해요! 이제 미션을 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 아직 정답이 아니에요.\n실행 결과: ${result.output}\n기대한 결과: ${skill.challenge.expectedOutput}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        // 나머지 함수들은 Java 게임과 유사하므로 생략...
+        // (showOutput, showHint, showAnswer, updatePlayerStatus, renderArea, etc.)
+
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.textContent = text;
+            
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 미션을 완료할 수 있습니다.';
+        }
+
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge text-white px-2 py-1 rounded text-xs font-bold';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 도전하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `⚙️ ${skills[quest.skill].name} 미션 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '코드를 실행해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 코딩 미션을 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000);
+            
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 미션 완료! "${skill.name}" 기술을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-blue-600 bg-opacity-50' : 'bg-gray-700 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm">${area.title}</div>
+                    <div class="text-xs mt-1">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cpp_workshop_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까?')) {
+                gameState = {
+                    currentArea: 'main_hall',
+                    player: {
+                        name: 'C++ 엔지니어',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['main_hall'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+        }
+
+        function initGame() {
+            const playerName = prompt('C++ 워크샵에 오신 것을 환영합니다! 엔지니어 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL 데이터베이스 관리소 🗄️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 25%, #6b7280 50%, #9ca3af 75%, #d1d5db 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #374151 0%, #4b5563 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #6b7280 0%, #9ca3af 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #374151 0%, #4b5563 100%);
+            transition: all 0.3s ease;
+            color: #f9fafb;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #111827;
+            border: 2px solid #374151;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            color: #d1fae5;
+        }
+        .code-editor:focus {
+            border-color: #4b5563;
+            outline: none;
+        }
+        .output-box {
+            background: #1f2937;
+            border-left: 4px solid #374151;
+        }
+        .error-box {
+            background: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+        .success-box {
+            background: #14532d;
+            border-left: 4px solid #22c55e;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #374151 0%, #4b5563 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(55, 65, 81, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(55, 65, 81, 0.1);
+            color: rgba(31, 41, 55, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #374151 0%, #4b5563 100%);
+            color: white;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(55, 65, 81, 0.2);
+            color: #1f2937;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(55, 65, 81, 0.1) 0%, rgba(75, 85, 99, 0.1) 100%);
+            border: 1px solid rgba(55, 65, 81, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(55, 65, 81, 0.2) 0%, rgba(75, 85, 99, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #111827;
+            border: 1px solid #374151;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(75, 85, 99, 0.1) 0%, rgba(156, 163, 175, 0.1) 100%);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .database-pulse {
+            animation: database-pulse 2s ease-in-out infinite;
+        }
+        @keyframes database-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .table-grid {
+            background-image: 
+                linear-gradient(rgba(55, 65, 81, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(55, 65, 81, 0.2) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .server-rack {
+            background: linear-gradient(to bottom, #374151, #1f2937);
+            border: 2px solid #4b5563;
+            position: relative;
+        }
+        .server-rack::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px;
+            height: 3px;
+            background: #10b981;
+            border-radius: 2px;
+            animation: data-flow 3s linear infinite;
+        }
+        @keyframes data-flow {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+        .query-result-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .query-result-table th,
+        .query-result-table td {
+            border: 1px solid #4b5563;
+            padding: 8px;
+            text-align: left;
+        }
+        .query-result-table th {
+            background-color: #374151;
+            color: white;
+        }
+        .query-result-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-800">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center mb-4">
+                <h1 class="text-5xl font-bold mr-4">🗄️ SQL 데이터베이스 관리소</h1>
+                <div class="database-pulse text-2xl">💾</div>
+            </div>
+            <p class="text-xl opacity-90">데이터의 바다를 탐험하며 SQL 마스터가 되어보세요!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-gray-300 table-grid">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👨‍💼</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">데이터베이스 관리자</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge text-white px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 신입 DBA</span>
+                            <span class="text-sm">📊 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 해결한 쿼리: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🛠️ 마스터한 SQL 기술:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-gray-300 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-gray-300">
+            <div class="text-center mb-6">
+                <!-- 서버 랙 -->
+                <div class="server-rack w-32 h-20 mx-auto mb-4 rounded-lg"></div>
+                
+                <div id="areaEmoji" class="text-6xl mb-4">🗄️</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">SQL 관리소 메인 서버룸</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    수많은 데이터가 흐르는 SQL 데이터베이스 관리소에 오신 것을 환영합니다! 
+                    이곳에서 데이터를 다루는 진정한 마법사, DBA(Database Administrator)가 되어보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-gray-800 bg-opacity-20 rounded-lg p-4 mb-6 hidden border border-gray-600">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2 text-gray-800"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 border border-gray-300">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 서버룸 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 쿼리 히스토리
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 데이터 분석
+                </button>
+            </div>
+
+            <!-- 서버룸 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ SQL 관리소 탐험 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 작성한 SQL 쿼리들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 SQL 분석 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-50 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto border-4 border-gray-600">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🗄️</div>
+                <h2 class="text-3xl font-bold mb-2 text-gray-900">SQL 쿼리 미션!</h2>
+                <h3 id="skillName" class="text-xl text-gray-700"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-gray-100 rounded-lg p-6 border border-gray-300">
+                    <h4 class="text-xl font-bold mb-4 text-gray-800">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4 text-gray-800"></p>
+                    <div class="bg-blue-100 rounded-lg p-4 mb-4 border border-blue-300">
+                        <h5 class="font-bold mb-2 text-blue-800">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm text-blue-700"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-green-300">⚡ 예제 쿼리</h5>
+                        <pre><code id="exampleCode" class="text-green-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- SQL 쿼리 작성 -->
+                <div class="bg-gray-100 rounded-lg p-6 border border-gray-300">
+                    <h4 class="text-xl font-bold mb-4 text-gray-800">🚀 쿼리 미션</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-700">📝 미션 설명:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-100 p-3 rounded border border-purple-300"></p>
+                    </div>
+                    
+                    <!-- 테이블 구조 표시 -->
+                    <div id="tableStructure" class="mb-4 hidden">
+                        <h5 class="font-bold mb-2 text-indigo-700">📋 테이블 구조:</h5>
+                        <div id="tableInfo" class="bg-indigo-100 p-3 rounded border border-indigo-300 text-sm"></div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-700">💻 SQL 쿼리를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-sm resize-none" 
+                                  placeholder="-- SQL 쿼리를 여기에 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 쿼리 실행
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-700">🔍 쿼리 결과:</h5>
+                        <div id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></div>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-700">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-100 p-3 rounded text-sm border border-yellow-300"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-700">📝 정답 쿼리:</h5>
+                        <pre id="answerCode" class="bg-red-100 p-3 rounded text-sm font-mono text-gray-800 border border-red-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 쿼리 미션 완료!
+                </button>
+                <p class="text-sm text-gray-600 mt-2">쿼리를 실행해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'server_room',
+            player: {
+                name: '데이터베이스 관리자',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['server_room'],
+                problemHistory: []
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // SQL 스킬 데이터
+        const skills = {
+            // === 1단계: SQL 기초 ===
+            select_basic: {
+                name: "기본 SELECT 문",
+                category: "SQL 기초",
+                explanation: "SELECT 문은 데이터베이스에서 데이터를 조회하는 가장 기본적인 SQL 명령어입니다. 테이블의 특정 컬럼을 선택하거나 모든 컬럼을 조회할 수 있습니다.",
+                application: "웹 애플리케이션의 사용자 정보 조회, 상품 목록 표시, 대시보드 데이터 표시 등에 필수적으로 사용됩니다.",
+                example: `-- 모든 컬럼 조회
+SELECT * FROM employees;
+
+-- 특정 컬럼만 조회
+SELECT name, age, department FROM employees;
+
+-- 별칭 사용
+SELECT name AS 이름, age AS 나이 FROM employees;`,
+                challenge: {
+                    description: "students 테이블에서 모든 학생의 이름(name)과 나이(age)만 조회하는 쿼리를 작성하세요.",
+                    tableInfo: "students (id, name, age, grade, major)",
+                    expectedOutput: "SELECT name, age FROM students;",
+                    hint: "SELECT 컬럼명1, 컬럼명2 FROM 테이블명; 형태로 작성하세요.",
+                    answer: `SELECT name, age FROM students;`
+                }
+            },
+            where_clause: {
+                name: "WHERE 조건절",
+                category: "SQL 기초",
+                explanation: "WHERE 절은 특정 조건을 만족하는 데이터만 조회할 때 사용합니다. 비교 연산자, 논리 연산자, LIKE, IN 등 다양한 조건을 사용할 수 있습니다.",
+                application: "특정 조건의 사용자 검색, 날짜 범위 조회, 가격 범위 필터링 등 대부분의 검색 기능에 사용됩니다.",
+                example: `-- 나이가 25 이상인 직원 조회
+SELECT * FROM employees WHERE age >= 25;
+
+-- 부서가 'IT'인 직원 조회
+SELECT * FROM employees WHERE department = 'IT';
+
+-- 복합 조건 (AND, OR)
+SELECT * FROM employees 
+WHERE age >= 25 AND department = 'IT';
+
+-- LIKE 패턴 매칭
+SELECT * FROM employees WHERE name LIKE '김%';`,
+                challenge: {
+                    description: "products 테이블에서 가격(price)이 10000원 이상인 상품의 이름(name)과 가격(price)을 조회하세요.",
+                    tableInfo: "products (id, name, price, category, stock)",
+                    expectedOutput: "SELECT name, price FROM products WHERE price >= 10000;",
+                    hint: "WHERE 절에서 >= 연산자를 사용하세요.",
+                    answer: `SELECT name, price FROM products WHERE price >= 10000;`
+                }
+            },
+            order_by: {
+                name: "ORDER BY 정렬",
+                category: "SQL 기초",
+                explanation: "ORDER BY 절은 조회 결과를 특정 컬럼 기준으로 정렬할 때 사용합니다. ASC(오름차순), DESC(내림차순)으로 정렬 방향을 지정할 수 있습니다.",
+                application: "최신 순 게시글 조회, 인기 상품 순위, 성적 순 학생 목록 등 정렬된 데이터 표시에 사용됩니다.",
+                example: `-- 나이 오름차순 정렬
+SELECT * FROM employees ORDER BY age ASC;
+
+-- 급여 내림차순 정렬
+SELECT * FROM employees ORDER BY salary DESC;
+
+-- 여러 컬럼으로 정렬
+SELECT * FROM employees 
+ORDER BY department ASC, salary DESC;`,
+                challenge: {
+                    description: "students 테이블에서 모든 학생을 성적(score) 내림차순으로 정렬하여 이름(name)과 성적(score)을 조회하세요.",
+                    tableInfo: "students (id, name, age, grade, score)",
+                    expectedOutput: "SELECT name, score FROM students ORDER BY score DESC;",
+                    hint: "ORDER BY 컬럼명 DESC를 사용하세요.",
+                    answer: `SELECT name, score FROM students ORDER BY score DESC;`
+                }
+            },
+
+            // === 2단계: 데이터 조작 ===
+            insert: {
+                name: "INSERT 데이터 삽입",
+                category: "데이터 조작",
+                explanation: "INSERT 문은 테이블에 새로운 데이터를 추가할 때 사용합니다. 모든 컬럼에 값을 지정하거나 특정 컬럼만 지정할 수 있습니다.",
+                application: "회원가입, 게시글 작성, 주문 등록 등 새로운 데이터를 생성하는 모든 기능에 사용됩니다.",
+                example: `-- 모든 컬럼에 값 삽입
+INSERT INTO employees VALUES (1, '김철수', 30, 'IT', 3500000);
+
+-- 특정 컬럼만 지정
+INSERT INTO employees (name, age, department) 
+VALUES ('이영희', 28, 'HR');
+
+-- 여러 행 동시 삽입
+INSERT INTO employees (name, age, department) 
+VALUES 
+    ('박민수', 32, 'Sales'),
+    ('최지영', 26, 'Marketing');`,
+                challenge: {
+                    description: "books 테이블에 제목이 '데이터베이스 개론', 저자가 '홍길동', 가격이 25000인 책을 삽입하는 쿼리를 작성하세요.",
+                    tableInfo: "books (id AUTO_INCREMENT, title, author, price, published_date)",
+                    expectedOutput: "INSERT INTO books (title, author, price) VALUES ('데이터베이스 개론', '홍길동', 25000);",
+                    hint: "INSERT INTO 테이블명 (컬럼1, 컬럼2, 컬럼3) VALUES (값1, 값2, 값3); 형태로 작성하세요.",
+                    answer: `INSERT INTO books (title, author, price) VALUES ('데이터베이스 개론', '홍길동', 25000);`
+                }
+            },
+            update: {
+                name: "UPDATE 데이터 수정",
+                category: "데이터 조작",
+                explanation: "UPDATE 문은 테이블의 기존 데이터를 수정할 때 사용합니다. WHERE 절을 사용해 특정 조건의 데이터만 수정할 수 있습니다.",
+                application: "사용자 정보 수정, 재고 수량 업데이트, 상태 변경 등 기존 데이터를 변경하는 모든 기능에 사용됩니다.",
+                example: `-- 특정 직원의 급여 수정
+UPDATE employees 
+SET salary = 4000000 
+WHERE name = '김철수';
+
+-- 여러 컬럼 동시 수정
+UPDATE employees 
+SET department = 'IT', salary = salary * 1.1 
+WHERE age >= 30;
+
+-- 조건 없이 모든 행 수정 (주의!)
+UPDATE employees SET bonus = 100000;`,
+                challenge: {
+                    description: "products 테이블에서 카테고리가 'electronics'인 상품들의 가격을 10% 할인(price * 0.9)하는 쿼리를 작성하세요.",
+                    tableInfo: "products (id, name, price, category, stock)",
+                    expectedOutput: "UPDATE products SET price = price * 0.9 WHERE category = 'electronics';",
+                    hint: "UPDATE 테이블명 SET 컬럼 = 새값 WHERE 조건; 형태로 작성하세요.",
+                    answer: `UPDATE products SET price = price * 0.9 WHERE category = 'electronics';`
+                }
+            },
+
+            // === 3단계: 집계와 그룹화 ===
+            group_by: {
+                name: "GROUP BY와 집계함수",
+                category: "집계와 그룹화",
+                explanation: "GROUP BY는 특정 컬럼 기준으로 데이터를 그룹화하고, 집계함수(COUNT, SUM, AVG, MAX, MIN)를 사용해 각 그룹의 통계를 계산합니다.",
+                application: "부서별 평균 급여, 월별 매출 합계, 카테고리별 상품 수 등 데이터 분석과 보고서 작성에 필수적입니다.",
+                example: `-- 부서별 직원 수 계산
+SELECT department, COUNT(*) as 직원수 
+FROM employees 
+GROUP BY department;
+
+-- 부서별 평균 급여
+SELECT department, AVG(salary) as 평균급여 
+FROM employees 
+GROUP BY department;
+
+-- 나이대별 통계
+SELECT 
+    CASE WHEN age < 30 THEN '20대'
+         WHEN age < 40 THEN '30대'
+         ELSE '40대 이상' END as 나이대,
+    COUNT(*) as 인원수,
+    AVG(salary) as 평균급여
+FROM employees 
+GROUP BY 나이대;`,
+                challenge: {
+                    description: "orders 테이블에서 고객별(customer_id) 주문 횟수를 계산하여 customer_id와 주문횟수를 조회하세요.",
+                    tableInfo: "orders (id, customer_id, product_id, quantity, order_date)",
+                    expectedOutput: "SELECT customer_id, COUNT(*) FROM orders GROUP BY customer_id;",
+                    hint: "GROUP BY customer_id를 사용하고 COUNT(*)로 개수를 세세요.",
+                    answer: `SELECT customer_id, COUNT(*) as 주문횟수 FROM orders GROUP BY customer_id;`
+                }
+            },
+            having: {
+                name: "HAVING 절",
+                category: "집계와 그룹화",
+                explanation: "HAVING 절은 GROUP BY로 그룹화된 결과에 조건을 적용할 때 사용합니다. WHERE는 그룹화 전 조건, HAVING은 그룹화 후 조건입니다.",
+                application: "일정 기준을 만족하는 그룹만 조회할 때 사용합니다. 예: 주문이 3회 이상인 고객, 평균 성적이 80점 이상인 반 등",
+                example: `-- 직원이 3명 이상인 부서만 조회
+SELECT department, COUNT(*) as 직원수 
+FROM employees 
+GROUP BY department 
+HAVING COUNT(*) >= 3;
+
+-- 평균 급여가 350만원 이상인 부서
+SELECT department, AVG(salary) as 평균급여 
+FROM employees 
+GROUP BY department 
+HAVING AVG(salary) >= 3500000;`,
+                challenge: {
+                    description: "orders 테이블에서 주문 횟수가 2회 이상인 고객의 customer_id와 주문횟수를 조회하세요.",
+                    tableInfo: "orders (id, customer_id, product_id, quantity, order_date)",
+                    expectedOutput: "SELECT customer_id, COUNT(*) FROM orders GROUP BY customer_id HAVING COUNT(*) >= 2;",
+                    hint: "GROUP BY 후에 HAVING COUNT(*) >= 2 조건을 추가하세요.",
+                    answer: `SELECT customer_id, COUNT(*) as 주문횟수 FROM orders GROUP BY customer_id HAVING COUNT(*) >= 2;`
+                }
+            },
+
+            // === 4단계: 조인 ===
+            inner_join: {
+                name: "INNER JOIN",
+                category: "조인",
+                explanation: "INNER JOIN은 두 테이블에서 조인 조건을 만족하는 데이터만 조회합니다. 양쪽 테이블에 모두 존재하는 데이터만 결과에 포함됩니다.",
+                application: "사용자 정보와 주문 정보 연결, 상품과 카테고리 정보 결합 등 관련된 테이블의 데이터를 함께 조회할 때 사용됩니다.",
+                example: `-- 직원과 부서 정보 조인
+SELECT e.name, e.salary, d.department_name 
+FROM employees e 
+INNER JOIN departments d ON e.department_id = d.id;
+
+-- 주문과 고객 정보 조인
+SELECT o.order_date, c.customer_name, o.total_amount 
+FROM orders o 
+INNER JOIN customers c ON o.customer_id = c.id;`,
+                challenge: {
+                    description: "students 테이블과 classes 테이블을 조인하여 학생 이름(s.name)과 수업 이름(c.class_name)을 조회하세요.",
+                    tableInfo: "students (id, name, class_id), classes (id, class_name, teacher)",
+                    expectedOutput: "SELECT s.name, c.class_name FROM students s INNER JOIN classes c ON s.class_id = c.id;",
+                    hint: "INNER JOIN을 사용하고 ON 절에서 s.class_id = c.id 조건을 사용하세요.",
+                    answer: `SELECT s.name, c.class_name FROM students s INNER JOIN classes c ON s.class_id = c.id;`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            server_room: {
+                title: "SQL 관리소 메인 서버룸",
+                emoji: "🗄️",
+                description: "수많은 데이터가 흐르는 SQL 데이터베이스 관리소에 오신 것을 환영합니다! 이곳에서 데이터를 다루는 진정한 마법사, DBA(Database Administrator)가 되어보세요.",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'select_basic', npc: '📊', name: 'SELECT 마스터', message: 'SQL의 기본! SELECT로 데이터 조회의 기초를 배워보세요!' },
+                    { skill: 'where_clause', npc: '🔍', name: '조건 검색 전문가', message: 'WHERE 절로 원하는 데이터만 정확히 찾아보세요!' },
+                    { skill: 'order_by', npc: '📈', name: '정렬 스페셜리스트', message: 'ORDER BY로 데이터를 의미있게 정렬해보세요!' }
+                ]
+            },
+            data_manipulation_lab: {
+                title: "데이터 조작 연구소",
+                emoji: "⚙️",
+                description: "데이터를 생성, 수정, 삭제하는 CRUD 연산을 마스터하는 곳입니다. 데이터의 생명주기를 완전히 다뤄보세요!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'insert', npc: '➕', name: '데이터 생성자', message: 'INSERT로 새로운 데이터를 생성하는 마법을 배워보세요!' },
+                    { skill: 'update', npc: '✏️', name: '데이터 편집자', message: 'UPDATE로 기존 데이터를 안전하게 수정해보세요!' }
+                ]
+            },
+            analytics_center: {
+                title: "데이터 분석 센터",
+                emoji: "📊",
+                description: "GROUP BY와 집계함수로 데이터에서 의미있는 인사이트를 추출하는 곳입니다. 데이터 분석가의 길로 나아가보세요!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'group_by', npc: '📈', name: '집계 분석가', message: 'GROUP BY와 집계함수로 데이터의 패턴을 발견해보세요!' },
+                    { skill: 'having', npc: '🎯', name: '조건 분석가', message: 'HAVING 절로 그룹화된 데이터를 필터링해보세요!' }
+                ]
+            },
+            join_workshop: {
+                title: "조인 워크샵",
+                emoji: "🔗",
+                description: "여러 테이블을 연결하여 복잡한 데이터 관계를 다루는 고급 기술을 배우는 곳입니다. 진정한 데이터베이스 마스터가 되어보세요!",
+                unlockLevel: 6,
+                quests: [
+                    { skill: 'inner_join', npc: '🔗', name: '조인 마스터', message: 'INNER JOIN으로 테이블들을 연결하는 고급 기법을 배워보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "신입 DBA", 2: "주니어 DBA", 3: "DBA", 4: "시니어 DBA", 5: "수석 DBA",
+            6: "DBA 팀장", 7: "DB 아키텍트", 8: "전설", 9: "구루", 10: "SQL의 신"
+        };
+
+        // SQL 쿼리 실행 시뮬레이션
+        function simulateSQLCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            try {
+                // SQL 쿼리 정규화 (대소문자, 공백 무시)
+                const normalizeQuery = (query) => {
+                    return query.replace(/\s+/g, ' ').trim().toLowerCase();
+                };
+                
+                const userQuery = normalizeQuery(code);
+                const expectedQuery = normalizeQuery(expectedOutput);
+                
+                // 기본 SQL 구조 검증
+                if (code.includes('SELECT') || code.includes('select')) {
+                    if (userQuery.includes('select') && userQuery.includes('from')) {
+                        output = "✅ SQL 쿼리 구조가 올바릅니다!";
+                        
+                        // 구체적인 쿼리 검증
+                        if (userQuery.includes(expectedQuery.split('from')[0].trim())) {
+                            success = true;
+                            output = "✅ 정확한 SELECT 쿼리입니다!";
+                        } else {
+                            output = "❌ SELECT 절을 다시 확인해보세요.";
+                        }
+                    } else {
+                        output = "❌ SELECT 문의 기본 구조를 확인해주세요.";
+                    }
+                } else if (code.includes('INSERT') || code.includes('insert')) {
+                    if (userQuery.includes('insert into') && userQuery.includes('values')) {
+                        success = true;
+                        output = "✅ INSERT 쿼리가 올바르게 작성되었습니다!";
+                    } else {
+                        output = "❌ INSERT 문의 기본 구조를 확인해주세요.";
+                    }
+                } else if (code.includes('UPDATE') || code.includes('update')) {
+                    if (userQuery.includes('update') && userQuery.includes('set')) {
+                        success = true;
+                        output = "✅ UPDATE 쿼리가 올바르게 작성되었습니다!";
+                    } else {
+                        output = "❌ UPDATE 문의 기본 구조를 확인해주세요.";
+                    }
+                }
+                
+                // 모의 결과 테이블 생성
+                if (success && userQuery.includes('select')) {
+                    output += "\n\n📋 쿼리 실행 결과:\n";
+                    output += "┌─────────────┬─────────────┐\n";
+                    output += "│    name     │     age     │\n";
+                    output += "├─────────────┼─────────────┤\n";
+                    output += "│   김철수    │     25      │\n";
+                    output += "│   이영희    │     30      │\n";
+                    output += "│   박민수    │     28      │\n";
+                    output += "└─────────────┴─────────────┘\n";
+                    output += "3 rows affected";
+                }
+                
+            } catch (error) {
+                throw new Error("쿼리 실행 중 오류가 발생했습니다: " + error.message);
+            }
+            
+            return { success, output };
+        }
+
+        // 나머지 함수들은 이전 게임들과 유사...
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ SQL 쿼리를 입력해주세요!", "error");
+                return;
+            }
+            
+            gameState.currentSession.userCode = code;
+            
+            try {
+                const result = simulateSQLCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 완벽합니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 훌륭해요! 이제 쿼리 미션을 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 쿼리를 다시 확인해보세요.\n${result.output}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.innerHTML = text.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+            
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 쿼리 미션을 완료할 수 있습니다.';
+        }
+
+        // 기본 게임 함수들
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge text-white px-2 py-1 rounded text-xs font-bold';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 도전하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `🗄️ ${skills[quest.skill].name} 미션 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            // 테이블 구조 표시
+            if (skill.challenge.tableInfo) {
+                document.getElementById('tableInfo').textContent = skill.challenge.tableInfo;
+                document.getElementById('tableStructure').classList.remove('hidden');
+            } else {
+                document.getElementById('tableStructure').classList.add('hidden');
+            }
+            
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '쿼리를 실행해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 SQL 쿼리 미션을 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000);
+            
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 쿼리 미션 완료! "${skill.name}" 기술을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-gray-600 bg-opacity-50' : 'bg-gray-400 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm text-white">${area.title}</div>
+                    <div class="text-xs mt-1 text-gray-200">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        // 저장/불러오기 및 기타 함수들
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sql_database_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까?')) {
+                gameState = {
+                    currentArea: 'server_room',
+                    player: {
+                        name: '데이터베이스 관리자',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['server_room'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+        }
+
+        function initGame() {
+            const playerName = prompt('SQL 데이터베이스 관리소에 오신 것을 환영합니다! DBA 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

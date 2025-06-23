@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask 웹 개발 스튜디오 🌶️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #ea580c 25%, #d97706 50%, #ca8a04 75%, #65a30d 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #dc2626 0%, #ea580c 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #d97706 0%, #ca8a04 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #dc2626 0%, #ea580c 100%);
+            transition: all 0.3s ease;
+            color: #fef2f2;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #1c1917;
+            border: 2px solid #dc2626;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            color: #fbbf24;
+        }
+        .code-editor:focus {
+            border-color: #ea580c;
+            outline: none;
+        }
+        .output-box {
+            background: #292524;
+            border-left: 4px solid #dc2626;
+        }
+        .error-box {
+            background: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+        .success-box {
+            background: #14532d;
+            border-left: 4px solid #22c55e;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #dc2626 0%, #ea580c 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(220, 38, 38, 0.1);
+            color: rgba(127, 29, 29, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #dc2626 0%, #ea580c 100%);
+            color: white;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(220, 38, 38, 0.2);
+            color: #7f1d1d;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(234, 88, 12, 0.1) 100%);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #1c1917;
+            border: 1px solid #dc2626;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+            border: 1px solid rgba(234, 88, 12, 0.3);
+        }
+        .flask-steam {
+            animation: flask-steam 3s ease-in-out infinite;
+        }
+        @keyframes flask-steam {
+            0%, 100% { opacity: 0.7; transform: translateY(0) scale(1); }
+            50% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+        }
+        .server-pattern {
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(220, 38, 38, 0.3) 1px, transparent 0),
+                linear-gradient(45deg, transparent 40%, rgba(234, 88, 12, 0.1) 50%, transparent 60%);
+            background-size: 25px 25px, 50px 50px;
+        }
+        .api-pulse {
+            animation: api-pulse 2s ease-in-out infinite;
+        }
+        @keyframes api-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        }
+        .route-connector {
+            position: relative;
+            overflow: hidden;
+        }
+        .route-connector::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #dc2626, transparent);
+            animation: route-flow 3s linear infinite;
+        }
+        @keyframes route-flow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-red-900">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center mb-4">
+                <h1 class="text-5xl font-bold mr-4">🌶️ Flask 웹 개발 스튜디오</h1>
+                <div class="flask-steam text-2xl">🔥</div>
+            </div>
+            <p class="text-xl opacity-90">Python Flask로 강력한 웹 애플리케이션을 만들어보세요!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-red-200 server-pattern">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👨‍💻</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">Flask 개발자</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge text-white px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 신입 개발자</span>
+                            <span class="text-sm">🌶️ 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 완성한 앱: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🛠️ 마스터한 기술:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-red-200 bg-opacity-50 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 mb-8 border border-red-200">
+            <div class="text-center mb-6">
+                <!-- API 연결 표시 -->
+                <div class="api-pulse w-20 h-20 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span class="text-white text-2xl">API</span>
+                </div>
+                
+                <div id="areaEmoji" class="text-6xl mb-4">🌶️</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">Flask 스튜디오 메인 서버</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    뜨거운 열정이 넘치는 Flask 웹 개발 스튜디오에 오신 것을 환영합니다! 
+                    이곳에서 Python의 경량 웹 프레임워크 Flask로 강력한 웹 애플리케이션을 만드는 마스터가 되어보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-red-900 bg-opacity-20 rounded-lg p-4 mb-6 hidden border border-red-600">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2 text-red-900"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6 border border-red-200">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 스튜디오 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 프로젝트 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 개발 통계
+                </button>
+            </div>
+
+            <!-- 스튜디오 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ Flask 스튜디오 탐험 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 만든 Flask 애플리케이션들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 Flask 개발 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-red-50 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto border-4 border-red-600">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🌶️</div>
+                <h2 class="text-3xl font-bold mb-2 text-red-900">Flask 앱 개발 미션!</h2>
+                <h3 id="skillName" class="text-xl text-red-700"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-red-100 rounded-lg p-6 border border-red-300">
+                    <h4 class="text-xl font-bold mb-4 text-red-800">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4 text-gray-800"></p>
+                    <div class="bg-orange-100 rounded-lg p-4 mb-4 border border-orange-300">
+                        <h5 class="font-bold mb-2 text-orange-800">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm text-orange-700"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-yellow-300">⚡ 예제 코드</h5>
+                        <pre><code id="exampleCode" class="text-yellow-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- Flask 앱 개발 -->
+                <div class="bg-red-100 rounded-lg p-6 border border-red-300">
+                    <h4 class="text-xl font-bold mb-4 text-red-800">🚀 앱 개발 미션</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-700">📝 개발 요구사항:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-100 p-3 rounded border border-purple-300"></p>
+                    </div>
+                    
+                    <!-- 파일 구조 표시 -->
+                    <div id="fileStructure" class="mb-4 hidden">
+                        <h5 class="font-bold mb-2 text-indigo-700">📁 파일 구조:</h5>
+                        <div id="fileInfo" class="bg-indigo-100 p-3 rounded border border-indigo-300 text-sm font-mono"></div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-700">💻 Flask 코드를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-sm resize-none" 
+                                  placeholder="# Flask 애플리케이션 코드를 여기에 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 앱 실행
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-700">🔍 실행 결과:</h5>
+                        <div id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></div>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-700">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-100 p-3 rounded text-sm border border-yellow-300"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-700">📝 정답 코드:</h5>
+                        <pre id="answerCode" class="bg-red-100 p-3 rounded text-sm font-mono text-gray-800 border border-red-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 앱 개발 완료!
+                </button>
+                <p class="text-sm text-gray-600 mt-2">앱을 실행해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'main_server',
+            player: {
+                name: 'Flask 개발자',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['main_server'],
+                problemHistory: []
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // Flask 스킬 데이터
+        const skills = {
+            // === 1단계: Flask 기초 ===
+            flask_basics: {
+                name: "Flask 기본 설정",
+                category: "Flask 기초",
+                explanation: "Flask는 Python의 경량 웹 프레임워크입니다. app = Flask(__name__)으로 앱을 생성하고, @app.route()로 URL 라우팅을 설정합니다.",
+                application: "웹 API 서버, 마이크로서비스, 프로토타입 웹 애플리케이션 개발에 널리 사용됩니다.",
+                example: `from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return '<h1>안녕하세요, Flask입니다!</h1>'
+
+@app.route('/about')
+def about():
+    return '<h1>소개 페이지</h1><p>Flask 웹 애플리케이션입니다.</p>'
+
+if __name__ == '__main__':
+    app.run(debug=True)`,
+                challenge: {
+                    description: "Flask 애플리케이션을 만들고 '/' 경로에서 '환영합니다!'라는 메시지를 반환하는 home 함수를 작성하세요.",
+                    fileInfo: "app.py - 메인 Flask 애플리케이션 파일",
+                    expectedOutput: "Flask 앱이 '/' 경로에서 '환영합니다!' 반환",
+                    hint: "@app.route('/')와 return '환영합니다!'를 사용하세요.",
+                    answer: `from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return '환영합니다!'
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+            routing: {
+                name: "URL 라우팅",
+                category: "Flask 기초",
+                explanation: "Flask의 라우팅은 URL과 함수를 연결합니다. 동적 URL을 위해 <변수명>을 사용하고, HTTP 메서드를 지정할 수 있습니다.",
+                application: "RESTful API 설계, 동적 웹 페이지, 사용자별 맞춤 콘텐츠 제공에 사용됩니다.",
+                example: `from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'Home Page'
+
+@app.route('/user/<name>')
+def user_profile(name):
+    return f'<h1>안녕하세요, {name}님!</h1>'
+
+@app.route('/post/<int:post_id>')
+def show_post(post_id):
+    return f'<h1>게시글 #{post_id}</h1>'
+
+@app.route('/api/data', methods=['GET', 'POST'])
+def api_data():
+    return {'message': 'API 엔드포인트'}`,
+                challenge: {
+                    description: "/hello/<name> 경로에서 이름을 받아 'Hello, [name]!'을 반환하는 hello 함수를 만드세요.",
+                    fileInfo: "app.py - 동적 라우팅을 포함한 Flask 앱",
+                    expectedOutput: "/hello/김철수 접속시 'Hello, 김철수!' 반환",
+                    hint: "@app.route('/hello/<name>')과 return f'Hello, {name}!'을 사용하세요.",
+                    answer: `from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/hello/<name>')
+def hello(name):
+    return f'Hello, {name}!'
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+            templates: {
+                name: "템플릿 렌더링",
+                category: "Flask 기초",
+                explanation: "Flask는 Jinja2 템플릿 엔진을 사용해 HTML을 동적으로 생성합니다. render_template()로 템플릿을 렌더링하고 변수를 전달할 수 있습니다.",
+                application: "동적 웹 페이지, 사용자 인터페이스, 데이터 표시 등 모든 웹 애플리케이션의 프론트엔드에 사용됩니다.",
+                example: `from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', username=name)
+
+@app.route('/posts')
+def posts():
+    posts_data = [
+        {'title': '첫 번째 포스트', 'content': '내용 1'},
+        {'title': '두 번째 포스트', 'content': '내용 2'}
+    ]
+    return render_template('posts.html', posts=posts_data)
+
+# templates/index.html
+# <h1>홈페이지</h1>
+# templates/user.html  
+# <h1>{{ username }}님의 페이지</h1>`,
+                challenge: {
+                    description: "/profile/<username> 경로에서 render_template을 사용해 'profile.html' 템플릿에 사용자 이름을 전달하는 함수를 작성하세요.",
+                    fileInfo: "app.py, templates/profile.html",
+                    expectedOutput: "render_template('profile.html', user=username) 호출",
+                    hint: "render_template('profile.html', user=username)을 return하세요.",
+                    answer: `from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route('/profile/<username>')
+def profile(username):
+    return render_template('profile.html', user=username)
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+
+            // === 2단계: 폼과 요청 처리 ===
+            forms: {
+                name: "폼과 요청 처리",
+                category: "폼과 요청",
+                explanation: "Flask에서 request 객체로 폼 데이터, GET/POST 파라미터를 처리할 수 있습니다. methods 파라미터로 HTTP 메서드를 지정합니다.",
+                application: "사용자 입력 처리, 로그인 폼, 검색 기능, 데이터 제출 등 인터랙티브한 웹 기능에 필수적입니다.",
+                example: `from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == 'admin' and password == '123':
+            return f'환영합니다, {username}님!'
+        else:
+            return '로그인 실패!'
+    return render_template('login.html')
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    return f'검색어: {query}'
+
+# templates/login.html
+# <form method="POST">
+#   <input name="username" placeholder="사용자명">
+#   <input name="password" type="password" placeholder="비밀번호">
+#   <button>로그인</button>
+# </form>`,
+                challenge: {
+                    description: "/contact 경로에서 GET은 폼을 보여주고, POST는 name과 message를 받아 '감사합니다, [name]님!'을 반환하는 함수를 작성하세요.",
+                    fileInfo: "app.py, templates/contact.html",
+                    expectedOutput: "POST 요청시 폼 데이터를 처리하여 메시지 반환",
+                    hint: "request.method로 GET/POST를 구분하고 request.form['name']으로 데이터를 받으세요.",
+                    answer: `from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form['name']
+        message = request.form['message']
+        return f'감사합니다, {name}님!'
+    return render_template('contact.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+            sessions: {
+                name: "세션 관리",
+                category: "폼과 요청",
+                explanation: "Flask의 session 객체로 사용자별 데이터를 서버에 저장할 수 있습니다. secret_key를 설정해야 세션을 사용할 수 있습니다.",
+                application: "로그인 상태 유지, 장바구니, 사용자 설정 저장 등 상태 관리가 필요한 모든 웹 애플리케이션에 사용됩니다.",
+                example: `from flask import Flask, session, request, redirect, url_for
+
+app = Flask(__name__)
+app.secret_key = 'your-secret-key'
+
+@app.route('/')
+def home():
+    if 'username' in session:
+        return f'로그인됨: {session["username"]}'
+    return '로그인이 필요합니다.'
+
+@app.route('/login', methods=['POST'])
+def login():
+    session['username'] = request.form['username']
+    return redirect(url_for('home'))
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('home'))`,
+                challenge: {
+                    description: "secret_key를 설정하고 /set_name/<name> 경로에서 세션에 이름을 저장한 후 '이름이 설정되었습니다!'를 반환하는 함수를 작성하세요.",
+                    fileInfo: "app.py - 세션 기능이 포함된 Flask 앱",
+                    expectedOutput: "세션에 이름 저장 후 확인 메시지 반환",
+                    hint: "app.secret_key 설정 후 session['name'] = name으로 저장하세요.",
+                    answer: `from flask import Flask, session
+
+app = Flask(__name__)
+app.secret_key = 'my-secret-key'
+
+@app.route('/set_name/<name>')
+def set_name(name):
+    session['name'] = name
+    return '이름이 설정되었습니다!'
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+
+            // === 3단계: API 개발 ===
+            json_api: {
+                name: "JSON API 개발",
+                category: "API 개발",
+                explanation: "Flask에서 jsonify()를 사용해 JSON 응답을 생성할 수 있습니다. REST API 개발의 기본이 되는 기능입니다.",
+                application: "모바일 앱 백엔드, SPA 프론트엔드와의 통신, 마이크로서비스 간 통신 등에 사용됩니다.",
+                example: `from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# 메모리상 데이터 (실제로는 데이터베이스 사용)
+users = [
+    {'id': 1, 'name': '김철수', 'email': 'kim@example.com'},
+    {'id': 2, 'name': '이영희', 'email': 'lee@example.com'}
+]
+
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    return jsonify(users)
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = next((u for u in users if u['id'] == user_id), None)
+    if user:
+        return jsonify(user)
+    return jsonify({'error': '사용자를 찾을 수 없습니다'}), 404
+
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    new_user = {
+        'id': len(users) + 1,
+        'name': data['name'],
+        'email': data['email']
+    }
+    users.append(new_user)
+    return jsonify(new_user), 201`,
+                challenge: {
+                    description: "/api/status 경로에서 {'status': 'ok', 'message': 'API가 정상 작동중입니다'}를 JSON으로 반환하는 함수를 작성하세요.",
+                    fileInfo: "app.py - JSON API 엔드포인트",
+                    expectedOutput: "JSON 형태의 상태 정보 반환",
+                    hint: "jsonify()를 사용해서 딕셔너리를 JSON으로 반환하세요.",
+                    answer: `from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/api/status')
+def api_status():
+    return jsonify({
+        'status': 'ok',
+        'message': 'API가 정상 작동중입니다'
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+            error_handling: {
+                name: "에러 처리",
+                category: "API 개발",
+                explanation: "Flask에서 @app.errorhandler로 커스텀 에러 페이지를 만들고, abort()로 HTTP 에러를 발생시킬 수 있습니다.",
+                application: "사용자 친화적인 에러 페이지, API 에러 응답, 예외 상황 처리 등에 사용됩니다.",
+                example: `from flask import Flask, jsonify, abort
+
+app = Flask(__name__)
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': '페이지를 찾을 수 없습니다'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': '서버 내부 오류'}), 500
+
+@app.route('/user/<int:user_id>')
+def get_user(user_id):
+    if user_id > 100:
+        abort(404)  # 404 에러 발생
+    return f'사용자 {user_id}'
+
+@app.route('/error-test')
+def error_test():
+    # 의도적으로 에러 발생
+    raise Exception('테스트 에러')`,
+                challenge: {
+                    description: "404 에러 발생시 {'error': '찾을 수 없습니다', 'code': 404}를 JSON으로 반환하는 에러 핸들러를 작성하세요.",
+                    fileInfo: "app.py - 에러 처리가 포함된 Flask 앱",
+                    expectedOutput: "404 에러 발생시 JSON 에러 응답 반환",
+                    hint: "@app.errorhandler(404)와 jsonify()를 사용하세요.",
+                    answer: `from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'error': '찾을 수 없습니다',
+        'code': 404
+    }), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            },
+
+            // === 4단계: 데이터베이스 연동 ===
+            database: {
+                name: "데이터베이스 연동",
+                category: "데이터베이스",
+                explanation: "Flask와 SQLAlchemy를 연동해 데이터베이스 작업을 할 수 있습니다. Flask-SQLAlchemy는 ORM을 제공해 Python 객체로 데이터를 다룰 수 있게 해줍니다.",
+                application: "사용자 관리, 게시판, 쇼핑몰 등 데이터 저장이 필요한 모든 웹 애플리케이션에 필수적입니다.",
+                example: `from flask import Flask, jsonify
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+        }
+
+@app.route('/api/users')
+def get_users():
+    users = User.query.all()
+    return jsonify([user.to_dict() for user in users])
+
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    user = User(username=data['username'], email=data['email'])
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.to_dict()), 201`,
+                challenge: {
+                    description: "SQLAlchemy를 설정하고 id, title, content 필드를 가진 Post 모델을 만드세요. (클래스 정의만)",
+                    fileInfo: "app.py - Flask-SQLAlchemy 모델 정의",
+                    expectedOutput: "Post 모델 클래스 정의",
+                    hint: "class Post(db.Model): 형태로 시작하고 db.Column으로 필드를 정의하세요.",
+                    answer: `from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db = SQLAlchemy(app)
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+
+if __name__ == '__main__':
+    app.run(debug=True)`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            main_server: {
+                title: "Flask 스튜디오 메인 서버",
+                emoji: "🌶️",
+                description: "뜨거운 열정이 넘치는 Flask 웹 개발 스튜디오에 오신 것을 환영합니다! 이곳에서 Python의 경량 웹 프레임워크 Flask로 강력한 웹 애플리케이션을 만드는 마스터가 되어보세요.",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'flask_basics', npc: '🔥', name: 'Flask 파이어 스타터', message: 'Flask의 기본! 첫 번째 웹 애플리케이션을 만들어보세요!' },
+                    { skill: 'routing', npc: '🛣️', name: '라우팅 마스터', message: 'URL 라우팅으로 다양한 페이지를 연결해보세요!' },
+                    { skill: 'templates', npc: '🎨', name: '템플릿 디자이너', message: 'Jinja2 템플릿으로 동적 웹 페이지를 만들어보세요!' }
+                ]
+            },
+            form_lab: {
+                title: "폼 처리 연구소",
+                emoji: "📝",
+                description: "사용자 입력과 상호작용을 처리하는 고급 기술을 배우는 곳입니다. 폼, 세션, 요청 처리의 마스터가 되어보세요!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'forms', npc: '📝', name: '폼 마스터', message: '사용자 입력을 안전하게 처리하는 방법을 배워보세요!' },
+                    { skill: 'sessions', npc: '🔐', name: '세션 관리자', message: '사용자 상태를 유지하는 세션 관리를 마스터해보세요!' }
+                ]
+            },
+            api_center: {
+                title: "API 개발 센터",
+                emoji: "🚀",
+                description: "RESTful API와 JSON 서비스를 개발하는 첨단 기술을 배우는 곳입니다. 현대적인 웹 서비스의 백엔드를 마스터해보세요!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'json_api', npc: '📡', name: 'API 아키텍트', message: 'JSON API로 강력한 백엔드 서비스를 만들어보세요!' },
+                    { skill: 'error_handling', npc: '🛡️', name: '에러 핸들러', message: '견고한 에러 처리로 안정적인 서비스를 만들어보세요!' }
+                ]
+            },
+            database_vault: {
+                title: "데이터베이스 저장소",
+                emoji: "🗃️",
+                description: "데이터의 영속성을 다루는 고급 기술을 배우는 곳입니다. SQLAlchemy와 데이터베이스 연동의 전문가가 되어보세요!",
+                unlockLevel: 6,
+                quests: [
+                    { skill: 'database', npc: '🗃️', name: 'DB 연동 마스터', message: 'Flask와 데이터베이스를 연결하는 고급 기술을 배워보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "신입 개발자", 2: "주니어 개발자", 3: "Flask 개발자", 4: "시니어 개발자", 5: "풀스택 개발자",
+            6: "백엔드 아키텍트", 7: "Flask 마스터", 8: "웹 개발 전문가", 9: "시스템 아키텍트", 10: "Flask의 신"
+        };
+
+        // Flask 코드 실행 시뮬레이션
+        function simulateFlaskCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            try {
+                // Flask 앱 구조 검증
+                const hasFlaskImport = code.includes('from flask import Flask') || code.includes('import flask');
+                const hasAppCreation = code.includes('app = Flask(__name__)');
+                const hasRoute = code.includes('@app.route');
+                const hasFunction = code.includes('def ');
+                const hasReturn = code.includes('return ');
+                
+                if (hasFlaskImport && hasAppCreation && hasRoute && hasFunction && hasReturn) {
+                    output = "✅ Flask 애플리케이션 구조가 완벽합니다!";
+                    success = true;
+                    
+                    // 구체적인 기능 검증
+                    if (code.includes("'환영합니다!'")) {
+                        output += "\n🏠 홈페이지가 올바르게 설정되었습니다!";
+                    } else if (code.includes('Hello, {name}!') || code.includes("f'Hello, {name}!'")) {
+                        output += "\n👋 동적 라우팅이 완벽하게 구현되었습니다!";
+                    } else if (code.includes('render_template')) {
+                        output += "\n🎨 템플릿 렌더링이 올바르게 설정되었습니다!";
+                    } else if (code.includes('request.form') || code.includes('request.method')) {
+                        output += "\n📝 폼 처리가 완벽하게 구현되었습니다!";
+                    } else if (code.includes('session[') && code.includes('secret_key')) {
+                        output += "\n🔐 세션 관리가 안전하게 설정되었습니다!";
+                    } else if (code.includes('jsonify')) {
+                        output += "\n📡 JSON API가 올바르게 구현되었습니다!";
+                    } else if (code.includes('@app.errorhandler')) {
+                        output += "\n🛡️ 에러 처리가 견고하게 구현되었습니다!";
+                    } else if (code.includes('db.Model') && code.includes('db.Column')) {
+                        output += "\n🗃️ 데이터베이스 모델이 완벽하게 정의되었습니다!";
+                    }
+                    
+                    // 모의 서버 실행 결과
+                    output += "\n\n🚀 Flask 개발 서버 시작됨:";
+                    output += "\n * Running on http://127.0.0.1:5000";
+                    output += "\n * Debug mode: on";
+                    output += "\n * Restarting with stat";
+                    
+                } else {
+                    let missingParts = [];
+                    if (!hasFlaskImport) missingParts.push("Flask import");
+                    if (!hasAppCreation) missingParts.push("app 생성");
+                    if (!hasRoute) missingParts.push("@app.route 데코레이터");
+                    if (!hasFunction) missingParts.push("함수 정의");
+                    if (!hasReturn) missingParts.push("return 문");
+                    
+                    output = `❌ Flask 애플리케이션이 불완전합니다.\n누락된 부분: ${missingParts.join(', ')}`;
+                }
+                
+            } catch (error) {
+                throw new Error("Flask 앱 검증 중 오류가 발생했습니다: " + error.message);
+            }
+            
+            return { success, output };
+        }
+
+        // 나머지 함수들은 이전 게임들과 유사...
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ Flask 코드를 입력해주세요!", "error");
+                return;
+            }
+            
+            gameState.currentSession.userCode = code;
+            
+            try {
+                const result = simulateFlaskCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 완벽합니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 훌륭해요! 이제 앱 개발을 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 앱을 다시 확인해보세요.\n${result.output}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.innerHTML = text.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+            
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 앱 개발을 완료할 수 있습니다.';
+        }
+
+        // 기본 게임 함수들
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge text-white px-2 py-1 rounded text-xs font-bold';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 개발하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `🌶️ ${skills[quest.skill].name} 미션 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            // 파일 구조 표시
+            if (skill.challenge.fileInfo) {
+                document.getElementById('fileInfo').textContent = skill.challenge.fileInfo;
+                document.getElementById('fileStructure').classList.remove('hidden');
+            } else {
+                document.getElementById('fileStructure').classList.add('hidden');
+            }
+            
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '앱을 실행해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 Flask 앱 개발을 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000);
+            
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 앱 개발 완료! "${skill.name}" 기술을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-red-600 bg-opacity-50' : 'bg-gray-700 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm text-white">${area.title}</div>
+                    <div class="text-xs mt-1 text-gray-200">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        // 저장/불러오기 및 기타 함수들
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'flask_studio_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까?')) {
+                gameState = {
+                    currentArea: 'main_server',
+                    player: {
+                        name: 'Flask 개발자',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['main_server'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+        }
+
+        function initGame() {
+            const playerName = prompt('Flask 웹 개발 스튜디오에 오신 것을 환영합니다! 개발자 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

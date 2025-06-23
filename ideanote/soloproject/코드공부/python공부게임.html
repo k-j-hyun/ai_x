@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파이썬 코딩 모험가 🐍</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #43e97b 0%, #38f9d7 100%);
+            transition: all 0.3s ease;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #1a202c;
+            border: 2px solid #4a5568;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+        }
+        .code-editor:focus {
+            border-color: #4299e1;
+            outline: none;
+        }
+        .output-box {
+            background: #2d3748;
+            border-left: 4px solid #48bb78;
+        }
+        .error-box {
+            background: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+        .success-box {
+            background: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(72, 187, 120, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: #1a202c;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(0, 242, 254, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border: 1px solid rgba(240, 147, 251, 0.3);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold mb-2">🐍 파이썬 코딩 모험가</h1>
+            <p class="text-xl opacity-90">직접 코딩하며 배우는 파이썬 RPG!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded mr-2">💾 게임 저장</button>
+                <button onclick="loadProgress()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded mr-2">📂 게임 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">🔄 게임 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👤</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">코딩 모험가</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 입문자</span>
+                            <span class="text-sm">💎 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 해결한 문제: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🏆 습득한 스킬:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-gray-300 bg-opacity-30 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 mb-8">
+            <div class="text-center mb-6">
+                <div id="areaEmoji" class="text-6xl mb-4">🏠</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">파이썬 마을</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    파이썬 언어의 고향인 이곳에서 당신의 코딩 모험이 시작됩니다! 
+                    각 지역을 탐험하며 새로운 스킬을 배우고 강력한 코더가 되어보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-black bg-opacity-30 rounded-lg p-4 mb-6 hidden">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 모험 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 학습 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 통계
+                </button>
+            </div>
+
+            <!-- 모험 진행 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ 모험 진행 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 해결한 문제들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 코딩 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-900 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🎓</div>
+                <h2 class="text-3xl font-bold mb-2">코딩 미션!</h2>
+                <h3 id="skillName" class="text-xl text-blue-400"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h4 class="text-xl font-bold mb-4 text-green-400">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4"></p>
+                    <div class="bg-blue-900 bg-opacity-50 rounded-lg p-4 mb-4">
+                        <h5 class="font-bold mb-2 text-blue-300">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-yellow-300">⚡ 예제 코드</h5>
+                        <pre><code id="exampleCode" class="text-green-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- 코딩 챌린지 -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h4 class="text-xl font-bold mb-4 text-yellow-400">🚀 코딩 챌린지</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-300">📝 문제:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-900 bg-opacity-50 p-3 rounded"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-300">💻 여기에 코드를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-green-300 text-sm resize-none" 
+                                  placeholder="# 여기에 파이썬 코드를 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 코드 실행
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-300">🔍 실행 결과:</h5>
+                        <pre id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></pre>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-300">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-900 bg-opacity-50 p-3 rounded text-sm"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-300">📝 정답 코드:</h5>
+                        <pre id="answerCode" class="bg-red-900 bg-opacity-50 p-3 rounded text-sm font-mono text-green-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button text-gray-900 font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 미션 완료하기!
+                </button>
+                <p class="text-sm text-gray-400 mt-2">코드를 실행해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'village',
+            player: {
+                name: '코딩 모험가',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['village'],
+                problemHistory: [] // 문제 해결 기록
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // 스킬 데이터 (코딩 챌린지 포함)
+        const skills = {
+            variables: {
+                name: "변수와 자료형",
+                category: "입문",
+                explanation: "변수는 데이터를 저장하는 상자입니다. 파이썬에서는 다양한 자료형(문자열, 숫자, 불린 등)을 자유롭게 사용할 수 있어요.",
+                application: "웹 개발, 데이터 분석, AI 등 모든 프로그래밍의 기초가 됩니다.",
+                example: `# 변수 선언과 자료형
+name = "파이썬"
+age = 30
+height = 175.5
+is_student = True
+
+print(f"{name}은 {age}살이고 키는 {height}cm입니다.")`,
+                challenge: {
+                    description: "사용자의 이름과 나이를 변수에 저장하고, '안녕하세요, 철수님! 25살이시군요!'라는 메시지를 출력하는 코드를 작성하세요.",
+                    expectedOutput: "안녕하세요, 철수님! 25살이시군요!",
+                    hint: "f-string을 사용하면 변수를 쉽게 문자열에 포함시킬 수 있어요. f'텍스트 {변수}'",
+                    answer: `name = "철수"
+age = 25
+print(f"안녕하세요, {name}님! {age}살이시군요!")`
+                }
+            },
+            loops: {
+                name: "반복문 (for, while)",
+                category: "입문",
+                explanation: "반복문은 같은 작업을 여러 번 수행할 때 사용합니다. for문과 while문으로 다양한 반복을 구현할 수 있어요.",
+                application: "대량의 데이터 처리, 게임 루프, 자동화 작업에 필수적입니다.",
+                example: `# for문 예제
+for i in range(5):
+    print(f"반복 {i+1}번째")
+
+# 리스트 순회
+fruits = ["사과", "바나나", "오렌지"]
+for fruit in fruits:
+    print(f"맛있는 {fruit}!")`,
+                challenge: {
+                    description: "1부터 10까지의 숫자 중 짝수만 출력하는 코드를 작성하세요. (힌트: % 연산자 사용)",
+                    expectedOutput: "2\n4\n6\n8\n10",
+                    hint: "if i % 2 == 0: 조건을 사용하면 짝수를 찾을 수 있어요!",
+                    answer: `for i in range(1, 11):
+    if i % 2 == 0:
+        print(i)`
+                }
+            },
+            functions: {
+                name: "함수 정의와 호출",
+                category: "입문",
+                explanation: "함수는 코드를 재사용 가능한 블록으로 만드는 방법입니다. 복잡한 작업을 간단하게 만들어줘요.",
+                application: "코드 재사용, 모듈화, 테스트 용이성을 위해 모든 프로그램에서 사용됩니다.",
+                example: `def greet(name, age=20):
+    return f"안녕하세요, {age}살 {name}님!"
+
+message = greet("철수", 25)
+print(message)`,
+                challenge: {
+                    description: "두 숫자를 받아서 더 큰 수를 반환하는 함수 'find_max'를 만들고, 5와 3을 비교한 결과를 출력하세요.",
+                    expectedOutput: "5",
+                    hint: "if문을 사용해서 두 숫자를 비교하고 더 큰 값을 return하세요.",
+                    answer: `def find_max(a, b):
+    if a > b:
+        return a
+    else:
+        return b
+
+result = find_max(5, 3)
+print(result)`
+                }
+            },
+            data_structures: {
+                name: "자료구조 (리스트, 딕셔너리)",
+                category: "기초 알고리즘",
+                explanation: "파이썬의 내장 자료구조들을 활용하면 데이터를 효율적으로 관리할 수 있습니다.",
+                application: "데이터베이스, 캐싱, 알고리즘 최적화에 핵심적으로 사용됩니다.",
+                example: `# 리스트
+numbers = [1, 2, 3, 4, 5]
+numbers.append(6)
+
+# 딕셔너리
+student = {"이름": "김철수", "나이": 20}
+print(student["이름"])`,
+                challenge: {
+                    description: "학생들의 점수가 담긴 리스트 [85, 92, 78, 96, 88]에서 평균 점수를 계산하고 출력하세요.",
+                    expectedOutput: "87.8",
+                    hint: "sum() 함수와 len() 함수를 사용하면 쉽게 평균을 구할 수 있어요!",
+                    answer: `scores = [85, 92, 78, 96, 88]
+average = sum(scores) / len(scores)
+print(average)`
+                }
+            },
+            algorithms: {
+                name: "정렬과 탐색 알고리즘",
+                category: "기초 알고리즘",
+                explanation: "정렬과 탐색은 프로그래밍의 핵심 알고리즘입니다. 효율적인 데이터 처리의 기본이 됩니다.",
+                application: "데이터베이스 인덱싱, 검색 엔진, 추천 시스템 등에 사용됩니다.",
+                example: `# 버블 정렬
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    return arr`,
+                challenge: {
+                    description: "리스트 [5, 2, 8, 1, 9]를 오름차순으로 정렬하고 결과를 출력하세요. (내장 sorted() 함수 사용)",
+                    expectedOutput: "[1, 2, 5, 8, 9]",
+                    hint: "sorted() 함수를 사용하거나 .sort() 메서드를 사용할 수 있어요!",
+                    answer: `numbers = [5, 2, 8, 1, 9]
+sorted_numbers = sorted(numbers)
+print(sorted_numbers)`
+                }
+            },
+            oop: {
+                name: "객체지향 프로그래밍",
+                category: "중급",
+                explanation: "클래스와 객체를 사용해 현실 세계를 모델링하고 코드를 체계적으로 구성합니다.",
+                application: "웹 프레임워크, 게임 개발, 대규모 소프트웨어 설계에 필수적입니다.",
+                example: `class Dog:
+    def __init__(self, name):
+        self.name = name
+    
+    def bark(self):
+        return f"{self.name}이 멍멍!"
+
+my_dog = Dog("바둑이")
+print(my_dog.bark())`,
+                challenge: {
+                    description: "Calculator 클래스를 만들어서 add(a, b) 메서드로 두 수를 더하는 기능을 구현하고, 3과 5를 더한 결과를 출력하세요.",
+                    expectedOutput: "8",
+                    hint: "class Calculator: 를 만들고 __init__ 메서드와 add 메서드를 정의하세요!",
+                    answer: `class Calculator:
+    def add(self, a, b):
+        return a + b
+
+calc = Calculator()
+result = calc.add(3, 5)
+print(result)`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            village: {
+                title: "파이썬 마을",
+                emoji: "🏠",
+                description: "파이썬 언어의 고향인 이곳에서 당신의 코딩 모험이 시작됩니다!",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'variables', npc: '🐍', name: '파이썬 가이드', message: '변수와 자료형을 마스터해보세요!' },
+                    { skill: 'loops', npc: '🔄', name: '반복 마스터', message: '반복문으로 효율적인 코딩을 배워보세요!' },
+                    { skill: 'functions', npc: '⚙️', name: '함수 장인', message: '함수로 코드를 재사용해보세요!' }
+                ]
+            },
+            algorithm_forest: {
+                title: "알고리즘 숲",
+                emoji: "🌲",
+                description: "효율적인 알고리즘과 자료구조를 배울 수 있는 곳입니다!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'data_structures', npc: '📚', name: '자료구조 학자', message: '데이터를 체계적으로 관리해보세요!' },
+                    { skill: 'algorithms', npc: '🔍', name: '알고리즘 탐험가', message: '정렬과 탐색의 비밀을 파헤쳐보세요!' }
+                ]
+            },
+            coding_academy: {
+                title: "코딩 아카데미",
+                emoji: "🎓",
+                description: "중급 개발자로 성장하기 위한 핵심 스킬들을 배우는 곳입니다!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'oop', npc: '🏗️', name: 'OOP 아키텍트', message: '객체지향으로 세상을 모델링해보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "입문자", 2: "초보자", 3: "견습생", 4: "개발자", 5: "숙련자",
+            6: "전문가", 7: "마스터", 8: "전설", 9: "신화", 10: "파이썬의 신"
+        };
+
+        // 코드 실행 함수
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ 코드를 입력해주세요!", "error");
+                return;
+            }
+            
+            // 사용자 코드 저장
+            gameState.currentSession.userCode = code;
+            
+            // 간단한 파이썬 코드 시뮬레이션
+            try {
+                const result = simulatePythonCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 정답입니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 훌륭해요! 이제 미션을 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 아직 정답이 아니에요.\n실행 결과: ${result.output}\n기대한 결과: ${skill.challenge.expectedOutput}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        // 파이썬 코드 시뮬레이션 (간단한 버전)
+        function simulatePythonCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            // 간단한 파이썬 코드 실행 시뮬레이션
+            try {
+                // print 문 찾기
+                const printMatches = code.match(/print\((.*?)\)/g);
+                if (printMatches) {
+                    const results = [];
+                    
+                    // 각 print문 처리
+                    printMatches.forEach(printStatement => {
+                        const content = printStatement.match(/print\((.*?)\)/)[1];
+                        
+                        // 변수 정의 찾기
+                        const variables = {};
+                        const varMatches = code.match(/(\w+)\s*=\s*(.+)/g);
+                        if (varMatches) {
+                            varMatches.forEach(varDef => {
+                                const [_, varName, varValue] = varDef.match(/(\w+)\s*=\s*(.+)/);
+                                try {
+                                    if (varValue.includes('"') || varValue.includes("'")) {
+                                        variables[varName] = varValue.replace(/['"]/g, '');
+                                    } else if (!isNaN(varValue)) {
+                                        variables[varName] = parseFloat(varValue);
+                                    } else if (varValue === 'True') {
+                                        variables[varName] = true;
+                                    } else if (varValue === 'False') {
+                                        variables[varName] = false;
+                                    } else if (varValue.startsWith('[') && varValue.endsWith(']')) {
+                                        variables[varName] = JSON.parse(varValue);
+                                    }
+                                } catch (e) {
+                                    // 복잡한 표현식은 그대로 둠
+                                }
+                            });
+                        }
+                        
+                        // f-string 처리
+                        if (content.includes('f"') || content.includes("f'")) {
+                            let result = content.replace(/f["']([^"']+)["']/, (match, str) => {
+                                return str.replace(/\{(\w+)\}/g, (match, varName) => {
+                                    return variables[varName] || varName;
+                                });
+                            });
+                            results.push(result);
+                        } else if (content in variables) {
+                            results.push(variables[content]);
+                        } else {
+                            // 기본적인 표현식 평가
+                            try {
+                                let evalContent = content;
+                                Object.keys(variables).forEach(varName => {
+                                    evalContent = evalContent.replace(new RegExp(`\\b${varName}\\b`, 'g'), 
+                                        typeof variables[varName] === 'string' ? `"${variables[varName]}"` : variables[varName]);
+                                });
+                                
+                                // 안전한 eval (제한적)
+                                if (/^[\d+\-*/().\s]+$/.test(evalContent) || 
+                                    /^"[^"]*"\s*$/.test(evalContent) ||
+                                    evalContent.includes('sum(') ||
+                                    evalContent.includes('len(') ||
+                                    evalContent.includes('sorted(')) {
+                                    
+                                    // 특별한 함수들 처리
+                                    if (evalContent.includes('sum([') && evalContent.includes('])')) {
+                                        const arrayMatch = evalContent.match(/sum\((\[.*?\])\)/);
+                                        if (arrayMatch) {
+                                            const array = JSON.parse(arrayMatch[1]);
+                                            results.push(array.reduce((a, b) => a + b, 0));
+                                        }
+                                    } else if (evalContent.includes('len([') && evalContent.includes('])')) {
+                                        const arrayMatch = evalContent.match(/len\((\[.*?\])\)/);
+                                        if (arrayMatch) {
+                                            const array = JSON.parse(arrayMatch[1]);
+                                            results.push(array.length);
+                                        }
+                                    } else if (evalContent.includes('sorted([') && evalContent.includes('])')) {
+                                        const arrayMatch = evalContent.match(/sorted\((\[.*?\])\)/);
+                                        if (arrayMatch) {
+                                            const array = JSON.parse(arrayMatch[1]);
+                                            results.push(JSON.stringify(array.sort((a, b) => a - b)));
+                                        }
+                                    } else {
+                                        results.push(eval(evalContent));
+                                    }
+                                } else {
+                                    results.push(content.replace(/['"]/g, ''));
+                                }
+                            } catch (e) {
+                                results.push(content.replace(/['"]/g, ''));
+                            }
+                        }
+                    });
+                    
+                    output = results.join('\n');
+                }
+                
+                // 결과 비교
+                success = output.trim() === expectedOutput.trim();
+                
+            } catch (error) {
+                throw new Error("코드 실행 중 오류가 발생했습니다.");
+            }
+            
+            return { success, output: output || "출력 없음" };
+        }
+
+        // 출력 표시
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.textContent = text;
+            
+            // 스타일 변경
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        // 힌트 표시
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        // 정답 표시
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            // 정답을 봤으니 미션 완료 가능
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 미션을 완료할 수 있습니다.';
+        }
+
+        // 게임 상태 업데이트
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge px-2 py-1 rounded text-xs font-bold text-gray-900';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            // 지역 이동 버튼들
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button text-gray-900 font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            // 현재 지역의 퀘스트 버튼들
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button text-gray-900 font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 도전하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button text-gray-900 font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `🚀 ${skills[quest.skill].name} 코딩 미션 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            // 세션 초기화
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            // 초기화
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '코드를 실행해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 코딩 미션을 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000); // 초 단위
+            
+            // 학습 기록 저장
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 미션 완료! "${skill.name}" 스킬을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-green-900 bg-opacity-50' : 'bg-gray-700 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm">${area.title}</div>
+                    <div class="text-xs mt-1">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        // 저장/불러오기 기능
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'python_rpg_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            // 자동 저장 표시
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까? 모든 진행사항이 삭제됩니다.')) {
+                gameState = {
+                    currentArea: 'village',
+                    player: {
+                        name: '코딩 모험가',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['village'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                updateRecordTab();
+                updateStatsTab();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        // 탭 전환 기능
+        function switchTab(tabName) {
+            // 모든 탭 버튼 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 모든 탭 콘텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // 선택된 탭 활성화
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
+            // 탭별 데이터 업데이트
+            if (tabName === 'record') {
+                updateRecordTab();
+            } else if (tabName === 'stats') {
+                updateStatsTab();
+            }
+        }
+
+        // 학습 기록 탭 업데이트
+        function updateRecordTab() {
+            const container = document.getElementById('solvedProblemsContainer');
+            
+            if (gameState.player.problemHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <div class="text-4xl mb-4">📝</div>
+                        <p>아직 해결한 문제가 없습니다.</p>
+                        <p class="text-sm mt-2">첫 번째 코딩 미션을 시작해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            gameState.player.problemHistory.forEach((record, index) => {
+                const statusIcon = record.solvedCorrectly ? '✅' : '👀';
+                const statusText = record.solvedCorrectly ? '직접 해결' : '정답 확인';
+                const timeText = record.timeSpent < 60 ? 
+                    `${record.timeSpent}초` : 
+                    `${Math.floor(record.timeSpent / 60)}분 ${record.timeSpent % 60}초`;
+                
+                html += `
+                    <div class="problem-card rounded-lg p-4 mb-4 transition-all duration-300">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h4 class="font-bold text-lg text-blue-300">${record.skillTitle}</h4>
+                                <p class="text-sm text-purple-300">${record.category} • ${record.completedAt}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl">${statusIcon}</span>
+                                <p class="text-xs text-gray-400">${statusText}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="font-bold text-sm text-yellow-300 mb-2">📝 문제:</h5>
+                            <p class="text-sm bg-gray-800 bg-opacity-50 p-3 rounded">${record.description}</p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <h5 class="font-bold text-sm text-green-300 mb-2">💻 내가 작성한 코드:</h5>
+                                <div class="code-preview rounded p-3">
+                                    <pre><code class="text-green-300 text-xs font-mono">${record.userCode || '코드가 저장되지 않음'}</code></pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-sm text-blue-300 mb-2">✨ 정답 코드:</h5>
+                                <div class="code-preview rounded p-3">
+                                    <pre><code class="text-blue-300 text-xs font-mono">${record.correctAnswer}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-400">
+                            <div class="flex space-x-4">
+                                <span>⏱️ 소요시간: ${timeText}</span>
+                                ${record.usedHint ? '<span>💡 힌트 사용</span>' : ''}
+                                ${record.viewedAnswer ? '<span>👀 정답 확인</span>' : ''}
+                            </div>
+                            <button onclick="reviewProblem('${record.skillName}')" 
+                                    class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">
+                                🔄 다시 도전
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 통계 탭 업데이트
+        function updateStatsTab() {
+            const container = document.getElementById('statisticsContainer');
+            const history = gameState.player.problemHistory;
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <div class="text-4xl mb-4">📊</div>
+                        <p>통계를 보려면 문제를 해결해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 통계 계산
+            const totalProblems = history.length;
+            const solvedCorrectly = history.filter(h => h.solvedCorrectly).length;
+            const successRate = Math.round((solvedCorrectly / totalProblems) * 100);
+            const averageTime = Math.round(history.reduce((sum, h) => sum + h.timeSpent, 0) / totalProblems);
+            const hintsUsed = history.filter(h => h.usedHint).length;
+            const answersViewed = history.filter(h => h.viewedAnswer).length;
+            
+            // 카테고리별 통계
+            const categoryStats = {};
+            history.forEach(h => {
+                if (!categoryStats[h.category]) {
+                    categoryStats[h.category] = { total: 0, solved: 0 };
+                }
+                categoryStats[h.category].total++;
+                if (h.solvedCorrectly) categoryStats[h.category].solved++;
+            });
+            
+            let categoryHtml = '';
+            Object.entries(categoryStats).forEach(([category, stats]) => {
+                const rate = Math.round((stats.solved / stats.total) * 100);
+                categoryHtml += `
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4">
+                        <h5 class="font-bold text-purple-300 mb-2">${category}</h5>
+                        <div class="flex justify-between text-sm">
+                            <span>해결: ${stats.solved}/${stats.total}</span>
+                            <span class="text-green-400">${rate}%</span>
+                        </div>
+                        <div class="w-full bg-gray-600 rounded-full h-2 mt-2">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" 
+                                 style="width: ${rate}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = `
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <h4 class="font-bold text-xl text-green-400">${successRate}%</h4>
+                        <p class="text-sm text-gray-400">정답률</p>
+                    </div>
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">⏱️</div>
+                        <h4 class="font-bold text-xl text-blue-400">${averageTime < 60 ? averageTime + '초' : Math.floor(averageTime/60) + '분'}</h4>
+                        <p class="text-sm text-gray-400">평균 소요시간</p>
+                    </div>
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">🏆</div>
+                        <h4 class="font-bold text-xl text-purple-400">${totalProblems}</h4>
+                        <p class="text-sm text-gray-400">총 해결 문제</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <h4 class="font-bold text-lg mb-4 text-yellow-400">📈 세부 통계</h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span>직접 해결:</span>
+                                <span class="text-green-400">${solvedCorrectly}개</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>정답 확인:</span>
+                                <span class="text-orange-400">${answersViewed}개</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>힌트 사용:</span>
+                                <span class="text-blue-400">${hintsUsed}회</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>현재 레벨:</span>
+                                <span class="text-purple-400">Lv.${gameState.player.level}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                        <h4 class="font-bold text-lg mb-4 text-purple-400">📚 카테고리별 성과</h4>
+                        <div class="space-y-3">
+                            ${categoryHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                    <h4 class="font-bold text-lg mb-4 text-green-400">🎖️ 달성 업적</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${totalProblems >= 1 ? '<div class="text-center"><div class="text-2xl">🌟</div><p class="text-xs">첫 문제 해결</p></div>' : ''}
+                        ${totalProblems >= 5 ? '<div class="text-center"><div class="text-2xl">🔥</div><p class="text-xs">5문제 돌파</p></div>' : ''}
+                        ${successRate >= 80 ? '<div class="text-center"><div class="text-2xl">🎯</div><p class="text-xs">고수 (80%+)</p></div>' : ''}
+                        ${solvedCorrectly >= 3 ? '<div class="text-center"><div class="text-2xl">💪</div><p class="text-xs">독립적 해결자</p></div>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 문제 다시 도전
+        function reviewProblem(skillName) {
+            if (confirm('이 문제를 다시 도전하시겠습니까?')) {
+                // 현재 지역을 해당 스킬이 있는 지역으로 이동
+                let targetArea = 'village';
+                Object.entries(areas).forEach(([areaKey, area]) => {
+                    if (area.quests.some(quest => quest.skill === skillName)) {
+                        targetArea = areaKey;
+                    }
+                });
+                
+                gameState.currentArea = targetArea;
+                hideNPCDialogue();
+                renderArea();
+                
+                // 해당 스킬의 NPC 대화 표시
+                const area = areas[targetArea];
+                const quest = area.quests.find(q => q.skill === skillName);
+                if (quest) {
+                    showNPCDialogue(quest);
+                }
+            }
+        }
+
+        function initGame() {
+            const playerName = prompt('파이썬 코딩 모험가의 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+            updateRecordTab();
+            updateStatsTab();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

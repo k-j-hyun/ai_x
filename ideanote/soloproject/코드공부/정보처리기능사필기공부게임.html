@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보처리기능사 필기 마스터 🏆</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        }
+        .subject-badge {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #43e97b 0%, #38f9d7 100%);
+            transition: all 0.3s ease;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .question-card {
+            background: #1a202c;
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+        }
+        .option-button {
+            background: #2d3748;
+            border: 2px solid #4a5568;
+            transition: all 0.3s ease;
+        }
+        .option-button:hover {
+            border-color: #4299e1;
+            background: #3a4a5c;
+        }
+        .option-button.selected {
+            border-color: #4299e1;
+            background: #2b6cb0;
+        }
+        .option-button.correct {
+            border-color: #48bb78;
+            background: #2f855a;
+        }
+        .option-button.incorrect {
+            border-color: #f56565;
+            background: #c53030;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(72, 187, 120, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: #1a202c;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border: 1px solid rgba(240, 147, 251, 0.3);
+        }
+        .result-excellent { background: linear-gradient(45deg, #48bb78, #38a169); }
+        .result-good { background: linear-gradient(45deg, #4299e1, #3182ce); }
+        .result-normal { background: linear-gradient(45deg, #ed8936, #dd6b20); }
+        .result-poor { background: linear-gradient(45deg, #f56565, #e53e3e); }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 학습 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold mb-2">🏆 정보처리기능사 필기 마스터</h1>
+            <p class="text-xl opacity-90">게임으로 배우는 정보처리기능사 필기시험!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👤</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">수험생</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 입문자</span>
+                            <span class="text-sm">📚 학습점수: <span id="playerScore">0</span></span>
+                            <span class="text-sm">✅ 정답률: <span id="correctRate">0%</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🏆 취득 자격:</div>
+                    <div id="subjectBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 진행률 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-gray-300 bg-opacity-30 rounded-full h-3">
+                    <div id="progressBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 장소 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 mb-8">
+            <div class="text-center mb-6">
+                <div id="areaEmoji" class="text-6xl mb-4">📚</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">정보처리 학원</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    정보처리기능사 필기시험을 준비하는 곳입니다. 
+                    각 과목별로 체계적으로 학습하고 실전 문제를 통해 실력을 키워보세요!
+                </p>
+            </div>
+
+            <!-- 강사 설명 -->
+            <div id="teacherDialogue" class="bg-black bg-opacity-30 rounded-lg p-4 mb-6 hidden">
+                <div class="flex items-start space-x-3">
+                    <div id="teacherEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="teacherName" class="font-bold text-lg mb-2"></div>
+                        <p id="teacherMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 과목 선택 -->
+            <div id="subjectContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 과목 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6">
+            <div class="flex space-x-4 mb-6">
+                <button id="studyTab" onclick="switchTab('study')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    📖 학습 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 풀이 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    🏆 성적 통계
+                </button>
+            </div>
+
+            <!-- 학습 현황 -->
+            <div id="studyContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">📖 과목별 학습 현황</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="studyProgress">
+                    <!-- 학습 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 풀이 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 최근 풀이 기록</h3>
+                <div id="recentRecords">
+                    <!-- 최근 풀이 기록이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 성적 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">🏆 나의 성적 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 문제 풀이 모달 -->
+    <div id="quizModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-900 rounded-xl p-8 max-w-4xl mx-4 max-h-[95vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🎯</div>
+                <h2 class="text-3xl font-bold mb-2">문제 풀이</h2>
+                <h3 id="subjectName" class="text-xl text-blue-400"></h3>
+                <div class="flex justify-center items-center space-x-4 mt-4 text-sm">
+                    <span>문제 <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span></span>
+                    <span>⏱️ <span id="timeRemaining">60</span>초</span>
+                    <span>점수: <span id="currentScore">0</span>점</span>
+                </div>
+            </div>
+            
+            <div class="question-card p-6 mb-6">
+                <h4 class="text-xl font-bold mb-4 text-yellow-400">📝 문제</h4>
+                <p id="questionText" class="text-lg leading-relaxed mb-6"></p>
+                
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- 선택지들이 여기에 동적으로 생성됩니다 -->
+                </div>
+                
+                <div class="flex justify-between items-center mt-6">
+                    <button id="hintButton" onclick="showHint()" 
+                            class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                        💡 힌트 보기
+                    </button>
+                    <button id="submitButton" onclick="submitAnswer()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded" disabled>
+                        ✅ 답안 제출
+                    </button>
+                </div>
+                
+                <!-- 힌트 -->
+                <div id="hintContainer" class="hidden mt-4 p-4 bg-yellow-900 bg-opacity-50 rounded">
+                    <h5 class="font-bold mb-2 text-yellow-300">💡 힌트:</h5>
+                    <p id="hintText" class="text-sm"></p>
+                </div>
+                
+                <!-- 해설 -->
+                <div id="explanationContainer" class="hidden mt-4 p-4 bg-blue-900 bg-opacity-50 rounded">
+                    <h5 class="font-bold mb-2 text-blue-300">📚 해설:</h5>
+                    <p id="explanationText" class="text-sm leading-relaxed"></p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="nextButton" onclick="nextQuestion()" 
+                        class="quest-button text-gray-900 font-bold py-3 px-6 rounded-lg text-lg hidden">
+                    ➡️ 다음 문제
+                </button>
+                <button id="completeButton" onclick="completeQuiz()" 
+                        class="quest-button text-gray-900 font-bold py-3 px-6 rounded-lg text-lg hidden">
+                    🏁 완료하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결과 모달 -->
+    <div id="resultModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-900 rounded-xl p-8 max-w-2xl mx-4">
+            <div class="text-center mb-6">
+                <div id="resultEmoji" class="text-6xl mb-4">🎉</div>
+                <h2 class="text-3xl font-bold mb-2">퀴즈 완료!</h2>
+                <h3 id="resultSubject" class="text-xl text-blue-400"></h3>
+            </div>
+            
+            <div id="resultSummary" class="bg-white bg-opacity-10 rounded-lg p-6 mb-6">
+                <!-- 결과 요약이 여기에 표시됩니다 -->
+            </div>
+            
+            <div class="text-center">
+                <button onclick="closeResultModal()" 
+                        class="quest-button text-gray-900 font-bold py-3 px-6 rounded-lg text-lg mr-4">
+                    📚 계속 학습하기
+                </button>
+                <button onclick="retryQuiz()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                    🔄 다시 도전하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'academy',
+            player: {
+                name: '수험생',
+                level: 1,
+                score: 0,
+                subjects: [],
+                totalQuestions: 0,
+                correctAnswers: 0,
+                completedSubjects: []
+            },
+            currentSubject: null,
+            currentQuiz: {
+                questions: [],
+                currentIndex: 0,
+                selectedAnswer: null,
+                score: 0,
+                timeRemaining: 60,
+                timer: null,
+                startTime: null
+            },
+            quizHistory: []
+        };
+
+        // 과목 데이터
+        const subjects = {
+            database: {
+                name: "데이터베이스",
+                emoji: "🗄️",
+                description: "데이터베이스 이론, SQL, DBMS, 정규화 등을 학습합니다.",
+                teacher: { emoji: "👨‍🏫", name: "DB 전문가" },
+                questions: [
+                    {
+                        text: "관계형 데이터베이스에서 기본키(Primary Key)의 특성으로 옳지 않은 것은?",
+                        options: ["1. 유일성(Uniqueness)", "2. 최소성(Minimality)", "3. NULL 값 허용", "4. 개체 무결성"],
+                        correct: 2,
+                        hint: "기본키는 NULL 값을 가질 수 없습니다.",
+                        explanation: "기본키는 각 행을 고유하게 식별하는 키로, NULL 값을 허용하지 않습니다. 유일성, 최소성, 개체 무결성은 모두 기본키의 특성입니다."
+                    },
+                    {
+                        text: "데이터베이스 정규화의 목적으로 가장 적절한 것은?",
+                        options: ["1. 데이터 중복 제거", "2. 저장 공간 증대", "3. 검색 속도 향상", "4. 보안 강화"],
+                        correct: 0,
+                        hint: "정규화는 중복을 제거하여 데이터 일관성을 유지하는 것이 주목적입니다.",
+                        explanation: "정규화는 데이터의 중복을 최소화하고 데이터 일관성을 유지하여 갱신 이상을 방지하는 것이 주목적입니다."
+                    },
+                    {
+                        text: "SQL에서 SELECT 문의 실행 순서로 올바른 것은?",
+                        options: ["1. SELECT → FROM → WHERE → GROUP BY", "2. FROM → WHERE → GROUP BY → SELECT", "3. WHERE → FROM → SELECT → GROUP BY", "4. GROUP BY → WHERE → FROM → SELECT"],
+                        correct: 1,
+                        hint: "FROM으로 테이블을 지정한 후, 조건을 필터링하고, 그룹화한 다음 선택합니다.",
+                        explanation: "SQL의 논리적 실행 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY 입니다."
+                    }
+                ]
+            },
+            programming: {
+                name: "프로그래밍 언어",
+                emoji: "💻",
+                description: "C언어, Java, Python 등 프로그래밍 언어의 기본 문법과 개념을 학습합니다.",
+                teacher: { emoji: "👩‍💻", name: "코딩 마스터" },
+                questions: [
+                    {
+                        text: "C언어에서 포인터 변수 선언의 올바른 형태는?",
+                        options: ["1. int ptr;", "2. int *ptr;", "3. int &ptr;", "4. ptr int;"],
+                        correct: 1,
+                        hint: "포인터는 * 기호를 사용하여 선언합니다.",
+                        explanation: "C언어에서 포인터 변수는 자료형 뒤에 *를 붙여서 선언합니다. int *ptr은 정수형 포인터 변수를 의미합니다."
+                    },
+                    {
+                        text: "객체지향 프로그래밍의 특징이 아닌 것은?",
+                        options: ["1. 캡슐화(Encapsulation)", "2. 상속성(Inheritance)", "3. 다형성(Polymorphism)", "4. 순차성(Sequence)"],
+                        correct: 3,
+                        hint: "객체지향의 3대 특성은 캡슐화, 상속성, 다형성입니다.",
+                        explanation: "객체지향 프로그래밍의 주요 특징은 캡슐화, 상속성, 다형성입니다. 순차성은 객체지향의 특징이 아닙니다."
+                    },
+                    {
+                        text: "Java에서 문자열을 비교할 때 사용하는 올바른 방법은?",
+                        options: ["1. str1 == str2", "2. str1.equals(str2)", "3. str1 = str2", "4. compare(str1, str2)"],
+                        correct: 1,
+                        hint: "Java에서는 equals() 메서드를 사용하여 문자열 내용을 비교합니다.",
+                        explanation: "Java에서 문자열 내용을 비교할 때는 equals() 메서드를 사용해야 합니다. == 연산자는 객체의 참조를 비교합니다."
+                    }
+                ]
+            },
+            system: {
+                name: "정보시스템",
+                emoji: "🖥️",
+                description: "시스템 분석 및 설계, 소프트웨어 생명주기 등을 학습합니다.",
+                teacher: { emoji: "👨‍💼", name: "시스템 아키텍트" },
+                questions: [
+                    {
+                        text: "소프트웨어 생명주기 모델 중 폭포수 모델의 특징은?",
+                        options: ["1. 순차적 개발", "2. 반복적 개발", "3. 점진적 개발", "4. 나선형 개발"],
+                        correct: 0,
+                        hint: "폭포수 모델은 단계별로 순차적으로 진행됩니다.",
+                        explanation: "폭포수 모델은 분석→설계→구현→테스트→유지보수 단계를 순차적으로 수행하는 전통적인 개발 모델입니다."
+                    },
+                    {
+                        text: "시스템 분석 단계에서 수행하는 작업이 아닌 것은?",
+                        options: ["1. 요구사항 분석", "2. 현행 시스템 분석", "3. 코딩", "4. 타당성 분석"],
+                        correct: 2,
+                        hint: "코딩은 구현 단계에서 수행하는 작업입니다.",
+                        explanation: "시스템 분석 단계에서는 요구사항 분석, 현행 시스템 분석, 타당성 분석 등을 수행하며, 코딩은 구현 단계의 작업입니다."
+                    }
+                ]
+            },
+            software: {
+                name: "소프트웨어 공학",
+                emoji: "⚙️",
+                description: "소프트웨어 개발 방법론, 테스팅, 품질관리 등을 학습합니다.",
+                teacher: { emoji: "👩‍🔬", name: "품질 관리자" },
+                questions: [
+                    {
+                        text: "소프트웨어 테스팅의 목적으로 가장 적절한 것은?",
+                        options: ["1. 오류가 없음을 증명", "2. 오류를 발견", "3. 성능 향상", "4. 개발 기간 단축"],
+                        correct: 1,
+                        hint: "테스팅의 주목적은 소프트웨어의 오류를 찾아내는 것입니다.",
+                        explanation: "소프트웨어 테스팅의 주목적은 프로그램에 존재하는 오류를 발견하는 것입니다. 오류가 없음을 증명하는 것은 불가능합니다."
+                    },
+                    {
+                        text: "화이트박스 테스트의 특징은?",
+                        options: ["1. 내부 구조 모름", "2. 내부 구조 알고 테스트", "3. 사용자 관점", "4. 기능 중심 테스트"],
+                        correct: 1,
+                        hint: "화이트박스 테스트는 프로그램의 내부 구조를 알고 수행하는 테스트입니다.",
+                        explanation: "화이트박스 테스트는 프로그램의 내부 논리 구조를 알고 수행하는 테스트로, 구조 기반 테스트라고도 합니다."
+                    }
+                ]
+            },
+            network: {
+                name: "데이터 통신",
+                emoji: "🌐",
+                description: "네트워크, 프로토콜, 인터넷 등 데이터 통신 기술을 학습합니다.",
+                teacher: { emoji: "👨‍🔧", name: "네트워크 엔지니어" },
+                questions: [
+                    {
+                        text: "OSI 7계층 중 전송 계층에 해당하는 것은?",
+                        options: ["1. 물리 계층", "2. 데이터링크 계층", "3. 네트워크 계층", "4. 전송 계층"],
+                        correct: 3,
+                        hint: "전송 계층은 OSI 7계층의 4계층입니다.",
+                        explanation: "OSI 7계층에서 전송 계층(Transport Layer)은 4계층으로, 신뢰성 있는 데이터 전송을 담당합니다."
+                    },
+                    {
+                        text: "TCP와 UDP의 차이점으로 올바른 것은?",
+                        options: ["1. TCP는 비연결형, UDP는 연결형", "2. TCP는 연결형, UDP는 비연결형", "3. 둘 다 연결형", "4. 둘 다 비연결형"],
+                        correct: 1,
+                        hint: "TCP는 연결을 설정한 후 데이터를 전송하는 연결형 프로토콜입니다.",
+                        explanation: "TCP는 연결형 프로토콜로 신뢰성 있는 데이터 전송을 보장하고, UDP는 비연결형 프로토콜로 빠른 전송이 특징입니다."
+                    }
+                ]
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            academy: {
+                title: "정보처리 학원",
+                emoji: "📚",
+                description: "정보처리기능사 필기시험을 체계적으로 준비할 수 있는 곳입니다."
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "입문자", 2: "초보자", 3: "견습생", 4: "수험생", 5: "준전문가",
+            6: "전문가", 7: "마스터", 8: "전설", 9: "신화", 10: "정보처리의 신"
+        };
+
+        // 타이머 관리
+        function startTimer() {
+            gameState.currentQuiz.timer = setInterval(() => {
+                gameState.currentQuiz.timeRemaining--;
+                document.getElementById('timeRemaining').textContent = gameState.currentQuiz.timeRemaining;
+                
+                if (gameState.currentQuiz.timeRemaining <= 0) {
+                    clearInterval(gameState.currentQuiz.timer);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (gameState.currentQuiz.timer) {
+                clearInterval(gameState.currentQuiz.timer);
+                gameState.currentQuiz.timer = null;
+            }
+        }
+
+        function timeUp() {
+            alert('⏰ 시간이 초과되었습니다!');
+            submitAnswer();
+        }
+
+        // 문제 표시
+        function showQuestion() {
+            const quiz = gameState.currentQuiz;
+            const question = quiz.questions[quiz.currentIndex];
+            
+            document.getElementById('currentQuestion').textContent = quiz.currentIndex + 1;
+            document.getElementById('totalQuestions').textContent = quiz.questions.length;
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('currentScore').textContent = quiz.score;
+            
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button w-full p-4 rounded-lg text-left';
+                button.textContent = option;
+                button.onclick = () => selectOption(index);
+                container.appendChild(button);
+            });
+            
+            // 초기화
+            gameState.currentQuiz.selectedAnswer = null;
+            document.getElementById('submitButton').disabled = true;
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('explanationContainer').classList.add('hidden');
+            document.getElementById('nextButton').classList.add('hidden');
+            document.getElementById('completeButton').classList.add('hidden');
+            document.getElementById('hintButton').disabled = false;
+            
+            // 타이머 리셋
+            gameState.currentQuiz.timeRemaining = 60;
+            document.getElementById('timeRemaining').textContent = '60';
+            startTimer();
+        }
+
+        function selectOption(index) {
+            // 이전 선택 해제
+            document.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 새 선택 설정
+            document.querySelectorAll('.option-button')[index].classList.add('selected');
+            gameState.currentQuiz.selectedAnswer = index;
+            document.getElementById('submitButton').disabled = false;
+        }
+
+        function showHint() {
+            const question = gameState.currentQuiz.questions[gameState.currentQuiz.currentIndex];
+            document.getElementById('hintText').textContent = question.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            document.getElementById('hintButton').disabled = true;
+        }
+
+        function submitAnswer() {
+            stopTimer();
+            
+            const quiz = gameState.currentQuiz;
+            const question = quiz.questions[quiz.currentIndex];
+            const selectedAnswer = quiz.selectedAnswer;
+            
+            // 정답 표시
+            document.querySelectorAll('.option-button').forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === question.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selectedAnswer && index !== question.correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            // 점수 계산
+            let points = 0;
+            if (selectedAnswer === question.correct) {
+                points = gameState.currentQuiz.timeRemaining > 30 ? 10 : 5;
+                quiz.score += points;
+            }
+            
+            // 해설 표시
+            document.getElementById('explanationText').textContent = question.explanation;
+            document.getElementById('explanationContainer').classList.remove('hidden');
+            
+            // 버튼 상태 변경
+            document.getElementById('submitButton').disabled = true;
+            
+            if (quiz.currentIndex < quiz.questions.length - 1) {
+                document.getElementById('nextButton').classList.remove('hidden');
+            } else {
+                document.getElementById('completeButton').classList.remove('hidden');
+            }
+            
+            // 기록 저장
+            const record = {
+                question: question.text,
+                selectedAnswer: selectedAnswer !== null ? question.options[selectedAnswer] : '시간 초과',
+                correctAnswer: question.options[question.correct],
+                isCorrect: selectedAnswer === question.correct,
+                timeUsed: 60 - gameState.currentQuiz.timeRemaining,
+                points: points
+            };
+            
+            if (!quiz.records) quiz.records = [];
+            quiz.records.push(record);
+        }
+
+        function nextQuestion() {
+            gameState.currentQuiz.currentIndex++;
+            showQuestion();
+        }
+
+        function completeQuiz() {
+            stopTimer();
+            
+            const quiz = gameState.currentQuiz;
+            const subject = subjects[gameState.currentSubject];
+            const correctCount = quiz.records.filter(r => r.isCorrect).length;
+            const accuracy = Math.round((correctCount / quiz.questions.length) * 100);
+            
+            // 퀴즈 기록 저장
+            const quizRecord = {
+                subject: gameState.currentSubject,
+                subjectName: subject.name,
+                score: quiz.score,
+                totalQuestions: quiz.questions.length,
+                correctAnswers: correctCount,
+                accuracy: accuracy,
+                completedAt: new Date().toLocaleString('ko-KR'),
+                records: quiz.records
+            };
+            
+            gameState.quizHistory.push(quizRecord);
+            
+            // 플레이어 상태 업데이트
+            gameState.player.score += quiz.score;
+            gameState.player.totalQuestions += quiz.questions.length;
+            gameState.player.correctAnswers += correctCount;
+            
+            // 과목 완료 체크
+            if (accuracy >= 70 && !gameState.player.completedSubjects.includes(gameState.currentSubject)) {
+                gameState.player.completedSubjects.push(gameState.currentSubject);
+            }
+            
+            // 레벨업 체크
+            const newLevel = Math.floor(gameState.player.score / 100) + 1;
+            if (newLevel > gameState.player.level) {
+                gameState.player.level = newLevel;
+            }
+            
+            showQuizResult(quizRecord);
+            hideQuizModal();
+            updatePlayerStatus();
+            autoSaveProgress();
+        }
+
+        function showQuizResult(record) {
+            const resultEmoji = document.getElementById('resultEmoji');
+            const resultSummary = document.getElementById('resultSummary');
+            
+            // 성과에 따른 이모지와 등급
+            let emoji, grade, gradeClass;
+            if (record.accuracy >= 90) {
+                emoji = '🏆'; grade = '최우수'; gradeClass = 'result-excellent';
+            } else if (record.accuracy >= 80) {
+                emoji = '🥇'; grade = '우수'; gradeClass = 'result-good';
+            } else if (record.accuracy >= 70) {
+                emoji = '🥈'; grade = '양호'; gradeClass = 'result-normal';
+            } else {
+                emoji = '📚'; grade = '재도전'; gradeClass = 'result-poor';
+            }
+            
+            resultEmoji.textContent = emoji;
+            document.getElementById('resultSubject').textContent = record.subjectName;
+            
+            resultSummary.innerHTML = `
+                <div class="${gradeClass} rounded-lg p-4 mb-4">
+                    <h4 class="text-2xl font-bold text-white text-center">${grade}</h4>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-blue-400">${record.score}점</div>
+                        <div class="text-sm text-gray-400">획득 점수</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-green-400">${record.accuracy}%</div>
+                        <div class="text-sm text-gray-400">정답률</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-purple-400">${record.correctAnswers}</div>
+                        <div class="text-sm text-gray-400">정답 수</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-orange-400">${record.totalQuestions}</div>
+                        <div class="text-sm text-gray-400">총 문제 수</div>
+                    </div>
+                </div>
+                ${record.accuracy >= 70 ? 
+                    '<div class="mt-4 text-center text-green-300">✅ 과목 이수 완료!</div>' : 
+                    '<div class="mt-4 text-center text-orange-300">📚 70% 이상 달성하여 과목을 이수하세요!</div>'
+                }
+            `;
+            
+            document.getElementById('resultModal').classList.remove('hidden');
+            document.getElementById('resultModal').classList.add('flex');
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+            document.getElementById('resultModal').classList.remove('flex');
+        }
+
+        function retryQuiz() {
+            closeResultModal();
+            startQuiz(gameState.currentSubject);
+        }
+
+        function hideQuizModal() {
+            document.getElementById('quizModal').classList.add('hidden');
+            document.getElementById('quizModal').classList.remove('flex');
+        }
+
+        function startQuiz(subjectKey) {
+            gameState.currentSubject = subjectKey;
+            const subject = subjects[subjectKey];
+            
+            // 문제 섞기
+            const shuffledQuestions = [...subject.questions].sort(() => Math.random() - 0.5);
+            
+            gameState.currentQuiz = {
+                questions: shuffledQuestions,
+                currentIndex: 0,
+                selectedAnswer: null,
+                score: 0,
+                timeRemaining: 60,
+                timer: null,
+                startTime: new Date(),
+                records: []
+            };
+            
+            document.getElementById('subjectName').textContent = subject.name;
+            document.getElementById('quizModal').classList.remove('hidden');
+            document.getElementById('quizModal').classList.add('flex');
+            
+            showQuestion();
+        }
+
+        // 게임 상태 업데이트
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerScore').textContent = gameState.player.score;
+            
+            const correctRate = gameState.player.totalQuestions > 0 ? 
+                Math.round((gameState.player.correctAnswers / gameState.player.totalQuestions) * 100) : 0;
+            document.getElementById('correctRate').textContent = correctRate + '%';
+            
+            const progress = (gameState.player.completedSubjects.length / Object.keys(subjects).length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            const subjectBadges = document.getElementById('subjectBadges');
+            subjectBadges.innerHTML = '';
+            gameState.player.completedSubjects.forEach(subjectKey => {
+                const badge = document.createElement('span');
+                badge.className = 'subject-badge px-2 py-1 rounded text-xs font-bold text-gray-900';
+                badge.textContent = subjects[subjectKey].name;
+                subjectBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const subjectContainer = document.getElementById('subjectContainer');
+            subjectContainer.innerHTML = '';
+            
+            Object.entries(subjects).forEach(([subjectKey, subject]) => {
+                const button = document.createElement('button');
+                const isCompleted = gameState.player.completedSubjects.includes(subjectKey);
+                
+                button.className = `quest-button text-gray-900 font-bold py-4 px-6 rounded-lg transition-all duration-300 ${
+                    isCompleted ? 'opacity-75' : ''
+                }`;
+                button.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">${subject.emoji}</span>
+                        <div class="text-left">
+                            <div class="text-lg">${subject.name}</div>
+                            <div class="text-sm opacity-80">${isCompleted ? '✅ 이수 완료' : '📝 문제 풀이 시작'}</div>
+                        </div>
+                    </div>
+                `;
+                button.onclick = () => showTeacherDialogue(subjectKey, subject);
+                subjectContainer.appendChild(button);
+            });
+        }
+
+        function showTeacherDialogue(subjectKey, subject) {
+            document.getElementById('teacherEmoji').textContent = subject.teacher.emoji;
+            document.getElementById('teacherName').textContent = subject.teacher.name;
+            document.getElementById('teacherMessage').textContent = subject.description;
+            document.getElementById('teacherDialogue').classList.remove('hidden');
+            
+            const subjectContainer = document.getElementById('subjectContainer');
+            subjectContainer.innerHTML = '';
+            
+            const startButton = document.createElement('button');
+            startButton.className = 'quest-button text-gray-900 font-bold py-4 px-8 rounded-lg text-xl';
+            startButton.innerHTML = `🚀 ${subject.name} 문제 풀이 시작!`;
+            startButton.onclick = () => startQuiz(subjectKey);
+            subjectContainer.appendChild(startButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideTeacherDialogue();
+                renderArea();
+            };
+            subjectContainer.appendChild(backButton);
+        }
+
+        function hideTeacherDialogue() {
+            document.getElementById('teacherDialogue').classList.add('hidden');
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
+            if (tabName === 'study') {
+                updateStudyProgress();
+            } else if (tabName === 'record') {
+                updateRecordTab();
+            } else if (tabName === 'stats') {
+                updateStatsTab();
+            }
+        }
+
+        function updateStudyProgress() {
+            const container = document.getElementById('studyProgress');
+            container.innerHTML = '';
+            
+            Object.entries(subjects).forEach(([subjectKey, subject]) => {
+                const isCompleted = gameState.player.completedSubjects.includes(subjectKey);
+                const subjectHistory = gameState.quizHistory.filter(h => h.subject === subjectKey);
+                const bestScore = subjectHistory.length > 0 ? Math.max(...subjectHistory.map(h => h.accuracy)) : 0;
+                
+                const card = document.createElement('div');
+                card.className = `stat-card rounded-lg p-4 ${isCompleted ? 'border-green-500' : ''}`;
+                card.innerHTML = `
+                    <div class="text-center mb-3">
+                        <div class="text-3xl mb-2">${subject.emoji}</div>
+                        <h4 class="font-bold text-lg">${subject.name}</h4>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>상태:</span>
+                            <span class="${isCompleted ? 'text-green-400' : 'text-yellow-400'}">
+                                ${isCompleted ? '✅ 이수 완료' : '📚 학습 중'}
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>최고 점수:</span>
+                            <span class="text-blue-400">${bestScore}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>도전 횟수:</span>
+                            <span class="text-purple-400">${subjectHistory.length}회</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateRecordTab() {
+            const container = document.getElementById('recentRecords');
+            
+            if (gameState.quizHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <div class="text-4xl mb-4">📝</div>
+                        <p>아직 풀이 기록이 없습니다.</p>
+                        <p class="text-sm mt-2">첫 번째 문제를 풀어보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const recentRecords = gameState.quizHistory.slice(-10).reverse();
+            let html = '';
+            
+            recentRecords.forEach(record => {
+                const gradeClass = record.accuracy >= 90 ? 'result-excellent' :
+                                 record.accuracy >= 80 ? 'result-good' :
+                                 record.accuracy >= 70 ? 'result-normal' : 'result-poor';
+                
+                html += `
+                    <div class="stat-card rounded-lg p-4 mb-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-bold text-lg text-blue-300">${record.subjectName}</h4>
+                                <p class="text-sm text-gray-400">${record.completedAt}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="${gradeClass} px-3 py-1 rounded text-white text-sm font-bold">
+                                    ${record.accuracy}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center text-sm">
+                            <div>
+                                <div class="font-bold text-blue-400">${record.score}점</div>
+                                <div class="text-gray-400">점수</div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-green-400">${record.correctAnswers}/${record.totalQuestions}</div>
+                                <div class="text-gray-400">정답/총문제</div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-purple-400">${record.accuracy}%</div>
+                                <div class="text-gray-400">정답률</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateStatsTab() {
+            const container = document.getElementById('statisticsContainer');
+            
+            if (gameState.quizHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <div class="text-4xl mb-4">📊</div>
+                        <p>통계를 보려면 문제를 풀어보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalAttempts = gameState.quizHistory.length;
+            const avgAccuracy = Math.round(gameState.quizHistory.reduce((sum, h) => sum + h.accuracy, 0) / totalAttempts);
+            const totalScore = gameState.player.score;
+            const completedSubjects = gameState.player.completedSubjects.length;
+            
+            container.innerHTML = `
+                <div class="grid md:grid-cols-4 gap-6 mb-6">
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <h4 class="font-bold text-xl text-green-400">${avgAccuracy}%</h4>
+                        <p class="text-sm text-gray-400">평균 정답률</p>
+                    </div>
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">💯</div>
+                        <h4 class="font-bold text-xl text-blue-400">${totalScore}</h4>
+                        <p class="text-sm text-gray-400">총 획득 점수</p>
+                    </div>
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">📚</div>
+                        <h4 class="font-bold text-xl text-purple-400">${completedSubjects}/5</h4>
+                        <p class="text-sm text-gray-400">이수 완료 과목</p>
+                    </div>
+                    <div class="stat-card rounded-lg p-6 text-center">
+                        <div class="text-3xl mb-2">🔄</div>
+                        <h4 class="font-bold text-xl text-orange-400">${totalAttempts}</h4>
+                        <p class="text-sm text-gray-400">총 도전 횟수</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-6">
+                    <h4 class="font-bold text-lg mb-4 text-yellow-400">🏆 달성 업적</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${totalAttempts >= 1 ? '<div class="text-center"><div class="text-2xl">🌟</div><p class="text-xs">첫 도전</p></div>' : ''}
+                        ${avgAccuracy >= 80 ? '<div class="text-center"><div class="text-2xl">🎯</div><p class="text-xs">고득점자</p></div>' : ''}
+                        ${completedSubjects >= 3 ? '<div class="text-center"><div class="text-2xl">📚</div><p class="text-xs">학습왕</p></div>' : ''}
+                        ${completedSubjects >= 5 ? '<div class="text-center"><div class="text-2xl">👑</div><p class="text-xs">마스터</p></div>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 저장/불러오기
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'craftsman_written_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            alert('진행사항을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까? 모든 진행사항이 삭제됩니다.')) {
+                gameState = {
+                    currentArea: 'academy',
+                    player: {
+                        name: '수험생',
+                        level: 1,
+                        score: 0,
+                        subjects: [],
+                        totalQuestions: 0,
+                        correctAnswers: 0,
+                        completedSubjects: []
+                    },
+                    currentSubject: null,
+                    currentQuiz: {
+                        questions: [],
+                        currentIndex: 0,
+                        selectedAnswer: null,
+                        score: 0,
+                        timeRemaining: 60,
+                        timer: null,
+                        startTime: null
+                    },
+                    quizHistory: []
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateStudyProgress();
+                updateRecordTab();
+                updateStatsTab();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function initGame() {
+            const playerName = prompt('수험생 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateStudyProgress();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

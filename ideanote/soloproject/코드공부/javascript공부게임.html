@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 웹 개발 스튜디오 🌐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 25%, #ef4444 50%, #ec4899 75%, #8b5cf6 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #f59e0b 0%, #f97316 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #ef4444 0%, #ec4899 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #f59e0b 0%, #f97316 100%);
+            transition: all 0.3s ease;
+            color: #451a03;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #1c1917;
+            border: 2px solid #f59e0b;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            color: #fbbf24;
+        }
+        .code-editor:focus {
+            border-color: #f97316;
+            outline: none;
+        }
+        .output-box {
+            background: #292524;
+            border-left: 4px solid #f59e0b;
+        }
+        .error-box {
+            background: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+        .success-box {
+            background: #14532d;
+            border-left: 4px solid #22c55e;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #f59e0b 0%, #f97316 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(245, 158, 11, 0.1);
+            color: rgba(69, 26, 3, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #f59e0b 0%, #f97316 100%);
+            color: white;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(245, 158, 11, 0.2);
+            color: #451a03;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(249, 115, 22, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #1c1917;
+            border: 1px solid #f59e0b;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.8); }
+        }
+        .browser-frame {
+            background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+            border-radius: 8px 8px 0 0;
+            padding: 8px;
+        }
+        .browser-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-stone-800">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center mb-4">
+                <h1 class="text-5xl font-bold mr-4">🌐 JavaScript 스튜디오</h1>
+                <div class="pulse-glow text-2xl">✨</div>
+            </div>
+            <p class="text-xl opacity-90">동적이고 인터랙티브한 웹의 세계를 만들어보세요!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-orange-800 hover:bg-orange-900 text-white px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-orange-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👨‍💻</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">웹 개발자</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge text-white px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 초보자</span>
+                            <span class="text-sm">🔥 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 해결한 문제: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🎨 습득한 스킬:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-orange-200 bg-opacity-50 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-orange-200">
+            <div class="text-center mb-6">
+                <!-- 브라우저 프레임 -->
+                <div class="browser-frame mb-4 max-w-md mx-auto">
+                    <div class="browser-dots">
+                        <div class="browser-dot bg-red-500"></div>
+                        <div class="browser-dot bg-yellow-500"></div>
+                        <div class="browser-dot bg-green-500"></div>
+                    </div>
+                </div>
+                
+                <div id="areaEmoji" class="text-6xl mb-4">🌐</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">JavaScript 스튜디오 로비</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    창의적인 에너지가 넘치는 JavaScript 웹 개발 스튜디오에 오신 것을 환영합니다! 
+                    이곳에서 동적이고 인터랙티브한 웹 애플리케이션을 만드는 마법을 배워보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-orange-900 bg-opacity-30 rounded-lg p-4 mb-6 hidden border border-orange-600">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2 text-orange-900"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 border border-orange-200">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 스튜디오 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 프로젝트 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 개발 통계
+                </button>
+            </div>
+
+            <!-- 스튜디오 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ JavaScript 스튜디오 탐험 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 해결한 JavaScript 문제들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 JavaScript 개발 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-orange-50 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto border-4 border-orange-600">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🌐</div>
+                <h2 class="text-3xl font-bold mb-2 text-orange-900">JavaScript 프로젝트!</h2>
+                <h3 id="skillName" class="text-xl text-orange-700"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-orange-100 rounded-lg p-6 border border-orange-300">
+                    <h4 class="text-xl font-bold mb-4 text-orange-800">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4 text-gray-800"></p>
+                    <div class="bg-blue-100 rounded-lg p-4 mb-4 border border-blue-300">
+                        <h5 class="font-bold mb-2 text-blue-800">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm text-blue-700"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-yellow-300">⚡ 예제 코드</h5>
+                        <pre><code id="exampleCode" class="text-yellow-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- 코딩 프로젝트 -->
+                <div class="bg-orange-100 rounded-lg p-6 border border-orange-300">
+                    <h4 class="text-xl font-bold mb-4 text-orange-800">🚀 코딩 프로젝트</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-700">📝 미션:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-100 p-3 rounded border border-purple-300"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-700">💻 JavaScript 코드를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-sm resize-none" 
+                                  placeholder="// JavaScript 코드를 여기에 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 코드 실행
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-700">🔍 실행 결과:</h5>
+                        <pre id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></pre>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-700">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-100 p-3 rounded text-sm border border-yellow-300"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-700">📝 정답 코드:</h5>
+                        <pre id="answerCode" class="bg-red-100 p-3 rounded text-sm font-mono text-gray-800 border border-red-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 프로젝트 완료하기!
+                </button>
+                <p class="text-sm text-gray-600 mt-2">코드를 실행해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'lobby',
+            player: {
+                name: '웹 개발자',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['lobby'],
+                problemHistory: []
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // JavaScript 스킬 데이터
+        const skills = {
+            // === 1단계: JavaScript 기초 ===
+            variables_js: {
+                name: "변수와 데이터 타입",
+                category: "JavaScript 기초",
+                explanation: "JavaScript는 동적 타입 언어로 var, let, const를 사용해 변수를 선언합니다. 타입은 런타임에 결정되며 매우 유연합니다.",
+                application: "웹 페이지의 동적 컨텐츠, 사용자 상호작용, 데이터 처리 등 모든 웹 개발의 기초가 됩니다.",
+                example: `// JavaScript 변수 선언
+let name = "홍길동";
+const age = 25;
+var isStudent = true;
+let score = 95.5;
+
+console.log(\`이름: \${name}, 나이: \${age}\`);
+console.log("학생 여부:", isStudent);`,
+                challenge: {
+                    description: "사용자의 이름(let name)과 좋아하는 색깔(const color)을 변수로 선언하고, '안녕하세요! 저는 [이름]이고 [색깔]색을 좋아합니다.'를 console.log로 출력하세요.",
+                    expectedOutput: "안녕하세요! 저는 김철수이고 파란색을 좋아합니다.",
+                    hint: "템플릿 리터럴 \`\${}'\을 사용하거나 + 연산자로 문자열을 연결하세요.",
+                    answer: `let name = "김철수";
+const color = "파란";
+
+console.log(\`안녕하세요! 저는 \${name}이고 \${color}색을 좋아합니다.\`);`
+                }
+            },
+            functions_js: {
+                name: "함수와 화살표 함수",
+                category: "JavaScript 기초",
+                explanation: "JavaScript 함수는 function 키워드나 화살표 함수(=>)로 선언할 수 있습니다. 일급 객체로 변수에 할당하고 매개변수로 전달할 수 있습니다.",
+                application: "이벤트 처리, 콜백 함수, 모듈화, 비동기 처리 등 JavaScript의 핵심 기능입니다.",
+                example: `// 일반 함수
+function greet(name) {
+    return "안녕하세요, " + name + "님!";
+}
+
+// 화살표 함수
+const add = (a, b) => a + b;
+const multiply = (x, y) => {
+    return x * y;
+};
+
+console.log(greet("철수"));
+console.log(add(5, 3));`,
+                challenge: {
+                    description: "두 숫자를 받아서 더 큰 수를 반환하는 화살표 함수 'getMax'를 만들고, 10과 7을 비교한 결과를 console.log로 출력하세요.",
+                    expectedOutput: "10",
+                    hint: "const getMax = (a, b) => a > b ? a : b; 형태로 삼항연산자를 사용하세요.",
+                    answer: `const getMax = (a, b) => a > b ? a : b;
+
+console.log(getMax(10, 7));`
+                }
+            },
+            arrays_js: {
+                name: "배열과 메서드",
+                category: "JavaScript 기초",
+                explanation: "JavaScript 배열은 동적이며 다양한 타입을 저장할 수 있습니다. map, filter, reduce 등의 고차 함수로 함수형 프로그래밍이 가능합니다.",
+                application: "DOM 요소 조작, 데이터 리스트 처리, API 응답 처리 등에 필수적으로 사용됩니다.",
+                example: `const fruits = ["사과", "바나나", "오렌지"];
+const numbers = [1, 2, 3, 4, 5];
+
+// 배열 메서드
+const doubled = numbers.map(n => n * 2);
+const evens = numbers.filter(n => n % 2 === 0);
+const sum = numbers.reduce((acc, n) => acc + n, 0);
+
+console.log("배열:", fruits);
+console.log("2배:", doubled);
+console.log("짝수:", evens);`,
+                challenge: {
+                    description: "점수 배열 [85, 92, 78, 96, 88]에서 90점 이상인 점수만 필터링해서 console.log로 출력하세요.",
+                    expectedOutput: "[92, 96]",
+                    hint: "filter() 메서드와 화살표 함수를 사용하세요. scores.filter(score => score >= 90)",
+                    answer: `const scores = [85, 92, 78, 96, 88];
+const highScores = scores.filter(score => score >= 90);
+
+console.log(highScores);`
+                }
+            },
+
+            // === 2단계: DOM 조작 ===
+            dom_basic: {
+                name: "DOM 선택과 조작",
+                category: "DOM 조작",
+                explanation: "DOM(Document Object Model)을 통해 웹 페이지의 요소를 선택하고 조작할 수 있습니다. getElementById, querySelector 등으로 요소를 찾을 수 있습니다.",
+                application: "웹 페이지의 동적 컨텐츠 변경, 사용자 인터페이스 구성, 반응형 웹 개발에 핵심적입니다.",
+                example: `// DOM 요소 선택
+const title = document.getElementById('title');
+const buttons = document.querySelectorAll('.btn');
+
+// 요소 조작
+title.textContent = '새로운 제목';
+title.style.color = 'blue';
+title.classList.add('highlight');
+
+// 새 요소 생성
+const newDiv = document.createElement('div');
+newDiv.innerHTML = '<p>새로운 컨텐츠</p>';`,
+                challenge: {
+                    description: "id가 'message'인 요소의 텍스트를 '성공적으로 변경되었습니다!'로 변경하는 코드를 작성하세요.",
+                    expectedOutput: "document.getElementById('message').textContent = '성공적으로 변경되었습니다!';",
+                    hint: "document.getElementById()와 textContent 속성을 사용하세요.",
+                    answer: `document.getElementById('message').textContent = '성공적으로 변경되었습니다!';`
+                }
+            },
+            events: {
+                name: "이벤트 처리",
+                category: "DOM 조작",
+                explanation: "addEventListener를 사용해 사용자의 클릭, 키보드 입력, 마우스 움직임 등의 이벤트를 처리할 수 있습니다.",
+                application: "버튼 클릭, 폼 제출, 마우스 오버 효과 등 모든 사용자 상호작용 구현에 필수적입니다.",
+                example: `// 이벤트 리스너 추가
+document.getElementById('myButton').addEventListener('click', function() {
+    alert('버튼이 클릭되었습니다!');
+});
+
+// 화살표 함수로 이벤트 처리
+const input = document.querySelector('#textInput');
+input.addEventListener('keyup', (event) => {
+    console.log('입력된 값:', event.target.value);
+});`,
+                challenge: {
+                    description: "id가 'clickBtn'인 버튼에 클릭 이벤트를 추가해서, 클릭하면 '버튼 클릭됨!'을 console.log로 출력하는 코드를 작성하세요.",
+                    expectedOutput: "document.getElementById('clickBtn').addEventListener('click', () => console.log('버튼 클릭됨!'));",
+                    hint: "addEventListener('click', 콜백함수)를 사용하세요.",
+                    answer: `document.getElementById('clickBtn').addEventListener('click', () => {
+    console.log('버튼 클릭됨!');
+});`
+                }
+            },
+
+            // === 3단계: 비동기 처리 ===
+            promises: {
+                name: "Promise와 async/await",
+                category: "비동기 처리",
+                explanation: "Promise는 비동기 작업의 완료나 실패를 나타내는 객체입니다. async/await는 Promise를 더 쉽게 다룰 수 있게 해줍니다.",
+                application: "API 호출, 파일 로딩, 데이터베이스 접근 등 모든 비동기 작업에 사용됩니다.",
+                example: `// Promise
+const fetchData = () => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('데이터가 로드되었습니다!');
+        }, 1000);
+    });
+};
+
+// async/await
+async function loadData() {
+    try {
+        const result = await fetchData();
+        console.log(result);
+    } catch (error) {
+        console.error('오류:', error);
+    }
+}`,
+                challenge: {
+                    description: "1초 후에 '완료!'를 resolve하는 Promise를 생성하고, async/await를 사용해서 결과를 console.log로 출력하세요.",
+                    expectedOutput: "완료!",
+                    hint: "new Promise((resolve) => setTimeout(() => resolve('완료!'), 1000))를 사용하세요.",
+                    answer: `const waitOneSecond = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve('완료!'), 1000);
+    });
+};
+
+async function test() {
+    const result = await waitOneSecond();
+    console.log(result);
+}
+
+test();`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            lobby: {
+                title: "JavaScript 스튜디오 로비",
+                emoji: "🌐",
+                description: "창의적인 에너지가 넘치는 JavaScript 웹 개발 스튜디오에 오신 것을 환영합니다! 이곳에서 동적이고 인터랙티브한 웹 애플리케이션을 만드는 마법을 배워보세요.",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'variables_js', npc: '🎨', name: 'JS 아티스트', message: 'JavaScript의 기본! 변수와 데이터 타입으로 창작을 시작해보세요!' },
+                    { skill: 'functions_js', npc: '⚡', name: '함수 마법사', message: '함수로 코드를 재사용하고 모듈화해보세요!' },
+                    { skill: 'arrays_js', npc: '📋', name: '배열 마스터', message: '배열과 고차 함수로 데이터를 우아하게 처리해보세요!' }
+                ]
+            },
+            dom_workshop: {
+                title: "DOM 조작 워크샵",
+                emoji: "🎭",
+                description: "웹 페이지에 생명을 불어넣는 DOM 조작의 세계입니다. 사용자와 상호작용하는 동적 웹을 만들어보세요!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'dom_basic', npc: '🎭', name: 'DOM 마에스트로', message: '웹 페이지의 요소들을 자유자재로 조작해보세요!' },
+                    { skill: 'events', npc: '🎯', name: '이벤트 핸들러', message: '사용자의 행동에 반응하는 인터랙티브한 웹을 만들어보세요!' }
+                ]
+            },
+            async_lab: {
+                title: "비동기 연구소",
+                emoji: "⏰",
+                description: "시간을 초월하는 비동기 프로그래밍의 세계입니다. Promise와 async/await로 우아한 비동기 코드를 작성해보세요!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'promises', npc: '⏰', name: '시간 여행자', message: 'Promise와 async/await로 비동기의 마법을 배워보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "초보자", 2: "개발자", 3: "크리에이터", 4: "아티스트", 5: "마스터",
+            6: "아키텍트", 7: "구루", 8: "전설", 9: "신화", 10: "JS의 신"
+        };
+
+        // JavaScript 코드 실행 시뮬레이션
+        function simulateJSCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            try {
+                // 실제 코드 실행을 시뮬레이션
+                let mockConsole = {
+                    log: function(...args) {
+                        output += args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' ') + '\n';
+                    }
+                };
+                
+                // 안전한 코드 실행 환경 구성
+                const safeGlobals = {
+                    console: mockConsole,
+                    setTimeout: (fn, delay) => fn(), // 즉시 실행으로 시뮬레이션
+                    Promise: Promise,
+                    document: {
+                        getElementById: (id) => ({
+                            textContent: '',
+                            style: {},
+                            classList: { add: () => {} }
+                        }),
+                        querySelector: () => ({ textContent: '' }),
+                        createElement: () => ({ innerHTML: '' })
+                    }
+                };
+                
+                // Function constructor로 안전하게 실행
+                const func = new Function(...Object.keys(safeGlobals), code);
+                const result = func(...Object.values(safeGlobals));
+                
+                // Promise 결과 처리
+                if (result instanceof Promise) {
+                    result.then(res => {
+                        if (res) mockConsole.log(res);
+                    });
+                }
+                
+                output = output.trim();
+                success = output === expectedOutput.trim();
+                
+            } catch (error) {
+                throw new Error("코드 실행 중 오류가 발생했습니다: " + error.message);
+            }
+            
+            return { success, output: output || "출력 없음" };
+        }
+
+        // 나머지 함수들은 이전 게임들과 유사...
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ 코드를 입력해주세요!", "error");
+                return;
+            }
+            
+            gameState.currentSession.userCode = code;
+            
+            try {
+                const result = simulateJSCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 정답입니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 훌륭해요! 이제 프로젝트를 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 아직 정답이 아니에요.\n실행 결과: ${result.output}\n기대한 결과: ${skill.challenge.expectedOutput}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.textContent = text;
+            
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 프로젝트를 완료할 수 있습니다.';
+        }
+
+        // 기본 게임 함수들 (updatePlayerStatus, renderArea, etc.)
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge text-white px-2 py-1 rounded text-xs font-bold';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 도전하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `🌐 ${skills[quest.skill].name} 프로젝트 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '코드를 실행해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 코딩 프로젝트를 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000);
+            
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 프로젝트 완료! "${skill.name}" 스킬을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-orange-600 bg-opacity-50' : 'bg-gray-700 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm">${area.title}</div>
+                    <div class="text-xs mt-1">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        // 저장/불러오기 및 기타 함수들
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'javascript_studio_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까?')) {
+                gameState = {
+                    currentArea: 'lobby',
+                    player: {
+                        name: '웹 개발자',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['lobby'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+        }
+
+        function initGame() {
+            const playerName = prompt('JavaScript 스튜디오에 오신 것을 환영합니다! 개발자 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

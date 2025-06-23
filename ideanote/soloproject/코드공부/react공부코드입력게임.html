@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React 컴포넌트 팩토리 ⚛️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 25%, #10b981 50%, #84cc16 75%, #eab308 100%);
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #0ea5e9 0%, #06b6d4 100%);
+        }
+        .skill-badge {
+            background: linear-gradient(45deg, #10b981 0%, #84cc16 100%);
+        }
+        .quest-button {
+            background: linear-gradient(45deg, #0ea5e9 0%, #06b6d4 100%);
+            transition: all 0.3s ease;
+            color: #0c4a6e;
+        }
+        .quest-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .code-editor {
+            background: #0f172a;
+            border: 2px solid #0ea5e9;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            color: #67e8f9;
+        }
+        .code-editor:focus {
+            border-color: #06b6d4;
+            outline: none;
+        }
+        .output-box {
+            background: #1e293b;
+            border-left: 4px solid #0ea5e9;
+        }
+        .error-box {
+            background: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+        .success-box {
+            background: #14532d;
+            border-left: 4px solid #22c55e;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(14, 165, 233, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        .save-indicator.show {
+            transform: translateY(0);
+        }
+        .tab-button {
+            background: rgba(14, 165, 233, 0.1);
+            color: rgba(12, 74, 110, 0.7);
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #0ea5e9 0%, #06b6d4 100%);
+            color: white;
+        }
+        .tab-button:hover:not(.active) {
+            background: rgba(14, 165, 233, 0.2);
+            color: #0c4a6e;
+        }
+        .problem-card {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        .problem-card:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+            transform: translateY(-2px);
+        }
+        .code-preview {
+            background: #0f172a;
+            border: 1px solid #0ea5e9;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .atom-spin {
+            animation: atom-spin 3s linear infinite;
+        }
+        @keyframes atom-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .component-grid {
+            background-image: 
+                linear-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .react-logo {
+            position: relative;
+        }
+        .react-logo::before {
+            content: '⚛️';
+            position: absolute;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-sky-900">
+    <!-- 저장 알림 -->
+    <div id="saveIndicator" class="save-indicator">
+        💾 진행사항 저장됨!
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center mb-4">
+                <h1 class="text-5xl font-bold mr-4">⚛️ React 컴포넌트 팩토리</h1>
+                <div class="atom-spin text-2xl">🔄</div>
+            </div>
+            <p class="text-xl opacity-90">재사용 가능한 컴포넌트로 아름다운 UI를 만들어보세요!</p>
+            <div class="mt-4">
+                <button onclick="saveProgress()" class="bg-sky-800 hover:bg-sky-900 text-white px-4 py-2 rounded mr-2">💾 진행사항 저장</button>
+                <button onclick="loadProgress()" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded mr-2">📂 불러오기</button>
+                <button onclick="resetGame()" class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 플레이어 상태 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-sky-200 component-grid">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">👨‍🎨</div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="playerName">React 개발자</h3>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="level-badge text-white px-3 py-1 rounded-full text-sm font-bold" id="playerLevel">Lv.1 신입</span>
+                            <span class="text-sm">⚛️ 경험치: <span id="playerExp">0</span>/100</span>
+                            <span class="text-sm">🏆 해결한 문제: <span id="solvedCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm mb-2">🧩 제작한 컴포넌트:</div>
+                    <div id="skillBadges" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <!-- 경험치 바 -->
+            <div class="mt-4">
+                <div class="w-full bg-sky-200 bg-opacity-50 rounded-full h-3">
+                    <div id="expBar" class="progress-bar h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 현재 지역 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 mb-8 border border-sky-200">
+            <div class="text-center mb-6">
+                <div id="areaEmoji" class="text-6xl mb-4 react-logo">⚛️</div>
+                <h2 id="areaTitle" class="text-3xl font-bold mb-4">React 팩토리 메인홀</h2>
+                <p id="areaDescription" class="text-lg opacity-90 leading-relaxed">
+                    혁신적인 컴포넌트들이 탄생하는 React 팩토리에 오신 것을 환영합니다! 
+                    이곳에서 재사용 가능하고 아름다운 UI 컴포넌트를 제작하는 마스터가 되어보세요.
+                </p>
+            </div>
+
+            <!-- NPC 대화 -->
+            <div id="npcDialogue" class="bg-sky-900 bg-opacity-30 rounded-lg p-4 mb-6 hidden border border-sky-600">
+                <div class="flex items-start space-x-3">
+                    <div id="npcEmoji" class="text-3xl"></div>
+                    <div>
+                        <div id="npcName" class="font-bold text-lg mb-2 text-sky-900"></div>
+                        <p id="npcMessage" class="opacity-90"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 퀘스트 선택 -->
+            <div id="questContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 퀘스트 버튼들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="bg-white bg-opacity-40 backdrop-blur-sm rounded-xl p-6 border border-sky-200">
+            <div class="flex space-x-4 mb-6">
+                <button id="progressTab" onclick="switchTab('progress')" 
+                        class="tab-button active px-4 py-2 rounded-lg font-bold transition-all">
+                    🗺️ 팩토리 현황
+                </button>
+                <button id="recordTab" onclick="switchTab('record')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📚 내 컴포넌트 기록
+                </button>
+                <button id="statsTab" onclick="switchTab('stats')" 
+                        class="tab-button px-4 py-2 rounded-lg font-bold transition-all">
+                    📊 제작 통계
+                </button>
+            </div>
+
+            <!-- 팩토리 현황 -->
+            <div id="progressContent" class="tab-content">
+                <h3 class="text-xl font-bold mb-4">🗺️ React 팩토리 탐험 현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="progressMap">
+                    <!-- 진행 현황이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 학습 기록 -->
+            <div id="recordContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📚 내가 제작한 React 컴포넌트들</h3>
+                <div id="solvedProblemsContainer">
+                    <!-- 해결한 문제들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div id="statsContent" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-4">📊 나의 React 제작 통계</h3>
+                <div id="statisticsContainer">
+                    <!-- 통계가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 모달 -->
+    <div id="learningModal" class="fixed inset-0 modal-backdrop bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-sky-50 rounded-xl p-8 max-w-6xl mx-4 max-h-[95vh] overflow-y-auto border-4 border-sky-600">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">⚛️</div>
+                <h2 class="text-3xl font-bold mb-2 text-sky-900">React 컴포넌트 제작!</h2>
+                <h3 id="skillName" class="text-xl text-sky-700"></h3>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <!-- 설명 -->
+                <div class="bg-sky-100 rounded-lg p-6 border border-sky-300">
+                    <h4 class="text-xl font-bold mb-4 text-sky-800">📚 개념 설명</h4>
+                    <p id="skillExplanation" class="leading-relaxed mb-4 text-gray-800"></p>
+                    <div class="bg-green-100 rounded-lg p-4 mb-4 border border-green-300">
+                        <h5 class="font-bold mb-2 text-green-800">💡 실제 활용</h5>
+                        <p id="skillApplication" class="text-sm text-green-700"></p>
+                    </div>
+                    
+                    <!-- 예제 코드 -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-bold mb-2 text-cyan-300">⚡ 예제 코드</h5>
+                        <pre><code id="exampleCode" class="text-cyan-300 text-sm font-mono"></code></pre>
+                    </div>
+                </div>
+
+                <!-- 컴포넌트 제작 -->
+                <div class="bg-sky-100 rounded-lg p-6 border border-sky-300">
+                    <h4 class="text-xl font-bold mb-4 text-sky-800">🚀 컴포넌트 제작</h4>
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-purple-700">📝 제작 요구사항:</h5>
+                        <p id="challengeDescription" class="text-sm bg-purple-100 p-3 rounded border border-purple-300"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="font-bold mb-2 text-blue-700">💻 React 컴포넌트를 작성하세요:</h5>
+                        <textarea id="codeEditor" class="code-editor w-full h-40 p-3 text-sm resize-none" 
+                                  placeholder="// React 컴포넌트를 여기에 작성하세요..."></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ▶ 컴포넌트 테스트
+                        </button>
+                        <button onclick="showHint()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            💡 힌트
+                        </button>
+                        <button onclick="showAnswer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            📝 정답 보기
+                        </button>
+                    </div>
+                    
+                    <!-- 실행 결과 -->
+                    <div id="outputContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-green-700">🔍 테스트 결과:</h5>
+                        <pre id="codeOutput" class="output-box p-3 rounded text-sm font-mono text-white"></pre>
+                    </div>
+                    
+                    <!-- 힌트 -->
+                    <div id="hintContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-yellow-700">💡 힌트:</h5>
+                        <div id="hintText" class="bg-yellow-100 p-3 rounded text-sm border border-yellow-300"></div>
+                    </div>
+                    
+                    <!-- 정답 -->
+                    <div id="answerContainer" class="hidden">
+                        <h5 class="font-bold mb-2 text-red-700">📝 정답 코드:</h5>
+                        <pre id="answerCode" class="bg-red-100 p-3 rounded text-sm font-mono text-gray-800 border border-red-300"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="completeButton" onclick="completeSkill()" 
+                        class="quest-button font-bold py-4 px-8 rounded-lg text-xl disabled:opacity-50" 
+                        disabled>
+                    ✅ 컴포넌트 제작 완료!
+                </button>
+                <p class="text-sm text-gray-600 mt-2">컴포넌트를 테스트해서 정답을 확인해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let gameState = {
+            currentArea: 'main_hall',
+            player: {
+                name: 'React 개발자',
+                level: 1,
+                experience: 0,
+                skills: [],
+                solvedProblems: [],
+                unlockedAreas: ['main_hall'],
+                problemHistory: []
+            },
+            currentSkill: null,
+            missionCompleted: false,
+            currentSession: {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: null
+            }
+        };
+
+        // React 스킬 데이터
+        const skills = {
+            // === 1단계: React 기초 ===
+            jsx: {
+                name: "JSX 문법",
+                category: "React 기초",
+                explanation: "JSX는 JavaScript XML의 줄임말로, HTML과 유사한 문법으로 React 요소를 작성할 수 있게 해줍니다. JavaScript 표현식을 {}로 감싸서 사용할 수 있습니다.",
+                application: "모든 React 애플리케이션의 기본이 되며, 선언적이고 직관적인 UI 작성을 가능하게 합니다.",
+                example: `function Greeting({ name }) {
+  const message = "안녕하세요";
+  
+  return (
+    <div>
+      <h1>{message}</h1>
+      <p>반갑습니다, {name}님!</p>
+      <p>현재 시간: {new Date().toLocaleTimeString()}</p>
+    </div>
+  );
+}
+
+// 사용
+<Greeting name="철수" />`,
+                challenge: {
+                    description: "name과 age를 props로 받아서 '안녕하세요! 저는 [name]이고 [age]살입니다.'를 h2 태그로 출력하는 Profile 컴포넌트를 JSX로 작성하세요.",
+                    expectedOutput: "<h2>안녕하세요! 저는 김철수이고 25살입니다.</h2>",
+                    hint: "function Profile({ name, age }) { return <h2>안녕하세요! 저는 {name}이고 {age}살입니다.</h2>; }",
+                    answer: `function Profile({ name, age }) {
+  return <h2>안녕하세요! 저는 {name}이고 {age}살입니다.</h2>;
+}`
+                }
+            },
+            components: {
+                name: "함수형 컴포넌트",
+                category: "React 기초",
+                explanation: "React 함수형 컴포넌트는 props를 입력받아 JSX를 반환하는 JavaScript 함수입니다. 간단하고 직관적이며 React Hooks와 함께 사용할 수 있습니다.",
+                application: "UI의 재사용 가능한 조각을 만들어 코드 중복을 줄이고 유지보수성을 향상시킵니다.",
+                example: `// 기본 컴포넌트
+function Welcome({ name }) {
+  return <h1>Welcome, {name}!</h1>;
+}
+
+// props 기본값 설정
+function Button({ text = "클릭", color = "blue" }) {
+  return (
+    <button style={{ backgroundColor: color }}>
+      {text}
+    </button>
+  );
+}
+
+// 컴포넌트 합성
+function App() {
+  return (
+    <div>
+      <Welcome name="React" />
+      <Button text="시작하기" color="green" />
+      <Button /> {/* 기본값 사용 */}
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "title과 content를 props로 받아서 div 안에 h3(title)와 p(content)를 렌더링하는 Card 컴포넌트를 작성하세요.",
+                    expectedOutput: "<div><h3>제목</h3><p>내용</p></div>",
+                    hint: "function Card({ title, content }) { return <div><h3>{title}</h3><p>{content}</p></div>; }",
+                    answer: `function Card({ title, content }) {
+  return (
+    <div>
+      <h3>{title}</h3>
+      <p>{content}</p>
+    </div>
+  );
+}`
+                }
+            },
+            state: {
+                name: "useState 훅",
+                category: "React 기초",
+                explanation: "useState는 함수형 컴포넌트에서 상태를 관리할 수 있게 해주는 React Hook입니다. 상태 값과 그 값을 업데이트하는 함수를 배열로 반환합니다.",
+                application: "사용자 입력, 토글 상태, 카운터 등 동적인 데이터를 관리하는 모든 인터랙티브한 UI에 필수적입니다.",
+                example: `import { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('');
+  
+  const increment = () => {
+    setCount(count + 1);
+  };
+  
+  return (
+    <div>
+      <h2>카운터: {count}</h2>
+      <button onClick={increment}>+1</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      
+      <input 
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="이름을 입력하세요"
+      />
+      <p>안녕하세요, {name}님!</p>
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "useState를 사용해서 클릭할 때마다 '보이기'와 '숨기기' 텍스트가 토글되는 ToggleButton 컴포넌트를 작성하세요.",
+                    expectedOutput: "토글 기능이 동작하는 버튼",
+                    hint: "const [isVisible, setIsVisible] = useState(true); 을 사용하고 onClick에서 상태를 반전시키세요.",
+                    answer: `import { useState } from 'react';
+
+function ToggleButton() {
+  const [isVisible, setIsVisible] = useState(true);
+  
+  return (
+    <button onClick={() => setIsVisible(!isVisible)}>
+      {isVisible ? '숨기기' : '보이기'}
+    </button>
+  );
+}`
+                }
+            },
+
+            // === 2단계: 이벤트와 라이프사이클 ===
+            events_react: {
+                name: "이벤트 처리",
+                category: "이벤트와 라이프사이클",
+                explanation: "React에서는 SyntheticEvent를 통해 브라우저의 네이티브 이벤트를 일관성 있게 처리할 수 있습니다. 이벤트 핸들러는 camelCase로 작성합니다.",
+                application: "버튼 클릭, 폼 제출, 키보드 입력 등 모든 사용자 상호작용을 처리하는 데 사용됩니다.",
+                example: `function EventExample() {
+  const [message, setMessage] = useState('');
+  
+  const handleClick = (e) => {
+    e.preventDefault();
+    setMessage('버튼이 클릭되었습니다!');
+  };
+  
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
+  };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setMessage('엔터가 눌렸습니다!');
+    }
+  };
+  
+  return (
+    <div>
+      <button onClick={handleClick}>클릭하세요</button>
+      <input 
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        placeholder="메시지 입력"
+      />
+      <p>{message}</p>
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "input에 텍스트를 입력하면 실시간으로 글자 수를 보여주는 CharacterCounter 컴포넌트를 작성하세요.",
+                    expectedOutput: "입력한 텍스트의 글자 수를 실시간으로 표시",
+                    hint: "useState와 onChange 이벤트를 사용해서 텍스트와 길이를 관리하세요.",
+                    answer: `import { useState } from 'react';
+
+function CharacterCounter() {
+  const [text, setText] = useState('');
+  
+  return (
+    <div>
+      <input 
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="텍스트를 입력하세요"
+      />
+      <p>글자 수: {text.length}</p>
+    </div>
+  );
+}`
+                }
+            },
+            useeffect: {
+                name: "useEffect 훅",
+                category: "이벤트와 라이프사이클",
+                explanation: "useEffect는 컴포넌트의 side effect를 처리하는 Hook입니다. 컴포넌트가 렌더링된 후, 상태가 변경된 후, 또는 컴포넌트가 언마운트되기 전에 실행됩니다.",
+                application: "API 호출, 구독 설정, 타이머 설정, DOM 조작 등 컴포넌트 외부 작업을 수행할 때 사용됩니다.",
+                example: `import { useState, useEffect } from 'react';
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  
+  useEffect(() => {
+    let interval = null;
+    
+    if (isRunning) {
+      interval = setInterval(() => {
+        setSeconds(seconds => seconds + 1);
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning]);
+  
+  return (
+    <div>
+      <h2>타이머: {seconds}초</h2>
+      <button onClick={() => setIsRunning(!isRunning)}>
+        {isRunning ? '정지' : '시작'}
+      </button>
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "useEffect를 사용해서 컴포넌트가 마운트될 때 '컴포넌트가 마운트되었습니다!'를 console.log로 출력하는 MountMessage 컴포넌트를 작성하세요.",
+                    expectedOutput: "컴포넌트 마운트 시 콘솔 메시지 출력",
+                    hint: "useEffect(() => { console.log('컴포넌트가 마운트되었습니다!'); }, []); 을 사용하세요.",
+                    answer: `import { useEffect } from 'react';
+
+function MountMessage() {
+  useEffect(() => {
+    console.log('컴포넌트가 마운트되었습니다!');
+  }, []);
+  
+  return <div>마운트 메시지 컴포넌트</div>;
+}`
+                }
+            },
+
+            // === 3단계: 고급 패턴 ===
+            conditional: {
+                name: "조건부 렌더링",
+                category: "고급 패턴",
+                explanation: "React에서는 JavaScript의 조건 연산자와 논리 연산자를 사용해 조건에 따라 다른 UI를 렌더링할 수 있습니다.",
+                application: "로그인 상태에 따른 UI 변경, 로딩 상태 표시, 에러 메시지 표시 등에 사용됩니다.",
+                example: `function ConditionalExample({ isLoggedIn, user, isLoading, error }) {
+  // 로딩 중일 때
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+  
+  // 에러가 있을 때
+  if (error) {
+    return <div>에러: {error}</div>;
+  }
+  
+  return (
+    <div>
+      {/* 삼항 연산자 */}
+      {isLoggedIn ? (
+        <h1>환영합니다, {user.name}님!</h1>
+      ) : (
+        <h1>로그인해주세요</h1>
+      )}
+      
+      {/* 논리 AND 연산자 */}
+      {isLoggedIn && <button>로그아웃</button>}
+      {!isLoggedIn && <button>로그인</button>}
+      
+      {/* 조건부 클래스 */}
+      <div className={isLoggedIn ? 'user-info' : 'login-form'}>
+        컨텐츠
+      </div>
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "isVisible prop을 받아서 true일 때는 '보임', false일 때는 '숨김'을 표시하는 VisibilityToggle 컴포넌트를 작성하세요.",
+                    expectedOutput: "조건에 따라 다른 텍스트 표시",
+                    hint: "삼항 연산자를 사용하세요: {isVisible ? '보임' : '숨김'}",
+                    answer: `function VisibilityToggle({ isVisible }) {
+  return (
+    <div>
+      {isVisible ? '보임' : '숨김'}
+    </div>
+  );
+}`
+                }
+            },
+            lists: {
+                name: "리스트와 키",
+                category: "고급 패턴",
+                explanation: "React에서는 배열의 map() 메서드를 사용해 데이터 리스트를 UI 리스트로 변환할 수 있습니다. 각 항목에는 고유한 key prop이 필요합니다.",
+                application: "할 일 목록, 사용자 목록, 상품 목록 등 동적 데이터를 리스트로 표시할 때 사용됩니다.",
+                example: `function TodoList({ todos }) {
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>
+          <span style={{ 
+            textDecoration: todo.completed ? 'line-through' : 'none' 
+          }}>
+            {todo.text}
+          </span>
+          {todo.completed && <span> ✅</span>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function UserList({ users }) {
+  return (
+    <div>
+      {users.map(user => (
+        <div key={user.id} className="user-card">
+          <h3>{user.name}</h3>
+          <p>{user.email}</p>
+          <p>나이: {user.age}</p>
+        </div>
+      ))}
+    </div>
+  );
+}`,
+                challenge: {
+                    description: "fruits 배열을 prop으로 받아서 각 과일을 li 태그로 렌더링하는 FruitList 컴포넌트를 작성하세요. (key 사용 필수)",
+                    expectedOutput: "과일 목록을 ul > li 구조로 렌더링",
+                    hint: "fruits.map((fruit, index) => <li key={index}>{fruit}</li>) 형태로 작성하세요.",
+                    answer: `function FruitList({ fruits }) {
+  return (
+    <ul>
+      {fruits.map((fruit, index) => (
+        <li key={index}>{fruit}</li>
+      ))}
+    </ul>
+  );
+}`
+                }
+            }
+        };
+
+        // 지역 데이터
+        const areas = {
+            main_hall: {
+                title: "React 팩토리 메인홀",
+                emoji: "⚛️",
+                description: "혁신적인 컴포넌트들이 탄생하는 React 팩토리에 오신 것을 환영합니다! 이곳에서 재사용 가능하고 아름다운 UI 컴포넌트를 제작하는 마스터가 되어보세요.",
+                unlockLevel: 1,
+                quests: [
+                    { skill: 'jsx', npc: '🎨', name: 'JSX 아티스트', message: 'React의 기본! JSX 문법으로 아름다운 UI를 그려보세요!' },
+                    { skill: 'components', npc: '🧩', name: '컴포넌트 설계자', message: '재사용 가능한 컴포넌트로 효율적인 개발을 경험해보세요!' },
+                    { skill: 'state', npc: '📊', name: '상태 관리자', message: 'useState로 동적인 상태를 관리해보세요!' }
+                ]
+            },
+            interaction_lab: {
+                title: "인터랙션 연구소",
+                emoji: "🎯",
+                description: "사용자와 상호작용하는 동적 컴포넌트를 연구하는 곳입니다. 이벤트 처리와 생명주기를 마스터해보세요!",
+                unlockLevel: 2,
+                quests: [
+                    { skill: 'events_react', npc: '🎯', name: '이벤트 마스터', message: '사용자의 모든 행동에 반응하는 컴포넌트를 만들어보세요!' },
+                    { skill: 'useeffect', npc: '⏰', name: '라이프사이클 전문가', message: 'useEffect로 컴포넌트의 생명주기를 다뤄보세요!' }
+                ]
+            },
+            advanced_workshop: {
+                title: "고급 패턴 워크샵",
+                emoji: "🏗️",
+                description: "React의 고급 패턴과 최적화 기법을 배우는 곳입니다. 프로급 컴포넌트 설계를 익혀보세요!",
+                unlockLevel: 4,
+                quests: [
+                    { skill: 'conditional', npc: '🔀', name: '조건부 렌더링 마스터', message: '상황에 따라 다른 UI를 보여주는 지능형 컴포넌트를 만들어보세요!' },
+                    { skill: 'lists', npc: '📋', name: '리스트 렌더링 전문가', message: '동적 데이터를 효율적으로 리스트로 렌더링해보세요!' }
+                ]
+            }
+        };
+
+        // 레벨별 칭호
+        const levelTitles = {
+            1: "신입", 2: "개발자", 3: "디자이너", 4: "아키텍트", 5: "마스터",
+            6: "전문가", 7: "구루", 8: "전설", 9: "신화", 10: "React의 신"
+        };
+
+        // React 코드 실행 시뮬레이션
+        function simulateReactCode(code, expectedOutput) {
+            let output = "";
+            let success = false;
+            
+            try {
+                // React 컴포넌트 코드 검증
+                const hasFunction = code.includes('function') && code.includes('return');
+                const hasJSX = code.includes('<') && code.includes('>');
+                const hasProps = code.includes('{') && code.includes('}');
+                
+                if (hasFunction && hasJSX) {
+                    output = "✅ React 컴포넌트 구조가 올바릅니다!";
+                    success = true;
+                } else {
+                    output = "❌ React 컴포넌트 구조를 확인해주세요.";
+                }
+                
+                // 간단한 패턴 매칭으로 정답 검증
+                if (code.includes('Profile') && code.includes('name') && code.includes('age')) {
+                    success = true;
+                    output = "✅ Profile 컴포넌트가 올바르게 작성되었습니다!";
+                } else if (code.includes('Card') && code.includes('title') && code.includes('content')) {
+                    success = true;
+                    output = "✅ Card 컴포넌트가 올바르게 작성되었습니다!";
+                } else if (code.includes('useState') && code.includes('ToggleButton')) {
+                    success = true;
+                    output = "✅ ToggleButton 컴포넌트가 올바르게 작성되었습니다!";
+                } else if (code.includes('CharacterCounter') && code.includes('onChange')) {
+                    success = true;
+                    output = "✅ CharacterCounter 컴포넌트가 올바르게 작성되었습니다!";
+                } else if (code.includes('useEffect') && code.includes('console.log')) {
+                    success = true;
+                    output = "✅ useEffect가 올바르게 사용되었습니다!";
+                } else if (code.includes('VisibilityToggle') && code.includes('?')) {
+                    success = true;
+                    output = "✅ 조건부 렌더링이 올바르게 구현되었습니다!";
+                } else if (code.includes('FruitList') && code.includes('map')) {
+                    success = true;
+                    output = "✅ 리스트 렌더링이 올바르게 구현되었습니다!";
+                }
+                
+            } catch (error) {
+                throw new Error("컴포넌트 검증 중 오류가 발생했습니다: " + error.message);
+            }
+            
+            return { success, output };
+        }
+
+        // 나머지 함수들은 이전 게임들과 유사...
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const skill = skills[gameState.currentSkill];
+            
+            if (!code.trim()) {
+                showOutput("❌ 코드를 입력해주세요!", "error");
+                return;
+            }
+            
+            gameState.currentSession.userCode = code;
+            
+            try {
+                const result = simulateReactCode(code, skill.challenge.expectedOutput);
+                if (result.success) {
+                    showOutput(`✅ 훌륭합니다!\n${result.output}`, "success");
+                    gameState.missionCompleted = true;
+                    document.getElementById('completeButton').disabled = false;
+                    document.querySelector('#completeButton + p').textContent = '🎉 완벽해요! 이제 컴포넌트 제작을 완료할 수 있습니다!';
+                } else {
+                    showOutput(`❌ 아직 요구사항을 만족하지 않습니다.\n${result.output}`, "error");
+                }
+            } catch (error) {
+                showOutput(`❌ 오류가 발생했습니다: ${error.message}`, "error");
+            }
+        }
+
+        function showOutput(text, type = "normal") {
+            const container = document.getElementById('outputContainer');
+            const output = document.getElementById('codeOutput');
+            
+            container.classList.remove('hidden');
+            output.textContent = text;
+            
+            output.className = type === "error" ? "error-box p-3 rounded text-sm font-mono text-white" :
+                              type === "success" ? "success-box p-3 rounded text-sm font-mono text-white" :
+                              "output-box p-3 rounded text-sm font-mono text-white";
+        }
+
+        function showHint() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('hintText').textContent = skill.challenge.hint;
+            document.getElementById('hintContainer').classList.remove('hidden');
+            gameState.currentSession.usedHint = true;
+        }
+
+        function showAnswer() {
+            const skill = skills[gameState.currentSkill];
+            document.getElementById('answerCode').textContent = skill.challenge.answer;
+            document.getElementById('answerContainer').classList.remove('hidden');
+            gameState.currentSession.viewedAnswer = true;
+            
+            gameState.missionCompleted = true;
+            document.getElementById('completeButton').disabled = false;
+            document.querySelector('#completeButton + p').textContent = '정답을 확인했네요! 이제 컴포넌트 제작을 완료할 수 있습니다.';
+        }
+
+        // 기본 게임 함수들 (나머지는 이전과 동일)
+        function updatePlayerStatus() {
+            document.getElementById('playerName').textContent = gameState.player.name;
+            document.getElementById('playerLevel').textContent = `Lv.${gameState.player.level} ${levelTitles[gameState.player.level] || '최고수'}`;
+            document.getElementById('playerExp').textContent = gameState.player.experience;
+            document.getElementById('solvedCount').textContent = gameState.player.solvedProblems.length;
+            
+            const expPercentage = (gameState.player.experience % 100);
+            document.getElementById('expBar').style.width = `${expPercentage}%`;
+            
+            const skillBadges = document.getElementById('skillBadges');
+            skillBadges.innerHTML = '';
+            gameState.player.skills.forEach(skillName => {
+                const badge = document.createElement('span');
+                badge.className = 'skill-badge text-white px-2 py-1 rounded text-xs font-bold';
+                badge.textContent = skills[skillName].name;
+                skillBadges.appendChild(badge);
+            });
+        }
+
+        function renderArea() {
+            const area = areas[gameState.currentArea];
+            document.getElementById('areaEmoji').textContent = area.emoji;
+            document.getElementById('areaTitle').textContent = area.title;
+            document.getElementById('areaDescription').textContent = area.description;
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            Object.keys(areas).forEach(areaKey => {
+                if (areaKey !== gameState.currentArea && gameState.player.level >= areas[areaKey].unlockLevel) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${areas[areaKey].emoji} ${areas[areaKey].title}로 이동`;
+                    button.onclick = () => {
+                        gameState.currentArea = areaKey;
+                        hideNPCDialogue();
+                        renderArea();
+                    };
+                    questContainer.appendChild(button);
+                }
+            });
+            
+            area.quests.forEach(quest => {
+                if (!gameState.player.skills.includes(quest.skill)) {
+                    const button = document.createElement('button');
+                    button.className = 'quest-button font-bold py-3 px-6 rounded-lg transition-all duration-300';
+                    button.innerHTML = `${quest.npc} ${skills[quest.skill].name} 제작하기`;
+                    button.onclick = () => showNPCDialogue(quest);
+                    questContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showNPCDialogue(quest) {
+            document.getElementById('npcEmoji').textContent = quest.npc;
+            document.getElementById('npcName').textContent = quest.name;
+            document.getElementById('npcMessage').textContent = quest.message;
+            document.getElementById('npcDialogue').classList.remove('hidden');
+            
+            const questContainer = document.getElementById('questContainer');
+            questContainer.innerHTML = '';
+            
+            const learnButton = document.createElement('button');
+            learnButton.className = 'quest-button font-bold py-4 px-8 rounded-lg text-xl';
+            learnButton.innerHTML = `⚛️ ${skills[quest.skill].name} 제작 시작!`;
+            learnButton.onclick = () => startLearning(quest.skill);
+            questContainer.appendChild(learnButton);
+            
+            const backButton = document.createElement('button');
+            backButton.className = 'bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300';
+            backButton.innerHTML = '🔙 돌아가기';
+            backButton.onclick = () => {
+                hideNPCDialogue();
+                renderArea();
+            };
+            questContainer.appendChild(backButton);
+        }
+
+        function hideNPCDialogue() {
+            document.getElementById('npcDialogue').classList.add('hidden');
+        }
+
+        function startLearning(skillName) {
+            gameState.currentSkill = skillName;
+            gameState.missionCompleted = false;
+            showLearningModal();
+        }
+
+        function showLearningModal() {
+            const skill = skills[gameState.currentSkill];
+            
+            document.getElementById('skillName').textContent = skill.name;
+            document.getElementById('skillExplanation').textContent = skill.explanation;
+            document.getElementById('skillApplication').textContent = skill.application;
+            document.getElementById('exampleCode').textContent = skill.example;
+            document.getElementById('challengeDescription').textContent = skill.challenge.description;
+            
+            gameState.currentSession = {
+                usedHint: false,
+                viewedAnswer: false,
+                userCode: '',
+                startTime: new Date()
+            };
+            
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('hintContainer').classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+            document.getElementById('completeButton').disabled = true;
+            document.querySelector('#completeButton + p').textContent = '컴포넌트를 테스트해서 정답을 확인해보세요!';
+            
+            document.getElementById('learningModal').classList.remove('hidden');
+            document.getElementById('learningModal').classList.add('flex');
+        }
+
+        function completeSkill() {
+            if (!gameState.missionCompleted) {
+                alert('먼저 컴포넌트 제작을 완료해주세요!');
+                return;
+            }
+            
+            const skillName = gameState.currentSkill;
+            const skill = skills[skillName];
+            const endTime = new Date();
+            const timeSpent = Math.round((endTime - gameState.currentSession.startTime) / 1000);
+            
+            const problemRecord = {
+                skillName: skillName,
+                skillTitle: skill.name,
+                category: skill.category,
+                description: skill.challenge.description,
+                userCode: gameState.currentSession.userCode || document.getElementById('codeEditor').value,
+                correctAnswer: skill.challenge.answer,
+                usedHint: gameState.currentSession.usedHint,
+                viewedAnswer: gameState.currentSession.viewedAnswer,
+                timeSpent: timeSpent,
+                completedAt: endTime.toLocaleString('ko-KR'),
+                solvedCorrectly: !gameState.currentSession.viewedAnswer
+            };
+            
+            gameState.player.problemHistory.push(problemRecord);
+            gameState.player.skills.push(skillName);
+            gameState.player.solvedProblems.push(skillName);
+            gameState.player.experience += 30;
+            
+            while (gameState.player.experience >= 100) {
+                gameState.player.experience -= 100;
+                gameState.player.level++;
+            }
+            
+            document.getElementById('learningModal').classList.add('hidden');
+            document.getElementById('learningModal').classList.remove('flex');
+            
+            updatePlayerStatus();
+            hideNPCDialogue();
+            renderArea();
+            updateProgressMap();
+            autoSaveProgress();
+            
+            setTimeout(() => {
+                alert(`🎊 컴포넌트 제작 완료! "${skill.name}" 기술을 습득했습니다!`);
+            }, 500);
+        }
+
+        function updateProgressMap() {
+            const progressMap = document.getElementById('progressMap');
+            progressMap.innerHTML = '';
+            
+            Object.entries(areas).forEach(([areaKey, area]) => {
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'text-center p-4 rounded-lg ' + 
+                    (gameState.player.level >= area.unlockLevel ? 
+                        'bg-sky-600 bg-opacity-50' : 'bg-gray-700 bg-opacity-50');
+                
+                const completedQuests = area.quests.filter(quest => 
+                    gameState.player.skills.includes(quest.skill)).length;
+                
+                areaDiv.innerHTML = `
+                    <div class="text-2xl mb-2">${area.emoji}</div>
+                    <div class="font-bold text-sm">${area.title}</div>
+                    <div class="text-xs mt-1">
+                        ${gameState.player.level >= area.unlockLevel ? 
+                            `${completedQuests}/${area.quests.length} 완료` : 
+                            `Lv.${area.unlockLevel} 필요`}
+                    </div>
+                `;
+                progressMap.appendChild(areaDiv);
+            });
+        }
+
+        // 저장/불러오기 및 기타 함수들
+        function saveProgress() {
+            const saveData = JSON.stringify(gameState);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'react_factory_save.json';
+            a.click();
+            showSaveIndicator();
+        }
+
+        function loadProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const saveData = JSON.parse(e.target.result);
+                            gameState = saveData;
+                            updatePlayerStatus();
+                            renderArea();
+                            updateProgressMap();
+                            showSaveIndicator();
+                            alert('게임을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function autoSaveProgress() {
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            if (confirm('정말로 게임을 초기화하시겠습니까?')) {
+                gameState = {
+                    currentArea: 'main_hall',
+                    player: {
+                        name: 'React 개발자',
+                        level: 1,
+                        experience: 0,
+                        skills: [],
+                        solvedProblems: [],
+                        unlockedAreas: ['main_hall'],
+                        problemHistory: []
+                    },
+                    currentSkill: null,
+                    missionCompleted: false,
+                    currentSession: {
+                        usedHint: false,
+                        viewedAnswer: false,
+                        userCode: '',
+                        startTime: null
+                    }
+                };
+                
+                updatePlayerStatus();
+                renderArea();
+                updateProgressMap();
+                alert('게임이 초기화되었습니다!');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+        }
+
+        function initGame() {
+            const playerName = prompt('React 컴포넌트 팩토리에 오신 것을 환영합니다! 개발자 이름을 입력해주세요:');
+            if (playerName) {
+                gameState.player.name = playerName;
+            }
+            
+            updatePlayerStatus();
+            renderArea();
+            updateProgressMap();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

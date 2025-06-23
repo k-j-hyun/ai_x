@@ -38,4 +38,7 @@ pip install gensim
 pip install python-dotenv
 # django
 pip install python-decouple
-
+# 주기적인(계절성) 데이터 트랜드 추이
+pip install statsmodels==0.13.5
+# facebook에서 개발한 시계열 예측 라이브러리
+pip install prophet

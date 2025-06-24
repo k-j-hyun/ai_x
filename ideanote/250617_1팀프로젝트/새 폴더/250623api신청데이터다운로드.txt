@@ -1,3 +1,80 @@
+# 신청완료
+기상청 레이더영상 조회서비스
+https://www.gimi9.com/dataset/www-data-go-kr-data-openapi-15056924/
+outcode유저가이드
+https://docs.outcode.biz/tutorials/collect-data-via-public-open-api
+기상청api허브
+https://apihub.kma.go.kr/urlRedirect.do?seqApi=10&seqApiSub=288&apiMov=%EC%A0%95%EB%B3%B4%20%EC%9E%90%EB%A3%8C%20%EC%A1%B0%ED%9A%8C
+https://apihub.kma.go.kr/urlRedirect.do?seqApi=10&seqApiSub=288&apiMov=%EC%A0%95%EB%B3%B4%20%EC%9E%90%EB%A3%8C%20%EC%A1%B0%ED%9A%8C#popup1
+초단기예보 : 기상청_단기예보 조회서비스
+레이더영상 : 기상청_레이더영상 조회서비스
+단기예보 : 기상청_단기예보 조회서비스
+기상특보 : 기상청_기상특보 조회서비스
+https://apihub.kma.go.kr/apiList.do?seqApi=10&seqApiSub=286&apiMov=%ED%86%B5%EB%B3%B4%EB%AC%B8
+
+공공데이터포털
+기상청_수치모델자료(경량화) 조회서비스
+기상청_기상특보 조회서비스
+기상청_레이더영상 조회서비스
+기상청_지상(종관,ASOS) 일자료 조회서비스
+기상청_지상(종관,ASOS) 시간자료 조회서비스
+기상청_단기예보((구)_동네예보) 조회서비스
+
+기상청 api허브
+
+구체적 신청 방법
+1단계: 기상청 API허브 회원가입
+https://apihub.kma.go.kr → 회원가입 → 이메일 인증
+2단계: 필수 API 활용신청
+
+로그인 후 → 지상관측 메뉴 클릭
+종관기상관측(ASOS) 선택
+
+✅ 시간자료
+✅ 시간자료(기간 조회)
+✅ 일자료
+
+
+방재기상관측(AWS) 선택 (가능하면)
+
+✅ 실시간 자료
+✅ 시간자료
+
+
+AWS 객관분석 선택
+
+✅ 격자분석자료
+
+
+지상관측 지점정보 선택
+
+✅ 지점정보 조회
+
+
+
+3단계: 인증키 발급받기
+
+승인 후 마이페이지에서 인증키 확인
+
+💡 중요 팁
+AWS 데이터 신청 시:
+
+활용목적: "학술연구 - 침수 예측 시스템 개발을 위한 실시간 기상데이터 분석"
+구체적 계획: 졸업작품/연구 프로젝트임을 명시
+지도교수 정보: 가능하면 추가
+
+대안 전략:
+AWS가 안 되면 ASOS 시간자료 + AWS 객관분석으로도 충분해요!
+🚀 최종 추천
+✅ 필수 신청: ASOS 시간자료, ASOS 일자료
+✅ 선택 신청: AWS 실시간자료 (도전해볼 가치 있음)
+✅ 보완 신청: AWS 객관분석, 지점정보
+이렇게 신청하면 공공데이터포털 API들과 함께 완벽한 침수 예측 시스템을 만들 수 있어요!
+지금 바로 신청하러 가세요! 💪
+
+
+
+
 # 침수 예측 프로젝트 데이터 수집 가이드
 
 ## 1. 기상 데이터 (최우선)

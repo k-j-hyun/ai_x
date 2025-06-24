@@ -42,3 +42,12 @@ pip install python-decouple
 pip install statsmodels==0.13.5
 # facebook에서 개발한 시계열 예측 라이브러리
 pip install prophet
+
+※ 허깅페이스(다양한 llm 모델과 환경을 제공)
+conda install pytorch torchvision -c pytorch # 파이토치
+pip install sympy==1.13.1 fsspec
+pip install transformers # 트랜스포머스
+pip install sentencepiece # 구글이 만든 자연어 Tokenizer
+pip install hf_xet # 허깅페이스 hub 대용량 모델 파일을 빠르게 다운로드 도구
+pip install pillow
+pip install sacremoses 

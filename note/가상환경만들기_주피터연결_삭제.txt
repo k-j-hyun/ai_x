@@ -1,0 +1,27 @@
+※ 가상환경 만들기(ml-dl-nlp / llm)
+
+현재 존재하는 가상환경 목록 확인 : conda env list
+가상환경 생성 : -n은 --name을 의미 : conda create -n llm python==3.10
+(파이썬 명령어 : python -m env llm)
+가상환경 제거 : conda env remove --name llm-lab
+가상환경으로 전환 : conda activate llm
+라이브러리 업데이트 : python.exe -m pip install --upgrade pip
+
+가상환경에 주피터 설치하기 : conda install ipykernel
+가상환경을 jupyter에 선택가능한 커널로 등록 : 
+	python -m ipykernel install --user --name llm --display-name "llm(ipykernel)"
+가상환경 커널 등록 확인 : jupyter kernelspec list
+
+※ ollama local madel들
+pip install langchain-ollama # llama model 쓰기 위함
+pip install langchain-openai # gpt 쓰기 위함
+pip install python-dotenv # .env파일 load를 위함
+pip install langchain-anthropic # claude model 쓰기 위함
+
+챗gpt결제시 사용할수 있는 기능들
+서비스 사용          가능 여부	설명
+chat.openai.com	   ✅ ChatGPT 웹 버전 (GPT-4o 포함)
+platform.openai.com  ✅ API 키 발급, Playground 사용 가능
+openai.com/sora	   ✅ (Pro만)	Sora(영상 생성기) 일부 가능
+openai.com/dall-e	   ✅ 이미지 생성 및 편집
+openai.com/voice	   ✅ (모바일 전용)	음성 대화 GPT (현재 앱 중심)

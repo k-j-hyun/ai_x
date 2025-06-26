@@ -18,6 +18,9 @@ pip install langchain-openai # gpt 쓰기 위함
 pip install python-dotenv # .env파일 load를 위함
 pip install langchain-anthropic # claude model 쓰기 위함
 
+pip install openai
+pip install streamlit
+
 챗gpt결제시 사용할수 있는 기능들
 서비스 사용          가능 여부	설명
 chat.openai.com	   ✅ ChatGPT 웹 버전 (GPT-4o 포함)

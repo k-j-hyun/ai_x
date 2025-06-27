@@ -1,0 +1,106 @@
+## 이미지그리기 & 저장 & 편집
+
+from dotenv import load_dotenv
+from openai import OpenAI
+load_dotenv()
+# OpenAI 클라이언트 인스턴스 생성
+client = OpenAI()
+
+prompt_text = "숲이 보이는 밝은 자연 이미지를 그려줘"
+response = client.images.generate(
+    prompt=prompt_text, # 이미지 설명
+    model="dall-e-2", # 모델명
+    n=1, # 생성될 이미지 갯수
+    size="512x512", # 이미지 해당도(사이즈지정)
+)
+
+image_url = response.data[0].url
+print(image_url)
+
+from PIL import Image
+import requests
+image = Image.open(requests.get(image_url, stream=True).raw)
+image.resize((100,100))
+#image.show() #py
+
+response = client.images.generate(
+    prompt=prompt_text,
+    model="dall-e-3",
+    n=1,
+    size="1024x1024",
+    quality="standard", # 또는 "hd" : 고품질
+    style="vivid", # 선명한스타일(vivid), 자연스러운톤(natural)
+)
+
+image_prompt = response.data[0].revised_prompt
+image_url = response.data[0].url
+print(image_prompt, image_url)
+
+image = Image.open(requests.get(image_url, stream=True).raw)
+# image.show() #py
+image.resize((150,150))
+
+# 저장
+img_response = requests.get(image_url)
+if img_response.status_code==200:
+    filename = 'data/ch4_generated_dalle3.jpg'
+    with open(filename, 'wb') as f:
+        f.write(img_response.content)
+    print(f'{filename} 이미지 저장 완료')
+else:
+    print('이미지 다운로드 실패')
+
+# 편집할 이미지 사이즈(1024x1024)의 마스크 이미지 생성
+# 위쪽 50%는 흰색(255), 아래 50%는 검은색(0)
+# 편집 : 1024x1024 3채널 이미지
+from PIL import Image, ImageDraw
+original_image = Image.open('data/original.png').convert('RGBA')
+
+import numpy as np
+image_array = np.array(original_image)
+image_array.shape
+
+print('편집할 이미지 크기 : ', original_image.size) # 편집할 이미지 크기
+
+mask = Image.new("1", # 흑백 이미지 모드
+                 original_image.size, # 이미지 크기(원본이미지와 같은 크기)
+                 0) # 검은 mask
+# mask
+# mask에 그리기 도구
+# mask 윗부분 하얀 부분만 편집. 검은부분은 원본 그대로 유지
+draw = ImageDraw.Draw(mask)
+w, h = original_image.size
+print(f'가로길이 : {w} 세로길이 : {h}')
+draw.rectangle([(0, 0), (w, int(h*0.5))], fill=255)
+# mask.show()
+mask.save('data/ch04_mask.png', format='PNG')
+
+import matplotlib.pyplot as plt
+plt.figure(figsize=(2,2))
+plt.imshow(mask)
+plt.show()
+
+# 이미지 편집 : dall-e-2 3채널 이미지 편집
+# 편집할 원본 이미지와 마스크 이미지
+original_image = open('data/original.png', 'rb')
+mask_image = open('data/ch04_mask.png', 'rb')
+response = client.images.edit(
+    model="dall-e-2",
+    image=original_image,
+    mask=mask_image,
+    prompt="하늘에 구름 추가해줘",
+    n=1,
+    size="1024x1024"
+)
+edit_url = response.data[0].url
+print(edit_url)
+
+# 저장하기
+import requests
+img_response = requests.get(edit_url)
+if img_response.status_code==200:
+    with open('data/original_edit2.png', 'wb') as f:
+        f.write(img_response.content)
+    print('이미지 저장 완료')
+else:
+    print('이미지 저장 실패')

@@ -1,0 +1,43 @@
+assistant API
+chat 이력 저장 
+파일 첨부해서 요청
+
+1. client 생성
+2. assistant 생성 (assistant.id필요)
+3. thread 생성 : 기억담당
+while True:
+    4. thread에 user 메시지(프롬프트) 추가
+    5. run 수행 (assistant.id, thread.id필요)
+    6. 최종 assistant 답변 출력
+7. 대화 이력 출력하기
+
+# 2. 어시스턴트 생성
+assistant = client.beta.assistants.create(
+    name="HelpBot",
+    instructions="당신은 유능하고, 친절한 도움말 어시스턴트입니다. 사용자 질문에 20글자 이내로 친절하게 답변하세요",
+    model="gpt-4o-mini",   
+)
+위 코드에서는 client.beta.assistants.create 메서드를 사용해 새로운 어시스턴트를 생성했습니다. 주요 파라미터를 살펴보면:
+name: 어시스턴트의 이름을 지정합니다. 콘솔이나 리스트에서 구분하기 위한 용도이며, 모델 응답 내용에는 영향을 미치지 않습니다.
+instructions: 시스템 레벨의 지시어로, 해당 어시스턴트가 모든 대화에서 따르게 될 기본 규칙이나 역할을 정의합니다. 여기서는 "친절한 도움말 어시스턴트"라는 성격을 부여했습니다. (이 지시어는 기존 ChatGPT의 시스템 메시지와 유사한 역할입니다.)
+model: 어시스턴트가 사용할 언어 모델을 지정합니다. 최신 기능을 쓰려면 OpenAI가 Nov 2023 이후 출시한 모델(-1106가 붙은 모델명)을 권장합니다.
+assistant 생성을 제공하는 모델
+GPT-4 계열:
+gpt-4 - 기본 GPT-4 모델
+gpt-4-turbo - 더 빠르고 효율적인 GPT-4
+gpt-4o - 최신 멀티모달 모델
+gpt-4o-mini - 경량화된 GPT-4o
+GPT-3.5 계열:
+gpt-3.5-turbo - 빠르고 효율적인 모델(추천)
+기타:
+dall-e-3 - 이미지 생성용
+whisper-1 - 음성 인식용
+tts-1, tts-1-hd - 텍스트 음성 변환용
+tools: 어시스턴트에 활성화할 도구 목록입니다. 기본적인 Q&A 챗봇에서는 특별한 툴이 필요 없으므로 비워두었습니다. (tools=[] 또는 생략) 나중에 코드 인터프리터나 함수 호출 등을 사용하게 될 경우 이 필드를 설정합니다.
+어시스턴트가 성공적으로 생성되면 고유 ID (assistant.id)가 반환됩니다. 이 ID는 이후 대화 스레드에서 어떤 어시스턴트를 사용할지 지정할 때 필요하므로 저장해둡니다. (참고로, client.beta.assistants.list()를 호출하면 계정 내 모든 어시스턴트 목록을 확인할 수 있습니다.)
+
+
+
+
+
+

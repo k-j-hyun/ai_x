@@ -1,0 +1,22 @@
+# .venv 가상환경 만들기(희망 경로에서 cmd 실행)
+python -m venv .venv
+# .venv 디렉토리 -> Scripts 디렉토리 들어가기
+cd .venv
+cd Scipts
+# 가상환경 실행하기
+activate
+
+
+python.exe -m pip install --upgrade pip
+pip install jupyter numpy==1.23.5 pandas==1.5.3
+# 엑셀 파일 활용
+pip install xlwings
+pip install python-decouple python-dotenv
+pip install openai
+# py(파이썬코드) 파일을 EXE 실행파일로 바꿀때 필요한 라이브러리
+pip install pyinstaller
+
+# 현재 가상환경 라이브러리 목록
+pip freeze > requirements.txt
+
+pip install -r requirements.txt

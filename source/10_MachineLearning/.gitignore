@@ -1,0 +1,7 @@
+.ipynb_checkpoints/
+__pycache__/
+.env
+.venv/
+build/
+dist/
+genai_rpa.exe

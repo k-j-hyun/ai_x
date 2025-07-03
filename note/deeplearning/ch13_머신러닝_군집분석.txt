@@ -1,0 +1,29 @@
+ch2. 군집분석
+
+# 1절. 군집모델(클러스터링)
+-클러스터(cluster) : 독립변수의특성이유사한데이터의그룹
+-클러스터링(clustering) : 주어진데이터를여러개의클러스터로구분하는것
+1) 중심기반클러스터링(K-Means) : https://commons.wikimedia.org/wiki/File:KMeans-Gaussian-data.svg
+<img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/KMeans-Gaussian-data.svg"
+style="display: block; margin-left: 0; width: 20%;">
+2) 연결기반클러스터링(DBSCAN) : https://commons.wikimedia.org/wiki/File:DBSCAN-density-data.svg
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/05/DBSCAN-density-data.svg"
+width="300"
+style="display: block; margin-left: 0; width: 20%;">
+3) 밀도기반클러스터링(DBSCAN의변형으로OPTICS) : https://commons.wikimedia.org/wiki/File:OPTICS-Gaussian-data.svg
+
+클러스터링
+클러스터(cluster) : 독립 변수의 특성이 유사한 데이터의 그룹
+클러스터링(clustering) : 주어진 데이터를 여러 개의 클러스터로 구분하는 것
+만약 클러스터의 수가 K라면 클러스터링은
+
+K-Means 클러스터링
+가장 단순하고 빠른 클러스터링 알고리즘의 하나
+목적함수 값이 최소화될 때까지 클러스터의 중심(centroid) 𝜇k와 각 데이터가
+소속될 클러스터를 반복해서 찾는 것
+
+K-Means 클러스터링의 세부 알고리즘
+1. 임의의 중심값 μk를 고릅니다.(보통 데이터 샘플 중의 하나를 선택합니다.)
+2. 중심에서 각 샘플 데이터까지의 거리를 계산합니다.
+3. 각 데이터 샘플에서 가장 가까운 중심을 선택하여 클러스터 갱신합니다.
+4. 다시 만들어진 클러스터에 대해 중심을 다시 계산하고 1~4를 반복합니다.

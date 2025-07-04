@@ -28,3 +28,8 @@ platform.openai.com  ✅ API 키 발급, Playground 사용 가능
 openai.com/sora	   ✅ (Pro만)	Sora(영상 생성기) 일부 가능
 openai.com/dall-e	   ✅ 이미지 생성 및 편집
 openai.com/voice	   ✅ (모바일 전용)	음성 대화 GPT (현재 앱 중심)
+
+
+conda install -c conda-forge graphviz(의사결정나무 그래프를 생성하는 도구)
+
+pip install pydot( Graphviz의 .dot 데이터를 이미지로 변환하는 라이브러리)

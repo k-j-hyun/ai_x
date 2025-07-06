@@ -1,0 +1,329 @@
+{
+  "creation_date": "2025-07-06T22:48:59.321465",
+  "model_performance": {
+    "random_forest_auc": 1.0,
+    "xgboost_auc": 1.0,
+    "lstm_auc": 0.85
+  },
+  "feature_importance": [
+    {
+      "feature": "precipitation_minmax",
+      "importance": 0.10994646680012901
+    },
+    {
+      "feature": "precipitation",
+      "importance": 0.10509290763918179
+    },
+    {
+      "feature": "drainage_overflow",
+      "importance": 0.09276388465255554
+    },
+    {
+      "feature": "flood_risk_level",
+      "importance": 0.07944100950829068
+    },
+    {
+      "feature": "precipitation_scaled",
+      "importance": 0.07777676342224711
+    },
+    {
+      "feature": "precip_risk_level",
+      "importance": 0.07245669594293601
+    },
+    {
+      "feature": "humidity_precip_index",
+      "importance": 0.0585622221733018
+    },
+    {
+      "feature": "precip_max_2d",
+      "importance": 0.05714934811239272
+    },
+    {
+      "feature": "is_heavy_rain",
+      "importance": 0.04828377754882579
+    },
+    {
+      "feature": "composite_risk",
+      "importance": 0.03261009516734396
+    },
+    {
+      "feature": "relative_precip",
+      "importance": 0.02860055947377281
+    },
+    {
+      "feature": "precip_max_3d",
+      "importance": 0.024084923278899793
+    },
+    {
+      "feature": "wind_precip_interaction",
+      "importance": 0.02324186230935548
+    },
+    {
+      "feature": "precip_cumsum_3d",
+      "importance": 0.022716450851016905
+    },
+    {
+      "feature": "precip_ma3",
+      "importance": 0.022339521207030377
+    },
+    {
+      "feature": "high_humidity_rain",
+      "importance": 0.017253557237066806
+    },
+    {
+      "feature": "precip_change",
+      "importance": 0.014713757883341606
+    },
+    {
+      "feature": "precip_sum_2d",
+      "importance": 0.014017084467604976
+    },
+    {
+      "feature": "drainage_capacity",
+      "importance": 0.013650229473542273
+    },
+    {
+      "feature": "extreme_weather_score",
+      "importance": 0.012437950350573646
+    },
+    {
+      "feature": "flood_risk_score",
+      "importance": 0.011084472860684735
+    },
+    {
+      "feature": "precip_sum_3d",
+      "importance": 0.009067149159526382
+    },
+    {
+      "feature": "precip_intensity",
+      "importance": 0.008517178713929185
+    },
+    {
+      "feature": "precip_sum_5d",
+      "importance": 0.008109312794904318
+    },
+    {
+      "feature": "humidity_scaled",
+      "importance": 0.00782395838000034
+    },
+    {
+      "feature": "precip_max_7d",
+      "importance": 0.005088131855217132
+    },
+    {
+      "feature": "humidity_minmax",
+      "importance": 0.005065195685408831
+    },
+    {
+      "feature": "humidity",
+      "importance": 0.004219481317101973
+    },
+    {
+      "feature": "precip_ma7",
+      "importance": 0.004023974777813216
+    },
+    {
+      "feature": "precip_max_10d",
+      "importance": 0.003584524759810135
+    },
+    {
+      "feature": "precip_sum_10d",
+      "importance": 0.0034157333128807072
+    },
+    {
+      "feature": "precip_max_5d",
+      "importance": 0.0012160676684916467
+    },
+    {
+      "feature": "precip_max_14d",
+      "importance": 0.00030956073280835063
+    },
+    {
+      "feature": "season_rainy",
+      "importance": 0.0002694401598910203
+    },
+    {
+      "feature": "soil_saturation",
+      "importance": 0.0002334806244673139
+    },
+    {
+      "feature": "precip_sum_14d",
+      "importance": 0.00017131413120366625
+    },
+    {
+      "feature": "temp_humidity_ratio",
+      "importance": 8.012553906349567e-05
+    },
+    {
+      "feature": "precip_lag1",
+      "importance": 7.833784655604775e-05
+    },
+    {
+      "feature": "year",
+      "importance": 7.824777499726108e-05
+    },
+    {
+      "feature": "humidity_ma7",
+      "importance": 7.766554412333951e-05
+    },
+    {
+      "feature": "humidity_lag3",
+      "importance": 7.61248147795174e-05
+    },
+    {
+      "feature": "precip_sum_7d",
+      "importance": 7.151711793482167e-05
+    },
+    {
+      "feature": "wind_speed",
+      "importance": 6.95309579774203e-05
+    },
+    {
+      "feature": "month",
+      "importance": 4.47672277003772e-05
+    },
+    {
+      "feature": "min_temp_minmax",
+      "importance": 4.119768534838045e-05
+    },
+    {
+      "feature": "avg_temp_scaled",
+      "importance": 2.6079378608237242e-05
+    },
+    {
+      "feature": "is_weekend",
+      "importance": 1.4063311151125174e-05
+    },
+    {
+      "feature": "max_temp",
+      "importance": 1.8720815427256745e-06
+    },
+    {
+      "feature": "pressure_estimate",
+      "importance": 1.3470703574280474e-06
+    },
+    {
+      "feature": "humidity_lag2",
+      "importance": 5.635763539804777e-07
+    },
+    {
+      "feature": "precip_pct_change",
+      "importance": 4.390948462208284e-07
+    },
+    {
+      "feature": "day_sin",
+      "importance": 7.654510354996547e-08
+    },
+    {
+      "feature": "min_temp",
+      "importance": 8.411970450234581e-16
+    },
+    {
+      "feature": "day",
+      "importance": 7.01534893170667e-16
+    },
+    {
+      "feature": "min_temp_scaled",
+      "importance": 6.738246448185381e-16
+    },
+    {
+      "feature": "temp_range",
+      "importance": 6.516854515568612e-16
+    },
+    {
+      "feature": "precip_cumsum_7d",
+      "importance": 5.696687685918457e-16
+    },
+    {
+      "feature": "avg_temp_minmax",
+      "importance": 4.568278560831638e-16
+    },
+    {
+      "feature": "day_cos",
+      "importance": 4.1491614599011115e-16
+    },
+    {
+      "feature": "max_temp_minmax",
+      "importance": 3.3942834099813725e-16
+    },
+    {
+      "feature": "precip_lag3",
+      "importance": 3.2304506668204067e-16
+    },
+    {
+      "feature": "month_period",
+      "importance": 3.0372760860388077e-16
+    },
+    {
+      "feature": "is_early_rainy",
+      "importance": 2.8571697072042184e-16
+    },
+    {
+      "feature": "is_typhoon_season",
+      "importance": 2.8514613845884403e-16
+    },
+    {
+      "feature": "is_peak_rainy",
+      "importance": 2.7864798558175038e-16
+    },
+    {
+      "feature": "is_early_summer",
+      "importance": 2.698220349272391e-16
+    },
+    {
+      "feature": "heat_humidity_index",
+      "importance": 2.4901751188348085e-16
+    },
+    {
+      "feature": "is_late_summer",
+      "importance": 2.340930094272887e-16
+    },
+    {
+      "feature": "humidity_lag1",
+      "importance": 2.238161190002012e-16
+    },
+    {
+      "feature": "max_temp_scaled",
+      "importance": 1.6506256010492064e-16
+    },
+    {
+      "feature": "day_of_year",
+      "importance": 1.6349131260215434e-16
+    },
+    {
+      "feature": "season_dry",
+      "importance": 1.5657729312935083e-16
+    },
+    {
+      "feature": "week_of_year",
+      "importance": 1.5004156019766102e-16
+    },
+    {
+      "feature": "avg_temp",
+      "importance": 1.122315501376078e-16
+    },
+    {
+      "feature": "is_peak_summer",
+      "importance": 1.0677212101517567e-16
+    },
+    {
+      "feature": "humidity_ma3",
+      "importance": 7.669593061025785e-17
+    },
+    {
+      "feature": "precip_lag2",
+      "importance": 2.4685530222580538e-17
+    },
+    {
+      "feature": "rain_days_cumsum",
+      "importance": 7.297776634181027e-18
+    },
+    {
+      "feature": "is_extreme_rain",
+      "importance": 0.0
+    }
+  ],
+  "phase4_contribution": 48.9,
+  "training_data_size": 746,
+  "test_data_size": 187
+}

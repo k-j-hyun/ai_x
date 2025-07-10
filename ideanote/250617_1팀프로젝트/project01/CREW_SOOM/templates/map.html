@@ -1,0 +1,481 @@
+<!-- templates/map.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>서울시 구별 침수 위험 지도</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { 
+      height: 80vh; 
+      border-radius: 15px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .blur-mask { 
+      position: absolute; 
+      top: 0; left: 0; width: 100%; height: 100%;
+      backdrop-filter: blur(8px); 
+      background: rgba(255,255,255,0.4); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 24px; 
+      font-weight: bold;
+      color: #333;
+      z-index: 999;
+      border-radius: 15px;
+    }
+    .legend {
+      background: white;
+      padding: 15px;
+      line-height: 1.8;
+      font-size: 14px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .legend div { 
+      margin-bottom: 8px; 
+      display: flex;
+      align-items: center;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+    }
+    .map-controls {
+      margin-bottom: 20px;
+    }
+    .map-controls button {
+      margin-right: 10px;
+    }
+    .status-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .login-prompt {
+      text-align: center;
+      padding: 20px;
+      background: #fff3cd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🗺️ 서울시 침수 위험 지도</h1>
+    <p>실시간 기상 데이터 기반 구별 침수 위험도 시각화</p>
+  </div>
+
+  <div class="container">
+    <!-- 로그인 안내 -->
+    <div id="login-prompt" class="login-prompt" style="display: none;">
+      <h3>🔒 로그인이 필요합니다</h3>
+      <p>상세한 위험도 정보를 보려면 로그인하세요</p>
+      <a href="/login" class="btn">로그인하기</a>
+    </div>
+
+    <!-- 지도 상태 정보 -->
+    <div class="status-info">
+      <h3>📊 현재 상태</h3>
+      <div id="map-status">
+        <p>🕐 마지막 업데이트: <span id="last-update-time">-</span></p>
+        <p>📡 데이터 소스: <span id="data-source">4개 기상청 API 통합</span></p>
+        <p>🎯 위험도 기준: 강수량, 습도, 계절성, 기상특보 종합</p>
+      </div>
+    </div>
+
+    <!-- 지도 컨트롤 -->
+    <div class="map-controls">
+      <button class="btn" onclick="refreshMap()">🔄 지도 새로고침</button>
+      <button class="btn" onclick="toggleAnimation()">🎬 애니메이션 토글</button>
+      <button class="btn" onclick="exportMap()">💾 지도 내보내기</button>
+      <button class="btn" onclick="showStatistics()">📊 통계 보기</button>
+    </div>
+
+    <!-- 지도 영역 -->
+    <div class="card" style="position: relative;">
+      <div id="map"></div>
+      <div id="map-blur" class="blur-mask" style="display: none;">
+        🔒 로그인 후 이용 가능합니다
+      </div>
+    </div>
+
+    <!-- 범례 -->
+    <div class="legend">
+      <strong>📈 위험도 색상 등급:</strong>
+      <div>
+        <div class="legend-color" style="background: #4CAF50;"></div>
+        <span>🟢 매우 낮음 (0-20점): 정상 업무</span>
+      </div>
+      <div>
+        <div class="legend-color" style="background: #FFEB3B;"></div>
+        <span>🟡 낮음 (21-40점): 상황 주시</span>
+      </div>
+      <div>
+        <div class="legend-color" style="background: #FF9800;"></div>
+        <span>🟠 보통 (41-60점): 주의 준비</span>
+      </div>
+      <div>
+        <div class="legend-color" style="background: #F44336;"></div>
+        <span>🔴 높음 (61-80점): 대비 조치</span>
+      </div>
+      <div>
+        <div class="legend-color" style="background: #9C27B0;"></div>
+        <span>🟣 매우 높음 (81-100점): 즉시 대응</span>
+      </div>
+    </div>
+
+    <!-- 통계 정보 -->
+    <div class="card" id="statistics" style="display: none;">
+      <h3>📊 서울시 침수 위험 통계</h3>
+      <div id="stats-content">
+        <div class="grid-3">
+          <div class="data-card">
+            <h4 id="avg-risk">-</h4>
+            <p>평균 위험도</p>
+          </div>
+          <div class="data-card">
+            <h4 id="high-risk-count">-</h4>
+            <p>고위험 지역 수</p>
+          </div>
+          <div class="data-card">
+            <h4 id="max-risk-area">-</h4>
+            <p>최고 위험 지역</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    let map;
+    let geoLayer;
+    let animationEnabled = false;
+    let updateInterval;
+
+    // 위험도별 색상 함수
+    const riskColor = (score) => {
+      if (score <= 20) return '#4CAF50';
+      if (score <= 40) return '#FFEB3B';
+      if (score <= 60) return '#FF9800';
+      if (score <= 80) return '#F44336';
+      return '#9C27B0';
+    };
+
+    // 로그인 상태 확인
+    async function checkLogin() {
+      try {
+        const res = await fetch('/api/session');
+        const data = await res.json();
+        
+        if (data.logged_in) {
+          document.getElementById('map-blur').style.display = 'none';
+          document.getElementById('login-prompt').style.display = 'none';
+          return true;
+        } else {
+          document.getElementById('map-blur').style.display = 'flex';
+          document.getElementById('login-prompt').style.display = 'block';
+          return false;
+        }
+      } catch (error) {
+        console.error('로그인 상태 확인 오류:', error);
+        return false;
+      }
+    }
+
+    // 지도 초기화
+    async function initMap() {
+      map = L.map('map').setView([37.5665, 126.9780], 11);
+      
+      // 지도 타일 레이어
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(map);
+
+      // 서울시 구 경계 데이터 로드 (GeoJSON)
+      await loadSeoulBoundaries();
+      
+      // 위험도 데이터 로드
+      await loadRiskData();
+      
+      // 정기 업데이트 시작
+      startAutoUpdate();
+    }
+
+    // 서울시 구 경계 데이터 로드
+    async function loadSeoulBoundaries() {
+      try {
+        // 간단한 서울시 구 경계 데이터 (실제 프로젝트에서는 GeoJSON 파일 사용)
+        const seoulDistricts = {
+          "type": "FeatureCollection",
+          "features": [
+            // 강남구 예시 (실제로는 정확한 GeoJSON 데이터 필요)
+            {
+              "type": "Feature",
+              "properties": {"name": "강남구"},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[126.9, 37.5], [127.1, 37.5], [127.1, 37.6], [126.9, 37.6], [126.9, 37.5]]]
+              }
+            }
+            // 다른 구들도 추가...
+          ]
+        };
+        
+        return seoulDistricts;
+      } catch (error) {
+        console.error('서울시 경계 데이터 로드 오류:', error);
+        return null;
+      }
+    }
+
+    // 위험도 데이터 로드
+    async function loadRiskData() {
+      try {
+        const response = await fetch('/api/flood_map');
+        const riskData = await response.json();
+        
+        // 지도 업데이트
+        updateMapColors(riskData);
+        
+        // 통계 업데이트
+        updateStatistics(riskData);
+        
+        // 마지막 업데이트 시간 표시
+        document.getElementById('last-update-time').textContent = new Date().toLocaleString();
+        
+        return riskData;
+      } catch (error) {
+        console.error('위험도 데이터 로드 오류:', error);
+        return {};
+      }
+    }
+
+    // 지도 색상 업데이트
+    function updateMapColors(riskData) {
+      // 서울시 25개 구 목록
+      const seoulGu = [
+        '강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구','노원구','도봉구',
+        '동대문구','동작구','마포구','서대문구','서초구','성동구','성북구','송파구','양천구','영등포구',
+        '용산구','은평구','종로구','중구','중랑구'
+      ];
+
+      // 기존 레이어 제거
+      if (geoLayer) {
+        map.removeLayer(geoLayer);
+      }
+
+      // 새로운 레이어 생성 (간단한 사각형으로 대체)
+      geoLayer = L.layerGroup();
+      
+      seoulGu.forEach((gu, index) => {
+        const score = riskData[gu] || 0;
+        const color = riskColor(score);
+        
+        // 간단한 사각형으로 구 영역 표시 (실제로는 정확한 GeoJSON 사용)
+        const bounds = [
+          [37.4 + (index % 5) * 0.1, 126.8 + Math.floor(index / 5) * 0.1],
+          [37.5 + (index % 5) * 0.1, 126.9 + Math.floor(index / 5) * 0.1]
+        ];
+        
+        const rectangle = L.rectangle(bounds, {
+          color: '#333',
+          weight: 1,
+          fillColor: color,
+          fillOpacity: 0.7
+        });
+        
+        // 툴팁 추가
+        rectangle.bindTooltip(`${gu}<br>위험도: ${score.toFixed(1)}점`, {
+          permanent: false,
+          direction: 'center',
+          className: 'map-tooltip'
+        });
+        
+        // 클릭 이벤트
+        rectangle.on('click', () => {
+          showDistrictInfo(gu, score);
+        });
+        
+        geoLayer.addLayer(rectangle);
+      });
+      
+      geoLayer.addTo(map);
+    }
+
+    // 구별 상세 정보 표시
+    function showDistrictInfo(district, score) {
+      const riskLevel = getRiskLevel(score);
+      const message = `
+📍 ${district}
+🎯 위험도: ${score.toFixed(1)}점
+${riskLevel.color} 등급: ${riskLevel.name}
+📋 권장사항: ${riskLevel.action}
+      `;
+      
+      alert(message);
+    }
+
+    // 위험도 등급 정보
+    function getRiskLevel(score) {
+      if (score <= 20) return {name: '매우낮음', color: '🟢', action: '정상 업무'};
+      if (score <= 40) return {name: '낮음', color: '🟡', action: '상황 주시'};
+      if (score <= 60) return {name: '보통', color: '🟠', action: '주의 준비'};
+      if (score <= 80) return {name: '높음', color: '🔴', action: '대비 조치'};
+      return {name: '매우높음', color: '🟣', action: '즉시 대응'};
+    }
+
+    // 통계 업데이트
+    function updateStatistics(riskData) {
+      const scores = Object.values(riskData);
+      const avgRisk = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+      const highRiskCount = scores.filter(score => score > 60).length;
+      const maxRiskArea = Object.keys(riskData).reduce((max, district) => 
+        riskData[district] > riskData[max] ? district : max, Object.keys(riskData)[0]
+      );
+
+      document.getElementById('avg-risk').textContent = avgRisk.toFixed(1) + '점';
+      document.getElementById('high-risk-count').textContent = highRiskCount + '개';
+      document.getElementById('max-risk-area').textContent = maxRiskArea;
+    }
+
+    // 지도 새로고침
+    async function refreshMap() {
+      await loadRiskData();
+    }
+
+    // 애니메이션 토글
+    function toggleAnimation() {
+      animationEnabled = !animationEnabled;
+      if (animationEnabled) {
+        // 애니메이션 효과 추가
+        document.querySelector('#map').style.transition = 'all 0.5s ease';
+      } else {
+        document.querySelector('#map').style.transition = 'none';
+      }
+    }
+
+    // 지도 내보내기
+    function exportMap() {
+      alert('지도 내보내기 기능은 준비 중입니다.');
+    }
+
+    // 통계 보기
+    function showStatistics() {
+      const statsDiv = document.getElementById('statistics');
+      statsDiv.style.display = statsDiv.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // 자동 업데이트 시작
+    function startAutoUpdate() {
+      updateInterval = setInterval(async () => {
+        if (await checkLogin()) {
+          await loadRiskData();
+        }
+      }, 60000); // 1분마다 업데이트
+    }
+
+    // 페이지 로드 시 초기화
+    window.onload = async function() {
+      const isLoggedIn = await checkLogin();
+      if (isLoggedIn) {
+        await initMap();
+      } else {
+        // 로그인되지 않은 경우 기본 지도만 표시
+        map = L.map('map').setView([37.5665, 126.9780], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18
+        }).addTo(map);
+      }
+    };
+
+    // 페이지 언로드 시 정리
+    window.onbeforeunload = function() {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+    };
+  </script>
+</body>
+</html>
+
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CREW_SOOM 침수 예측 시스템{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">🌊 CREW_SOOM</a>
+            <ul class="nav-menu">
+                <li><a href="/">대시보드</a></li>
+                <li><a href="/models">모델</a></li>
+                <li><a href="/map">지도</a></li>
+                <li><a href="/logs">로그</a></li>
+                <li><a href="/login">로그인</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <p>&copy; 2024 CREW_SOOM. 침수 예측 AI 시스템.</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오류 - CREW_SOOM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>❌ 오류 발생</h1>
+        <p>시스템에서 오류가 발생했습니다.</p>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>🔍 오류 정보</h2>
+            <div class="status status-error">
+                <h3>{{ error_code or '500' }}</h3>
+                <p>{{ error_message or '내부 서버 오류가 발생했습니다.' }}</p>
+            </div>
+            
+            <div class="function-buttons">
+                <button class="btn" onclick="history.back()">← 이전 페이지</button>
+                <button class="btn" onclick="location.href='/'">🏠 홈으로</button>
+                <button class="btn" onclick="location.reload()">🔄 새로고침</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

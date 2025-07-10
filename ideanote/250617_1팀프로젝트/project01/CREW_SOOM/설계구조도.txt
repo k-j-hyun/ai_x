@@ -1,0 +1,45 @@
+CREW_SOOM/
+│
+├── 📄 실행 파일
+│   ├── run.py                    # 메인 실행 스크립트
+│   ├── setup.py                  # 자동 설치 스크립트
+│   ├── check_system.py           # 시스템 환경 체크
+│   └── requirements.txt          # 패키지 의존성
+│
+├── 📁 모듈 (modules/)
+│   ├── web_app.py               # Flask 웹 애플리케이션
+│   ├── multi_weather_api.py     # 4개 기상청 API 통합
+│   ├── data_loader.py           # 데이터 로딩
+│   ├── preprocessor.py          # 데이터 전처리
+│   ├── trainer.py               # 모델 훈련
+│   ├── evaluator.py             # 모델 평가
+│   └── visualizer.py            # 데이터 시각화
+│
+├── 📁 웹 인터페이스
+│   ├── templates/               # HTML 템플릿
+│   │   ├── dashboard.html       # 메인 대시보드
+│   │   ├── login.html          # 로그인 페이지
+│   │   ├── map.html            # 지도 페이지
+│   │   └── models.html         # 모델 비교 페이지
+│   └── static/                 # 정적 파일
+│       ├── css/style.css       # 스타일시트
+│       └── js/dashboard.js     # 자바스크립트
+│
+├── 📁 데이터 저장소
+│   ├── data/                   # 원시 및 처리된 데이터
+│   ├── models/                 # 훈련된 ML 모델
+│   ├── outputs/                # 결과 파일 (차트, 리포트)
+│   ├── logs/                   # 시스템 로그
+│   └── users/                  # 사용자 정보
+│
+├── 📁 Windows 지원
+│   ├── quick_start.bat         # 통합 실행 메뉴
+│   ├── install.bat             # 설치 배치 파일
+│   ├── check.bat               # 체크 배치 파일
+│   └── run.bat                 # 실행 배치 파일
+│
+└── 📄 설정 파일
+    ├── .env                    # 환경 변수 (생성 필요)
+    ├── .env.example           # 환경 변수 예시
+    ├── README.md              # 프로젝트 설명서
+    └── 설계구조도.txt         # 시스템 구조 설명

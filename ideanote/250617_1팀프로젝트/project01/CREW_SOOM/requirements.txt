@@ -1,98 +1,209 @@
-# Flask 및 웹 프레임워크
+# CREW_SOOM 고급 AI 침수 예측 시스템 - 패키지 의존성
+# 4개 고급 머신러닝 모델 지원: RandomForest, XGBoost, LSTM+CNN, Transformer
+
+# ======================
+# 웹 프레임워크
+# ======================
 Flask==2.3.3
 Werkzeug==2.3.7
 Jinja2==3.1.2
-MarkupSafe==2.1.3
-itsdangerous==2.1.2
-click==8.1.7
 
-# 데이터 과학 및 머신러닝
+# ======================
+# 데이터 처리 및 분석
+# ======================
 pandas==2.1.1
 numpy==1.24.3
+scipy==1.11.3
+
+# ======================
+# 머신러닝 - 기본
+# ======================
 scikit-learn==1.3.0
-matplotlib==3.7.2
-seaborn==0.12.2
 joblib==1.3.2
 
-# 선택적 ML 라이브러리
+# ======================
+# 머신러닝 - 고급 모델
+# ======================
+# XGBoost (그래디언트 부스팅)
 xgboost==1.7.6
 
-# API 및 웹 요청
+# TensorFlow (LSTM+CNN, Transformer)
+tensorflow==2.13.0
+# tensorflow-gpu==2.13.0  # GPU 사용 시 주석 해제
+
+# Keras (TensorFlow에 포함되지만 명시)
+keras==2.13.1
+
+# ======================
+# 시각화
+# ======================
+matplotlib==3.7.2
+seaborn==0.12.2
+plotly==5.17.0
+
+# ======================
+# 데이터 수집 (API)
+# ======================
 requests==2.31.0
 urllib3==2.0.4
 
-# 환경 변수 관리
+# ======================
+# 환경 설정
+# ======================
 python-dotenv==1.0.0
 
-# 날짜/시간 처리
-pytz==2023.3
-
-# 이미지 처리
-Pillow==10.0.1
-
-# 한글 폰트 지원 (Windows)
-# matplotlib-base==3.7.2
-
-# 개발 도구 (선택사항)
-jupyter==1.0.0
-ipython==8.15.0
-
-# 데이터베이스 (향후 사용)
-# SQLAlchemy==2.0.21
-# sqlite3  # Python 내장 모듈
-
-# 캐싱 (향후 사용)
-# redis==5.0.1
-
-# 웹 서버 (운영환경)
-# gunicorn==21.2.0
-# nginx-python==1.1.0
-
-# 테스트 (선택사항)
-# pytest==7.4.2
-# pytest-flask==1.2.0
-
-# 로깅 및 모니터링
-# loguru==0.7.2
-
-# 보안 (향후 사용)
-# Flask-JWT-Extended==4.5.3
-# bcrypt==4.0.1
-
-# 데이터 검증
-# marshmallow==3.20.1
-
-# 비동기 처리
-# celery==5.3.2
-
-# 파일 압축
-# zipfile36==0.1.3
-
-# XML/JSON 처리
-# lxml==4.9.3
-# xmltodict==0.13.0
-
-# 타임존 처리
-# python-dateutil==2.8.2
-
-# 통계 분석
-# scipy==1.11.3
+# ======================
+# 시계열 처리
+# ======================
+# 추가적인 시계열 분석이 필요한 경우
 # statsmodels==0.14.0
+# prophet==1.1.4
 
-# 그래프 이론
-# networkx==3.1
+# ======================
+# 성능 최적화
+# ======================
+# Intel MKL 최적화 (Intel CPU에서 더 빠른 연산)
+# mkl==2023.2.0
+# mkl-service==2.4.0
 
-# 지리정보 (지도 기능용)
-# folium==0.14.0
-# geopandas==0.13.2
+# 멀티프로세싱 지원
+# multiprocessing-logging==0.3.4
 
-# 메모리 최적화
-# psutil==5.9.5
+# ======================
+# 개발 및 디버깅 도구
+# ======================
+# 개발 중에만 필요 (프로덕션에서는 제거)
+# jupyter==1.0.0
+# ipython==8.15.0
+# notebook==7.0.3
 
-# 프로세스 관리
-# threading  # Python 내장 모듈
-# multiprocessing  # Python 내장 모듈
+# ======================
+# 보안 및 유틸리티
+# ======================
+# 보안 강화
+# cryptography==41.0.4
 
-# 기타 유틸리티
-# tqdm==4.66.1
-# colorama==0.4.6
+# 날짜/시간 처리
+# pytz==2023.3
+
+# ======================
+# 선택적 의존성 (고급 기능)
+# ======================
+
+# GPU 가속 (NVIDIA GPU 있는 경우)
+# tensorflow-gpu==2.13.0
+# cupy-cuda11x==12.2.0  # CUDA 11.x 버전에 맞게 조정
+
+# 분산 처리 (대용량 데이터 처리 시)
+# dask==2023.9.2
+# distributed==2023.9.2
+
+# 고급 최적화 라이브러리
+# optuna==3.3.0  # 하이퍼파라미터 튜닝
+# hyperopt==0.2.7  # 대안 튜닝 라이브러리
+
+# 모델 해석
+# shap==0.42.1  # 모델 설명가능성
+# lime==0.2.0.1  # 대안 설명가능성
+
+# 고급 전처리
+# category-encoders==2.6.2  # 카테고리 인코딩
+# imbalanced-learn==0.11.0  # 불균형 데이터 처리
+
+# 시계열 전문 라이브러리
+# sktime==0.22.0  # 시계열 머신러닝
+# tsfresh==0.20.1  # 시계열 특성 추출
+
+# ======================
+# 데이터베이스 (선택사항)
+# ======================
+# SQLite는 Python 기본 포함
+# PostgreSQL 사용 시
+# psycopg2-binary==2.9.7
+
+# MongoDB 사용 시
+# pymongo==4.5.0
+
+# Redis 사용 시 (캐싱)
+# redis==4.6.0
+
+# ======================
+# 배포 및 프로덕션
+# ======================
+# WSGI 서버
+gunicorn==21.2.0
+
+# 로깅 개선
+# structlog==23.1.0
+
+# 모니터링
+# prometheus-client==0.17.1
+
+# ======================
+# 테스트 (개발 시)
+# ======================
+# pytest==7.4.2
+# pytest-cov==4.1.0
+# pytest-mock==3.11.1
+
+# ======================
+# 코드 품질 (개발 시)
+# ======================
+# flake8==6.0.0
+# black==23.7.0
+# isort==5.12.0
+
+# ======================
+# 문서화 (개발 시)
+# ======================
+# sphinx==7.2.6
+# sphinx-rtd-theme==1.3.0
+
+# ======================
+# 버전 호환성 정보
+# ======================
+# Python >= 3.8, < 3.12
+# 권장: Python 3.9 또는 3.10
+
+# ======================
+# 설치 순서 권장사항
+# ======================
+# 1. 기본 패키지부터 설치:
+#    pip install pandas numpy matplotlib scikit-learn flask
+# 
+# 2. 고급 ML 라이브러리:
+#    pip install xgboost tensorflow
+# 
+# 3. 나머지 패키지:
+#    pip install -r requirements.txt
+#
+# 4. GPU 지원 (NVIDIA GPU 있는 경우):
+#    pip uninstall tensorflow
+#    pip install tensorflow-gpu==2.13.0
+
+# ======================
+# 메모리 요구사항
+# ======================
+# 최소: 8GB RAM
+# 권장: 16GB+ RAM (대용량 데이터 처리 시)
+# 딥러닝 모델 훈련 시: 32GB+ RAM 권장
+
+# ======================
+# 주의사항
+# ======================
+# 1. TensorFlow는 CPU/GPU 버전을 선택해서 설치
+# 2. XGBoost는 시스템에 따라 컴파일이 필요할 수 있음
+# 3. 일부 패키지는 Visual Studio C++ 빌드 도구가 필요 (Windows)
+# 4. macOS에서는 Xcode 개발자 도구가 필요할 수 있음
+
+# ======================
+# 대안 설치 방법
+# ======================
+# Conda 사용 시:
+# conda install tensorflow xgboost scikit-learn pandas matplotlib flask
+# conda install -c conda-forge plotly seaborn
+
+# Docker 사용 시:
+# FROM tensorflow/tensorflow:2.13.0-jupyter
+# 또는
+# FROM python:3.10-slim

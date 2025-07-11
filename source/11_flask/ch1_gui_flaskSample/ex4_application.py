@@ -7,13 +7,13 @@ application = Flask(__name__) # 웹 어플리케이션 객체 생성
 
 @application.route("/")
 def handler_function():
-    return "<h><br><br><center><h1>Hello, Flask</h1></center><br><br><h>"
+    return "<br><br><center><h1>Hello, Flask</h1></center><br><br>"
 
 # /apt/2005/106/8
 @application.route("/apt/<year>/<square>/<floor>")
 def aptPredictHandler(year, square, floor):
     answer = predict_apt_price(year, square, floor)
-    return "<h><br><br><center><h1>예측 금액은 {}입니다</h1></center><br><br><h>".format(answer)
+    return "<br><br><center><h1>예측 금액은 {}입니다</h1></center><br><br>".format(answer)
     # return {'year':year,
     #         'square':square,
     #         'floor':floor,

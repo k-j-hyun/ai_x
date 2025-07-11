@@ -1,253 +1,274 @@
-# check_system.py - 시스템 환경 체크 스크립트
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+check_system.py - CREW_SOOM 시스템 상태 진단 스크립트
+"""
+
 import sys
 import os
-import platform
-import subprocess
 import importlib.util
+from pathlib import Path
+
+def print_banner():
+    """진단 시작 배너"""
+    banner = """
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          🔍 CREW_SOOM 시스템 진단                           ║
+║                    문제 해결을 위한 상태 점검 도구                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+    """
+    print(banner)
 
 def check_python_version():
     """Python 버전 확인"""
-    print("🐍 Python 버전 확인...")
+    print("🐍 Python 환경 확인...")
     version = sys.version_info
-    print(f"   현재 Python 버전: {version.major}.{version.minor}.{version.micro}")
+    print(f"   Python 버전: {version.major}.{version.minor}.{version.micro}")
     
     if version.major == 3 and version.minor >= 8:
-        print("   ✅ Python 버전 OK")
+        print("   ✅ Python 버전 요구사항 충족")
         return True
     else:
-        print("   ❌ Python 3.8 이상이 필요합니다")
+        print("   ❌ Python 3.8 이상이 필요합니다.")
         return False
 
-def check_directories():
-    """필요한 디렉토리 확인 및 생성"""
-    print("📁 디렉토리 구조 확인...")
+def check_required_modules():
+    """필수 모듈 확인"""
+    print("\n📦 필수 모듈 확인...")
+    
+    required_modules = {
+        'pandas': 'pandas',
+        'numpy': 'numpy', 
+        'matplotlib': 'matplotlib',
+        'sklearn': 'scikit-learn',
+        'requests': 'requests',
+        'flask': 'Flask'
+    }
+    
+    missing_modules = []
+    
+    for module_name, package_name in required_modules.items():
+        try:
+            importlib.import_module(module_name)
+            print(f"   ✅ {package_name}")
+        except ImportError:
+            print(f"   ❌ {package_name} - 설치 필요")
+            missing_modules.append(package_name)
+    
+    if missing_modules:
+        print(f"\n💡 설치 명령: pip install {' '.join(missing_modules)}")
+        return False
+    
+    return True
+
+def check_optional_modules():
+    """선택적 모듈 확인"""
+    print("\n🔧 선택적 모듈 확인...")
+    
+    optional_modules = {
+        'tensorflow': 'TensorFlow (딥러닝 모델용)',
+        'xgboost': 'XGBoost (고성능 모델용)',
+        'seaborn': 'Seaborn (시각화 향상)',
+        'psutil': 'psutil (시스템 모니터링)'
+    }
+    
+    for module_name, description in optional_modules.items():
+        try:
+            importlib.import_module(module_name)
+            print(f"   ✅ {description}")
+        except ImportError:
+            print(f"   ⚠️ {description} - 선택사항")
+
+def check_project_structure():
+    """프로젝트 구조 확인"""
+    print("\n📁 프로젝트 구조 확인...")
+    
+    required_files = [
+        'modules/multi_weather_api.py',
+        'modules/web_app.py',
+        'modules/data_loader.py',
+        'modules/preprocessor.py',
+        'modules/trainer.py',
+        'modules/evaluator.py',
+        'modules/visualizer.py',
+        'templates/dashboard.html',
+        'templates/login.html',
+        'static/css/style.css',
+        'static/js/dashboard.js',
+        'run.py'
+    ]
+    
+    missing_files = []
+    
+    for file_path in required_files:
+        if os.path.exists(file_path):
+            print(f"   ✅ {file_path}")
+        else:
+            print(f"   ❌ {file_path} - 파일 없음")
+            missing_files.append(file_path)
+    
+    if missing_files:
+        print(f"\n💡 누락된 파일 {len(missing_files)}개를 확인하세요.")
+        return False
+    
+    return True
+
+def check_data_directories():
+    """데이터 디렉토리 확인"""
+    print("\n📊 데이터 디렉토리 확인...")
     
     required_dirs = [
-        'data', 'data/processed', 'data/raw', 
-        'models', 'outputs', 'logs', 'users',
-        'modules', 'templates', 'static'
+        'data',
+        'data/processed',
+        'data/raw', 
+        'models',
+        'outputs',
+        'logs'
     ]
     
     for dir_path in required_dirs:
-        if not os.path.exists(dir_path):
-            try:
-                os.makedirs(dir_path, exist_ok=True)
-                print(f"   📂 생성: {dir_path}")
-            except Exception as e:
-                print(f"   ❌ 디렉토리 생성 실패: {dir_path} - {e}")
-                return False
+        if os.path.exists(dir_path):
+            print(f"   ✅ {dir_path}/")
         else:
-            print(f"   ✅ 존재: {dir_path}")
-    
-    return True
-
-def check_required_packages():
-    """필수 패키지 확인"""
-    print("📦 필수 패키지 확인...")
-    
-    required_packages = [
-        'flask', 'pandas', 'numpy', 'matplotlib', 
-        'seaborn', 'scikit-learn', 'requests', 'python-dotenv'
-    ]
-    
-    missing_packages = []
-    
-    for package in required_packages:
-        try:
-            # 패키지 import 시도
-            if package == 'python-dotenv':
-                package_name = 'dotenv'
-            elif package == 'scikit-learn':
-                package_name = 'sklearn'
-            else:
-                package_name = package
-            
-            spec = importlib.util.find_spec(package_name)
-            if spec is None:
-                missing_packages.append(package)
-                print(f"   ❌ 누락: {package}")
-            else:
-                print(f"   ✅ 설치됨: {package}")
-        except Exception as e:
-            missing_packages.append(package)
-            print(f"   ❌ 오류: {package} - {e}")
-    
-    if missing_packages:
-        print(f"\n📋 누락된 패키지: {', '.join(missing_packages)}")
-        print("💡 설치 명령어: pip install " + " ".join(missing_packages))
-        return False
-    
-    return True
+            print(f"   ⚠️ {dir_path}/ - 자동 생성됨")
+            os.makedirs(dir_path, exist_ok=True)
 
 def check_env_file():
-    """환경 변수 파일 확인"""
-    print("🔧 환경 설정 파일 확인...")
+    """환경 설정 파일 확인"""
+    print("\n🔑 환경 설정 확인...")
     
     if os.path.exists('.env'):
         print("   ✅ .env 파일 존재")
         
         # .env 파일 내용 확인
         try:
-            with open('.env', 'r') as f:
+            with open('.env', 'r', encoding='utf-8') as f:
                 content = f.read()
                 if 'OPENWEATHER_API_KEY' in content:
                     print("   ✅ API 키 설정 확인됨")
                 else:
-                    print("   ⚠️ API 키가 설정되지 않음 (시뮬레이션 모드로 동작)")
+                    print("   ⚠️ OPENWEATHER_API_KEY가 설정되지 않음")
         except Exception as e:
-            print(f"   ❌ .env 파일 읽기 오류: {e}")
-            return False
+            print(f"   ⚠️ .env 파일 읽기 오류: {e}")
     else:
-        print("   ⚠️ .env 파일이 없습니다")
-        print("   💡 .env.example을 복사하여 .env 파일을 만드세요")
-        return False
-    
-    return True
+        print("   ❌ .env 파일 없음")
+        print("   💡 .env 파일을 생성하고 API 키를 설정하세요:")
+        print("      OPENWEATHER_API_KEY=your_api_key_here")
 
-def check_port_availability():
-    """포트 사용 가능 여부 확인"""
-    print("🌐 포트 사용 가능 여부 확인...")
+def test_module_imports():
+    """모듈 import 테스트"""
+    print("\n🧪 모듈 import 테스트...")
     
-    try:
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
-        result = sock.connect_ex(('localhost', 5000))
-        sock.close()
-        
-        if result == 0:
-            print("   ⚠️ 포트 5000이 이미 사용 중입니다")
-            print("   💡 다른 Flask 앱이 실행 중이거나 다른 서비스가 포트를 사용 중입니다")
-            return False
-        else:
-            print("   ✅ 포트 5000 사용 가능")
-            return True
-    except Exception as e:
-        print(f"   ❌ 포트 확인 오류: {e}")
-        return False
-
-def check_system_resources():
-    """시스템 리소스 확인"""
-    print("💻 시스템 리소스 확인...")
+    test_modules = [
+        ('modules.multi_weather_api', 'MultiWeatherAPI'),
+        ('modules.web_app', 'AdvancedFloodWebApp'),
+        ('modules.data_loader', 'DataLoader'),
+        ('modules.trainer', 'AdvancedModelTrainer')
+    ]
     
-    try:
-        import psutil
-        
-        # 메모리 확인
-        memory = psutil.virtual_memory()
-        memory_gb = memory.total / (1024**3)
-        print(f"   🧠 총 메모리: {memory_gb:.1f} GB")
-        
-        if memory_gb < 4:
-            print("   ⚠️ 메모리가 부족할 수 있습니다 (권장: 4GB 이상)")
-        else:
-            print("   ✅ 메모리 충분")
-        
-        # 디스크 공간 확인
-        disk = psutil.disk_usage('.')
-        disk_gb = disk.free / (1024**3)
-        print(f"   💾 여유 디스크 공간: {disk_gb:.1f} GB")
-        
-        if disk_gb < 2:
-            print("   ⚠️ 디스크 공간이 부족할 수 있습니다 (권장: 2GB 이상)")
-        else:
-            print("   ✅ 디스크 공간 충분")
-        
-        return True
-        
-    except ImportError:
-        print("   ⚠️ psutil 패키지가 없어 시스템 리소스를 확인할 수 없습니다")
-        print("   💡 설치: pip install psutil")
-        return True  # 필수는 아니므로 True 반환
-
-def check_font_availability():
-    """한글 폰트 사용 가능 여부 확인"""
-    print("🔤 한글 폰트 확인...")
-    
-    try:
-        import matplotlib.pyplot as plt
-        import matplotlib.font_manager as fm
-        
-        # 시스템 폰트 목록 가져오기
-        font_list = [f.name for f in fm.fontManager.ttflist]
-        
-        korean_fonts = ['Malgun Gothic', 'NanumGothic', 'AppleGothic', 'DejaVu Sans']
-        available_korean_fonts = [font for font in korean_fonts if font in font_list]
-        
-        if available_korean_fonts:
-            print(f"   ✅ 사용 가능한 한글 폰트: {', '.join(available_korean_fonts)}")
-            return True
-        else:
-            print("   ⚠️ 한글 폰트가 없습니다. 그래프에서 한글이 깨질 수 있습니다")
-            if platform.system() == 'Windows':
-                print("   💡 Windows: 제어판 → 글꼴에서 '맑은 고딕' 설치 확인")
-            elif platform.system() == 'Darwin':
-                print("   💡 macOS: 기본 한글 폰트 사용")
+    for module_path, class_name in test_modules:
+        try:
+            module = importlib.import_module(module_path)
+            if hasattr(module, class_name):
+                print(f"   ✅ {module_path}.{class_name}")
             else:
-                print("   💡 Linux: sudo apt-get install fonts-nanum")
-            return False
-            
-    except ImportError:
-        print("   ⚠️ matplotlib가 없어 폰트를 확인할 수 없습니다")
-        return True
+                print(f"   ❌ {module_path}.{class_name} - 클래스 없음")
+        except ImportError as e:
+            print(f"   ❌ {module_path} - Import 오류: {e}")
+        except Exception as e:
+            print(f"   ⚠️ {module_path} - 기타 오류: {e}")
 
-def run_basic_imports():
-    """기본 import 테스트"""
-    print("🔄 기본 모듈 import 테스트...")
+def check_data_files():
+    """데이터 파일 확인"""
+    print("\n💾 데이터 파일 확인...")
     
-    try:
-        import flask
-        import pandas as pd
-        import numpy as np
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        import sklearn
-        import requests
-        import dotenv
-        
-        print("   ✅ 모든 필수 모듈 import 성공")
-        return True
-        
-    except Exception as e:
-        print(f"   ❌ 모듈 import 실패: {e}")
-        return False
+    data_files = [
+        ('data/processed/REAL_WEATHER_DATA.csv', '일자료'),
+        ('data/processed/ASOS_HOURLY_DATA.csv', '시간자료')
+    ]
+    
+    for file_path, description in data_files:
+        if os.path.exists(file_path):
+            try:
+                import pandas as pd
+                df = pd.read_csv(file_path)
+                print(f"   ✅ {description}: {len(df)}행")
+            except Exception as e:
+                print(f"   ⚠️ {description}: 파일 손상됨 ({e})")
+        else:
+            print(f"   ❌ {description}: 파일 없음")
+
+def suggest_fixes():
+    """문제 해결 제안"""
+    print("\n🛠️ 문제 해결 가이드:")
+    print("   1. 필수 모듈 설치: pip install -r requirements.txt")
+    print("   2. .env 파일 생성 및 API 키 설정")
+    print("   3. 데이터 수집: python modules/multi_weather_api.py")
+    print("   4. 웹 앱 실행: python run.py")
+    print("\n📞 추가 도움이 필요하면:")
+    print("   - GitHub Issues 확인")
+    print("   - 로그 파일 확인: logs/ 디렉토리")
+    print("   - 상세 오류: python run.py --verbose")
 
 def main():
-    """메인 체크 함수"""
-    print("🚀 CREW_SOOM 시스템 환경 체크 시작\n")
-    print("=" * 50)
+    """메인 진단 함수"""
+    print_banner()
     
     checks = [
         ("Python 버전", check_python_version),
-        ("디렉토리 구조", check_directories),
-        ("필수 패키지", check_required_packages),
+        ("필수 모듈", check_required_modules), 
+        ("프로젝트 구조", check_project_structure),
+        ("데이터 디렉토리", check_data_directories),
         ("환경 설정", check_env_file),
-        ("포트 사용 가능", check_port_availability),
-        ("시스템 리소스", check_system_resources),
-        ("한글 폰트", check_font_availability),
-        ("모듈 import", run_basic_imports)
+        ("모듈 Import", test_module_imports),
+        ("데이터 파일", check_data_files)
     ]
     
-    passed = 0
-    total = len(checks)
+    results = []
     
     for check_name, check_func in checks:
-        print(f"\n{check_name}:")
-        if check_func():
-            passed += 1
-        print("-" * 30)
+        try:
+            result = check_func()
+            results.append((check_name, result))
+        except Exception as e:
+            print(f"   ❌ {check_name} 확인 중 오류: {e}")
+            results.append((check_name, False))
     
-    print(f"\n📊 체크 결과: {passed}/{total} 통과")
+    # 선택적 모듈 확인 (오류 무시)
+    try:
+        check_optional_modules()
+    except:
+        pass
+    
+    # 결과 요약
+    print("\n" + "="*80)
+    print("📋 진단 결과 요약:")
+    
+    passed = sum(1 for _, result in results if result)
+    total = len(results)
+    
+    for check_name, result in results:
+        status = "✅ 통과" if result else "❌ 실패"
+        print(f"   {check_name}: {status}")
+    
+    print(f"\n🎯 전체 상태: {passed}/{total} 통과")
     
     if passed == total:
-        print("🎉 모든 체크 통과! 시스템 실행 준비 완료")
-        print("▶️ 실행 명령어: python run.py")
-        return True
+        print("🎉 모든 확인 완료! 시스템이 정상 상태입니다.")
+        print("💡 이제 python run.py로 시스템을 실행하세요.")
     else:
-        print("⚠️ 일부 체크에서 문제가 발견되었습니다")
-        print("💡 위의 권장사항을 참고하여 문제를 해결하세요")
-        return False
+        print("⚠️ 일부 문제가 발견되었습니다.")
+        suggest_fixes()
+    
+    return passed == total
 
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
+    try:
+        success = main()
+        sys.exit(0 if success else 1)
+    except KeyboardInterrupt:
+        print("\n\n🛑 사용자에 의해 중단되었습니다.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ 진단 중 예상치 못한 오류: {e}")
+        sys.exit(1)

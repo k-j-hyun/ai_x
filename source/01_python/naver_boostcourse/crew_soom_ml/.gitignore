@@ -1,5 +1,6 @@
 .ipynb_checkpoints/
 __pycache__/
 .env
+X_seq.npy
 strategic_flood_data
 strategic_flood_data.db-journal

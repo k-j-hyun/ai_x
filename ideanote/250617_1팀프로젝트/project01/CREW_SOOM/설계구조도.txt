@@ -8,12 +8,10 @@ CREW_SOOM/
 │
 ├── 📁 모듈 (modules/)
 │   ├── web_app.py               # Flask 웹 애플리케이션
-│   ├── multi_weather_api.py     # 4개 기상청 API 통합
-│   ├── data_loader.py           # 데이터 로딩
-│   ├── preprocessor.py          # 데이터 전처리
-│   ├── trainer.py               # 모델 훈련
-│   ├── evaluator.py             # 모델 평가
-│   └── visualizer.py            # 데이터 시각화
+│   ├── preprocessor.py  1        # 데이터로딩# 데이터 전처리# 4개 기상청 API 통합
+│   ├── trainer.py    2           # 모델 훈련 
+│   ├── evaluator.py    3         # 모델 평가 report
+│   └── visualizer.py     4       # 데이터 시각화
 │
 ├── 📁 웹 인터페이스
 │   ├── templates/               # HTML 템플릿
@@ -32,11 +30,6 @@ CREW_SOOM/
 │   ├── logs/                   # 시스템 로그
 │   └── users/                  # 사용자 정보
 │
-├── 📁 Windows 지원
-│   ├── quick_start.bat         # 통합 실행 메뉴
-│   ├── install.bat             # 설치 배치 파일
-│   ├── check.bat               # 체크 배치 파일
-│   └── run.bat                 # 실행 배치 파일
 │
 └── 📄 설정 파일
     ├── .env                    # 환경 변수 (생성 필요)

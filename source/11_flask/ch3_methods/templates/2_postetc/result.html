@@ -22,8 +22,24 @@
   <p id="result"></p>
 </body>
 </html>
-<!-- buton#update click 할 때 : #name, #id, #pw, #addr "/update/name/id/pw/addr을 patch방식 요청"-->
 <script>
+  // buton#delete click 할 때 : #id "/delete/id를 delete방식 요청"
+  document.getElementById("delete").addEventListener("click", ()=>{
+    let id = document.getElementById("id").value;
+    fetch(`/delete/${id}`, {method:'DELETE'})
+    .then(response => {
+      if(response.status!=200){
+        alert("삭제에 실패했습니다.", response.status);
+        return;
+      }
+      return response.text();
+    })
+    .then(data =>{
+      alert(data);
+      location.href = "/join";    // get 요청  
+    });
+  });
+  // buton#update click 할 때 : #name, #id, #pw, #addr "/update/name/id/pw/addr을 patch방식 요청"
   document.getElementById("update").addEventListener("click", ()=>{
     let name = document.getElementById("name").value;
     let id   = document.getElementById("id").value;

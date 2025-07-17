@@ -15,7 +15,8 @@
     # {% endfor %}
 # 3. 헤더나 푸터 include {% include 'header.html' %}
 # 4. 서브 태그 {% block 블럭명 %} 내용 {% endblock %}
-# 5. 주석 {% comment %} 주석 내용 {% endcomment %}
+# 5. Jinja2 주석 {# 주석 #}
+# 6. dJango 주석 {% comment %} 주석 내용 {% endcomment %}
 
 from flask import Flask, render_template, request # 파라미터 값 받기(접근)
 

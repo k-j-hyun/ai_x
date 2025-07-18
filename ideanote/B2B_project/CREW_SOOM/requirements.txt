@@ -1,5 +1,4 @@
 # CREW_SOOM v2.0 패키지 의존성 - 실제 프로젝트용
-python -m pip install --upgrade pip
 
 # 기본 의존성
 numpy>=1.21.0

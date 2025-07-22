@@ -37,3 +37,5 @@ psutil>=5.8.0
 dotenv
 beautifulsoup4>=4.9.0
 openpyxl>=3.0.0
+
+gunicorn

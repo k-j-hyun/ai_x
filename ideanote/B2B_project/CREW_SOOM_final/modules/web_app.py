@@ -239,8 +239,13 @@ app = Flask(
     template_folder=os.path.join(project_root, 'templates'),
     static_folder=os.path.join(project_root, 'static')
 )
-app.secret_key = os.environ.get('SECRET_KEY', 'crew_soom_secret_key_2024')
+app.secret_key = os.environ.get('SECRET_KEY', 'crew_soom_secret_key_2025')
 app.config['SESSION_TYPE'] = 'filesystem'
+
+# Render HTTPS 환경에서도 세션 정상 작동시키는 설정
+app.config['SESSION_COOKIE_SECURE'] = True  # https 사용 시 True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # 쿠키 공유 가능
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # JS 접근 방지
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)

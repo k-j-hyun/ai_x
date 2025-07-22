@@ -199,6 +199,7 @@ async function apiRequest(url, options = {}) {
     try {
         const response = await fetch(url, {
             timeout: 30000, // 30초 타임아웃
+            credentials: 'include',
             ...options
         });
         

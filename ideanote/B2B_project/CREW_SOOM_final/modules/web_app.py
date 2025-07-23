@@ -239,13 +239,8 @@ app = Flask(
     template_folder=os.path.join(project_root, 'templates'),
     static_folder=os.path.join(project_root, 'static')
 )
-app.secret_key = os.environ.get('SECRET_KEY', 'crew_soom_secret_key_2025')
+app.secret_key = os.environ.get('SECRET_KEY', 'crew_soom_secret_key_2024')
 app.config['SESSION_TYPE'] = 'filesystem'
-
-# Render HTTPS 환경에서도 세션 정상 작동시키는 설정
-app.config['SESSION_COOKIE_SECURE'] = True  # https 사용 시 True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # 쿠키 공유 가능
-app.config['SESSION_COOKIE_HTTPONLY'] = True  # JS 접근 방지
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -834,8 +829,8 @@ def register_page():
 @app.route('/user_model')
 def user_model_page():
     """사용자 모델 선택 예측 페이지"""
-    if 'user_id' not in session:
-        return redirect(url_for('login_page'))
+    # if 'user_id' not in session:
+    #     return redirect(url_for('login_page'))
     
     return render_template('user_model.html')
 
@@ -898,8 +893,8 @@ def api_register():
 @app.route('/api/predict_advanced', methods=['POST'])
 def api_predict_advanced():
     """실제 AI 모델을 사용한 고급 예측 API"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
     
     try:
         data = request.get_json()
@@ -1005,8 +1000,8 @@ def api_predict_advanced():
 @app.route('/api/predict_randomforest_only', methods=['POST'])
 def api_predict_randomforest_only():
     """실시간 지도용 - RandomForest 모델만 사용한 예측 API (지역별 차별화)"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
     
     try:
         data = request.get_json()
@@ -1429,8 +1424,8 @@ def get_weather_news():
 @app.route('/api/load_data', methods=['POST'])
 def api_load_data():
     """데이터 로드 API"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
     
     try:
         log_event('DATA_LOAD', '데이터 로드 시작')
@@ -1476,8 +1471,8 @@ def api_load_data():
 @app.route('/api/train_advanced_models', methods=['POST'])
 def api_train_advanced_models():
     """실제 4가지 모델 훈련 API"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
     
     try:
         log_event('MODEL_TRAIN', '4가지 AI 모델 훈련 시작')
@@ -1593,8 +1588,8 @@ def get_today_weather():
 @app.route('/api/get_logs')
 def api_get_logs():
     """시스템 로그 조회 API"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    # if 'user_id' not in session:
+    #     return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
     
     return jsonify(system_logs[-100:])
 
@@ -1637,6 +1632,6 @@ if __name__ == '__main__':
     app.run(
         host='0.0.0.0',
         port=5000,
-        debug=False,
+        debug=True,
         threaded=True
     )

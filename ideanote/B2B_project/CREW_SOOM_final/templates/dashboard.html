@@ -1753,10 +1753,10 @@
                 <li><a href="/user_model" class="nav-link">침수 예측</a></li>
             </ul>
             
-            <div class="nav-actions">
+            <!-- <div class="nav-actions">
                 <a href="/login" class="btn btn-outline">로그인</a>
                 <button class="btn btn-primary" onclick="showRegister()">회원가입</button>
-            </div>
+            </div> -->
         </nav>
     </header>
     <!-- Header 끝 -->
@@ -1903,7 +1903,10 @@
         <!-- 로그인 전 보이는 서비스 미리보기 -->
             <div id="locked-services" class="services-grid">
 
-                <div class="service-card locked">
+                <!-- <div class="service-card locked"> -->
+
+                <di class="service-card">
+                    
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
@@ -1911,11 +1914,11 @@
                     <p>4가지 고급 머신러닝 모델(RandomForest, XGBoost, LSTM+CNN, Transformer)을 활용한 정밀 예측</p>
                     <button class="btn btn-primary" onclick="requireLogin('AI 예측')">지금 시작하기</button>
                     
-                    <div class="blur-overlay">
+                    <!-- <div class="blur-overlay">
                         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 16px;"></i>
                         <h4 style="margin-bottom: 12px;">로그인 후 이용 가능</h4>
                         <button class="btn btn-primary" onclick="goToLogin()">로그인</button>
-                    </div>
+                    </div> -->
                 </div>
                 
                 <div class="service-card locked">
@@ -1926,11 +1929,11 @@
                     <p>평온한 날씨부터 극한 폭우까지 다양한 기상 조건을 시뮬레이션하여 위험도를 미리 확인</p>
                     <button class="btn btn-primary" onclick="requireLogin('시나리오 테스트')">테스트 시작</button>
                     
-                    <div class="blur-overlay">
+                    <!-- <div class="blur-overlay">
                         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 16px;"></i>
                         <h4 style="margin-bottom: 12px;">로그인 후 이용 가능</h4>
                         <button class="btn btn-primary" onclick="goToLogin()">로그인</button>
-                    </div>
+                    </div> -->
                 </div>
                 
                 <div class="service-card locked">
@@ -1941,11 +1944,11 @@
                     <p>복잡한 기상 데이터를 직관적인 차트와 그래프로 변환하여 이해하기 쉽게 제공</p>
                     <button class="btn btn-primary" onclick="requireLogin('데이터 분석')">분석 시작</button>
                     
-                    <div class="blur-overlay">
+                    <!-- <div class="blur-overlay">
                         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 16px;"></i>
                         <h4 style="margin-bottom: 12px;">로그인 후 이용 가능</h4>
                         <button class="btn btn-primary" onclick="goToLogin()">로그인</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -2362,7 +2365,7 @@
             checkStatus();
             
             // 로그인 상태 확인
-            checkLoginAndUpdateUI();
+            // checkLoginAndUpdateUI();
         });
 
         // Elancer 스타일 함수들

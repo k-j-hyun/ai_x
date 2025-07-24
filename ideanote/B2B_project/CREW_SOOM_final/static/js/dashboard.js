@@ -199,7 +199,6 @@ async function apiRequest(url, options = {}) {
     try {
         const response = await fetch(url, {
             timeout: 30000, // 30초 타임아웃
-            credentials: 'include',
             ...options
         });
         
@@ -1520,3 +1519,28 @@ async function loadTodayWeather() {
         console.error('날씨 로딩 오류:', error);
     }
 }
+
+// 페이지 로드 시 실행 - 모든 로그인 관련 제한 해제
+document.addEventListener('DOMContentLoaded', function() {
+    // blur-overlay 제거
+    const blurOverlays = document.querySelectorAll('.blur-overlay, #map-blur');
+    blurOverlays.forEach(overlay => {
+        if (overlay) overlay.style.display = 'none';
+    });
+    
+    // 로그인 상태를 true로 강제 설정
+    if (typeof isLoggedIn !== 'undefined') {
+        window.isLoggedIn = true;
+    }
+    
+    // 로그인이 필요한 함수들을 무력화
+    if (typeof requireLogin === 'function') {
+        window.requireLogin = function() { return true; };
+    }
+    
+    // 지도 초기화 (map.html인 경우)
+    if (typeof initMap === 'function') {
+        initMap();
+        updateStatistics();
+    }
+});

@@ -684,32 +684,47 @@
         }
         
         // 로그인 상태 확인
+        // async function checkLogin() {
+        //     try {
+        //         const response = await fetch('/api/session');
+        //         const data = await response.json();
+                
+        //         isLoggedIn = data.logged_in;
+                
+        //         if (isLoggedIn) {
+        //             document.getElementById('map-blur').style.display = 'none';
+        //             updateNavigation(true);
+        //             initMap();
+        //             updateStatistics();
+        //         } else {
+        //             document.getElementById('map-blur').style.display = 'flex';
+        //             updateNavigation(false);
+        //             initBasicMap();
+        //         }
+                
+        //         return isLoggedIn;
+        //     } catch (error) {
+        //         console.error('로그인 상태 확인 오류:', error);
+        //         document.getElementById('map-blur').style.display = 'flex';
+        //         initBasicMap();
+        //         return false;
+        //     }
+        // }
+
         async function checkLogin() {
             try {
-                const response = await fetch('/api/session');
-                const data = await response.json();
-                
-                isLoggedIn = data.logged_in;
-                
-                if (isLoggedIn) {
-                    document.getElementById('map-blur').style.display = 'none';
-                    updateNavigation(true);
-                    initMap();
-                    updateStatistics();
-                } else {
-                    document.getElementById('map-blur').style.display = 'flex';
-                    updateNavigation(false);
-                    initBasicMap();
-                }
-                
-                return isLoggedIn;
+                // 로그인 체크 없이 바로 지도 표시
+                document.getElementById('map-blur').style.display = 'none';
+                updateNavigation(true); // 로그인된 것처럼 처리
+                initMap();
+                updateStatistics();
+                return true; // 항상 로그인된 것으로 처리
             } catch (error) {
                 console.error('로그인 상태 확인 오류:', error);
-                document.getElementById('map-blur').style.display = 'flex';
-                initBasicMap();
-                return false;
+                return true; // 에러가 나도 로그인된 것으로 처리
             }
         }
+
 
         // 기본 지도 초기화 (로그인 없음)
         function initBasicMap() {
@@ -1061,6 +1076,35 @@
             }
         `;
         document.head.appendChild(style);
+
+
+        // 페이지 로드 시 실행 - 모든 로그인 관련 제한 해제
+        document.addEventListener('DOMContentLoaded', function() {
+            // blur-overlay 제거
+            const blurOverlays = document.querySelectorAll('.blur-overlay, #map-blur');
+            blurOverlays.forEach(overlay => {
+                if (overlay) overlay.style.display = 'none';
+            });
+            
+            // 로그인 상태를 true로 강제 설정
+            if (typeof isLoggedIn !== 'undefined') {
+                window.isLoggedIn = true;
+            }
+            
+            // 로그인이 필요한 함수들을 무력화
+            if (typeof requireLogin === 'function') {
+                window.requireLogin = function() { return true; };
+            }
+            
+            // 지도 초기화 (map.html인 경우)
+            if (typeof initMap === 'function') {
+                initMap();
+                updateStatistics();
+            }
+});
+
+
+
     </script>
 </body>
 </html>

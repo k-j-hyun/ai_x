@@ -462,3 +462,30 @@ document.addEventListener('DOMContentLoaded', function() {
 console.log('모델 성능 비교 시스템 로드 완료!');
 console.log('사용 가능한 모델: Random Forest, XGBoost, LSTM+CNN, Transformer');
 console.log('기능: 슬라이드 뷰, 상세 텍스트, 키보드 조작 (←/→/ESC)');
+
+
+
+// 페이지 로드 시 실행 - 모든 로그인 관련 제한 해제
+document.addEventListener('DOMContentLoaded', function() {
+    // blur-overlay 제거
+    const blurOverlays = document.querySelectorAll('.blur-overlay, #map-blur');
+    blurOverlays.forEach(overlay => {
+        if (overlay) overlay.style.display = 'none';
+    });
+    
+    // 로그인 상태를 true로 강제 설정
+    if (typeof isLoggedIn !== 'undefined') {
+        window.isLoggedIn = true;
+    }
+    
+    // 로그인이 필요한 함수들을 무력화
+    if (typeof requireLogin === 'function') {
+        window.requireLogin = function() { return true; };
+    }
+    
+    // 지도 초기화 (map.html인 경우)
+    if (typeof initMap === 'function') {
+        initMap();
+        updateStatistics();
+    }
+});

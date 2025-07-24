@@ -1903,10 +1903,7 @@
         <!-- 로그인 전 보이는 서비스 미리보기 -->
             <div id="locked-services" class="services-grid">
 
-                <!-- <div class="service-card locked"> -->
-
-                <di class="service-card">
-                    
+                <div class="service-card"> <!-- locked"> -->
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
@@ -1921,7 +1918,7 @@
                     </div> -->
                 </div>
                 
-                <div class="service-card locked">
+                <div class="service-card"> <!-- locked"> -->
                     <div class="service-icon">
                         <i class="fas fa-flask"></i>
                     </div>
@@ -1929,14 +1926,14 @@
                     <p>평온한 날씨부터 극한 폭우까지 다양한 기상 조건을 시뮬레이션하여 위험도를 미리 확인</p>
                     <button class="btn btn-primary" onclick="requireLogin('시나리오 테스트')">테스트 시작</button>
                     
-                    <!-- <div class="blur-overlay">
+                    <div class="blur-overlay">
                         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 16px;"></i>
                         <h4 style="margin-bottom: 12px;">로그인 후 이용 가능</h4>
                         <button class="btn btn-primary" onclick="goToLogin()">로그인</button>
-                    </div> -->
+                    </div>
                 </div>
                 
-                <div class="service-card locked">
+                <div class="service-card"> <!-- locked"> -->
                     <div class="service-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
@@ -1944,11 +1941,11 @@
                     <p>복잡한 기상 데이터를 직관적인 차트와 그래프로 변환하여 이해하기 쉽게 제공</p>
                     <button class="btn btn-primary" onclick="requireLogin('데이터 분석')">분석 시작</button>
                     
-                    <!-- <div class="blur-overlay">
+                    <div class="blur-overlay">
                         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 16px;"></i>
                         <h4 style="margin-bottom: 12px;">로그인 후 이용 가능</h4>
                         <button class="btn btn-primary" onclick="goToLogin()">로그인</button>
-                    </div> -->
+                    </div>
                 </div>
             </div>
 
@@ -2365,7 +2362,7 @@
             checkStatus();
             
             // 로그인 상태 확인
-            // checkLoginAndUpdateUI();
+            checkLoginAndUpdateUI();
         });
 
         // Elancer 스타일 함수들
@@ -2625,6 +2622,34 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('SOOM 뉴스 섹션이 로드되었습니다.');
         });
+
+
+        // 페이지 로드 시 실행 - 모든 로그인 관련 제한 해제
+        document.addEventListener('DOMContentLoaded', function() {
+            // blur-overlay 제거
+            const blurOverlays = document.querySelectorAll('.blur-overlay, #map-blur');
+            blurOverlays.forEach(overlay => {
+                if (overlay) overlay.style.display = 'none';
+            });
+            
+            // 로그인 상태를 true로 강제 설정
+            if (typeof isLoggedIn !== 'undefined') {
+                window.isLoggedIn = true;
+            }
+            
+            // 로그인이 필요한 함수들을 무력화
+            if (typeof requireLogin === 'function') {
+                window.requireLogin = function() { return true; };
+            }
+            
+            // 지도 초기화 (map.html인 경우)
+            if (typeof initMap === 'function') {
+                initMap();
+                updateStatistics();
+            }
+        });
+
+
     </script>
 </body>
 </html>

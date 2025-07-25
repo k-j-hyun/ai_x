@@ -158,7 +158,7 @@ function showModelComparison(modelType) {
         updateModelComparisonButtons(modelType);
         
         if (typeof showNotification === 'function') {
-            showNotification(`📊 ${currentModelData.name} 모델의 성능 지표를 표시합니다.`, 'info', 3000);
+            showNotification(` ${currentModelData.name} 모델의 성능 지표를 표시합니다.`, 'info', 3000);
         }
     }
 }
@@ -183,7 +183,7 @@ function showAllModelsComparison() {
                                      style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 16px; cursor: pointer;" 
                                      onclick="openImageModal('${data.image}')">
                                 <div class="viz-info" style="background: linear-gradient(135deg, #2c5ff7, #4a90e2); color: white; padding: 20px; border-radius: 12px; font-size: 14px;">
-                                    <h4 style="margin-bottom: 12px; color: white;">🤖 AI 모델 성능 분석 결과</h4>
+                                    <h4 style="margin-bottom: 12px; color: white;"> AI 모델 성능 분석 결과</h4>
                                     <p><strong>최고 모델:</strong> ${data.best_model || 'N/A'}</p>
                                     <p><strong>평균 정확도:</strong> ${data.avg_accuracy || 'N/A'}</p>
                                     <p><strong>분석 모델:</strong> ${data.models_count || 4}개</p>
@@ -195,7 +195,7 @@ function showAllModelsComparison() {
                     
                     if (typeof showNotification === 'function') {
                         showNotification(
-                            `AI 모델 성능 비교 분석이 완료되었습니다.\n최고 성능: ${data.best_model}\n📈 평균 정확도: ${data.avg_accuracy}`, 
+                            `AI 모델 성능 비교 분석이 완료되었습니다.\n최고 성능: ${data.best_model}\n 평균 정확도: ${data.avg_accuracy}`, 
                             'success', 
                             6000
                         );

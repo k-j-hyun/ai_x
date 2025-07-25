@@ -615,30 +615,30 @@
 
             <!-- 시스템 특징 
             <div class="login-features">
-                <h4>🚀 CREW_SOOM 핵심 기능</h4>
+                <h4> CREW_SOOM 핵심 기능</h4>
                 <div class="feature-list">
                     <div class="feature-item">
-                        <span class="feature-icon">🤖</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">4가지 고급 AI 모델 (RandomForest, XGBoost, LSTM+CNN, Transformer)</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🌐</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">4개 기상청 API 실시간 연동 시스템</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">📊</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">고급 데이터 시각화 및 통계 분석</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">⚡</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">실시간 위험도 예측 및 즉시 알림</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🎯</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">95.2% 검증된 높은 예측 정확도</span>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🏆</span>
+                        <span class="feature-icon"></span>
                         <span class="feature-text">25,420건 누적 예측 성공 사례</span>
                     </div>
                 </div>
@@ -682,7 +682,7 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showSuccessMessage('🎉 로그인 성공! AI 예측 시스템으로 이동합니다...');
+                    showSuccessMessage(' 로그인 성공! AI 예측 시스템으로 이동합니다...');
                     
                     // 성공 애니메이션
                     loginButton.style.background = 'var(--gradient-success)';
@@ -692,10 +692,10 @@
                         window.location.href = '/';
                     }, 1500);
                 } else {
-                    showErrorMessage('❌ ' + (result.message || '로그인에 실패했습니다.'));
+                    showErrorMessage(' ' + (result.message || '로그인에 실패했습니다.'));
                 }
             } catch (error) {
-                showErrorMessage('🌐 네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+                showErrorMessage(' 네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 console.error('로그인 오류:', error);
             } finally {
                 // 로딩 상태 종료 (성공이 아닌 경우만)
@@ -734,7 +734,7 @@
             // 입력 필드 포커스 효과
             setupInputEffects();
             
-            console.log('🌊 CREW_SOOM Elancer 스타일 로그인 페이지 로드 완료');
+            console.log(' CREW_SOOM Elancer 스타일 로그인 페이지 로드 완료');
         });
         
         // 메시지 표시 함수

@@ -9,30 +9,26 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 
-admin_id : admin / admin1234
-
 1. SECRET_KEY 처리(.env)
 2. 앱등록
-3. templates 폴더와 static 폴더 추가 등록(base.html, footer.html, ~)
+3. myproject밑에 templates 폴더와 static 폴더 추가 등록(base.html, footer.html, ~)
 4. 한국어 등록
 5. timezone 등록
-
-
 """
+
 
 from pathlib import Path
 import os
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# print('★ BASE_DIR :', BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 from decouple import config
-SECRET_KEY = config("SECRET_KEY", "secretkey")
+SECRET_KEY = config('SECRET_KEY', 'secretkey')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,8 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions", # 추가 앱 등록(django 5.2부터는 shell에도 model 자동 import)
     "blog",
-    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -69,7 +65,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            os.path.join(BASE_DIR, "myproject", "templates"),
+            os.path.join(BASE_DIR, 'myproject', 'templates'),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -132,9 +128,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "myproject", "static"),
+    os.path.join(BASE_DIR, 'myproject', 'static'),
 ]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

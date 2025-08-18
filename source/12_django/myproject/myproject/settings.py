@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     "django_extensions", # 추가 앱 등록(django 5.2부터는 shell에도 model 자동 import)
     "blog",
     "accounts",
+    "book",
+    "django.contrib.humanize", # intcomma(세자리마다 쉼표 추가) 필터 사용
+    "article", # GenericView이용(paging처리), 파일첨부(ch08)
 ]
 
 MIDDLEWARE = [

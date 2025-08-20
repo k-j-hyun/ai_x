@@ -12,9 +12,8 @@ def lnglat_validator(value):
   if not re.match(r'(\d+\.?\d*),(\d+\.?\d*)', value):
     raise ValidationError('Invalid LngLat. ex:38, 128')
 
-class Tag(models.Model): # 테이블명 : blog_tag
-  name = models.CharField(max_length=100,
-                          unique=True)
+class Tag(models.Model):
+  name = models.CharField(max_length=100, unique=True)
   def __str__(self):
     return self.name
 
@@ -38,7 +37,7 @@ class Post(models.Model): # 테이블명 : blog_post
                             validators=[lnglat_validator] )
   url = models.URLField(blank=True, null=True)
   tags = models.ManyToManyField(Tag)
-
+  
   def __str__(self):
     return "제목:{}-{}작성 {}최종 수정".format(self.title,
                                       self.create_at,

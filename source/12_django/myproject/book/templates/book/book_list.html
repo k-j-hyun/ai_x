@@ -17,6 +17,5 @@
   {% empty %}
     <p>도서 목록이 없습니다</p>
   {% endfor %}
-  {% comment %} <a href="/book/new">[BOOK 추가]</a> {% endcomment %}
   <a href="{% url 'book:new' %}">[BOOK 추가]</a>
 {% endblock  %}

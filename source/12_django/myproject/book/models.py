@@ -4,44 +4,35 @@ from django.core.validators import MinLengthValidator
 from django.core.validators import MinValueValidator
 from django.core.validators import MaxValueValidator
 from django.urls import reverse
-
-def min_length_validator(value):
-    if len(value) < 3:
-        raise forms.ValidationError("3글자 이상 입력하세요")
-
 # Create your models here.
-class Book(models.Model):
-    title = models.CharField("책제목",
-                            max_length=50,
-                            )
-    author = models.CharField(verbose_name="글쓴이",
-                            max_length=50,
-                            validators=[min_length_validator]
-                            # validators=[MinLengthValidator(3),]
+def min_length_3_validator(value):
+    if len(value)<3:
+        raise forms.ValidationError('3글자 이상 입력하세요')
+
+class Book(models.Model): # book_book 테이블
+    title = models.CharField(verbose_name="책이름", max_length=50)
+    author = models.CharField(verbose_name="글쓴이", 
+                            max_length=50, 
+                            validators=[min_length_3_validator]
+                            # validators=[ MinLengthValidator(3)]
                             )
     publisher = models.CharField(verbose_name="출판사",
                                 max_length=50,
-                                null=True,
-                                blank=True,
-                                )
-    sales = models.IntegerField("판매가",
+                                null=True, blank=True)
+    sales = models.IntegerField(verbose_name="판매가",
                                 default=1000,
                                 validators=[MinValueValidator(0),
-                                            MaxValueValidator(100000)]
-                                            )
+                                            MaxValueValidator(100000)])
     ip = models.GenericIPAddressField(blank=True, null=True)
-
     publication_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "{}:{}저 {}원 from{}".format(self.title,
-                                            self.author,
-                                            self.sales,
-                                            self.ip)
+        return f"{self.title}:{self.author}저 {self.sales}원 from{self.ip}"
     
     def get_absolute_url(self):
         return reverse("book:list")
     
     class Meta:
-        ordering = ["-publication_date"]
-        unique_together = (('title', 'author'),) # title과 author가 같으면 저장 불가
+        ordering = ['-publication_date']
+        unique_together = (('title','author'),) #title과 author가 같으면 저장 불가
+    

@@ -18,10 +18,11 @@ article_list = ListView.as_view(model=Article,
 								#tamplate_name = 'article/article_list.html',
 								paginate_by=3) # 1페이지에 3데이터
 
-article_new = CreateView.as_view(model = Article,
-								fields = '__all__')
-article_detail = DetailView.as_view(model = Article)
-article_edit = UpdateView.as_view(model = Article, 
-								fields = '__all__')
-article_delete = DeleteView.as_view(model = Article,
-								success_url = reverse_lazy('article:list'))
+article_new = CreateView.as_view(model = Article, fields = '__all__')
+
+article_detail = DetailView.as_view(model=Article)
+
+article_edit = UpdateView.as_view(model=Article, fields = '__all__')
+
+article_delete = DeleteView.as_view(model=Article,
+									success_url = reverse_lazy("article:list"))

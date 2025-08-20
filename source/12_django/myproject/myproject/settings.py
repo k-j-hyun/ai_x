@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "blog",
     "accounts",
     "book",
-    "django.contrib.humanize", # intcomma(세자리마다 쉼표 추가) 필터 사용
+    "django.contrib.humanize", # intcomma(세자리마다 ,) 필터 사용 
     "article", # GenericView이용(paging처리), 파일첨부(ch08)
 ]
 
@@ -129,12 +129,21 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# 개발 환경
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'myproject', 'static'),
 ]
+# 운영 환경 python manage.py collectstatic 실행(pt. 10)
+STATIC_ROOT = os.path.join(BASE_DIR, '_staticfiles')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# https://github.com/django/django/blob/main/django/conf/global_settings.py
+# media파일의 url prefix /media/article/noImg.png
+MEDIA_URL = "/media/"
+# 업로드한 파일이 저장될 폴더 -> 이미지 파일 지원 라이브러리 pip install pillow->pip freeze > requirements.txt
+MEDIA_ROOT = os.path.join(BASE_DIR, "_media")

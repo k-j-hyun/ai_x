@@ -33,7 +33,9 @@ SECRET_KEY = config('SECRET_KEY', 'secretkey')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+# .env에 ALLOWED_HOSTS=3.15.21.1, domain.com
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 
 # Application definition
